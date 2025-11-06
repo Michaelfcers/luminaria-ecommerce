@@ -1,9 +1,9 @@
-import { Navigation } from "@/components/navigation"
-import { ProductGallery } from "@/components/product-gallery"
-import { ProductInfo } from "@/components/product-info"
-import { ProductSpecs } from "@/components/product-specs"
-import { RecommendedProducts } from "@/components/recommended-products"
-import { Footer } from "@/components/footer"
+import { Navigation } from "@/components/layout/navigation"
+import { ProductGallery } from "@/features/store/components/product-gallery"
+import { ProductInfo } from "@/features/store/components/product-info"
+import { ProductSpecs } from "@/features/store/components/product-specs"
+import { RecommendedProducts } from "@/features/store/components/recommended-products"
+import { Footer } from "@/components/layout/footer"
 
 // This would typically come from a database or API
 const getProduct = (id: string) => {
@@ -41,9 +41,9 @@ const getProduct = (id: string) => {
     },
     images: [
       "/modern-pendant-lamp-minimalist.jpg",
-      "/placeholder.svg?height=600&width=600",
-      "/placeholder.svg?height=600&width=600",
-      "/placeholder.svg?height=600&width=600",
+      "/brands/philips-logo.webp",
+      "/brands/philips-logo.webp",
+      "/brands/philips-logo.webp",
     ],
     technicalSheet: "/docs/lampara-colgante-moderna-ficha-tecnica.pdf",
   }

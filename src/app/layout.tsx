@@ -4,7 +4,7 @@ import { Space_Grotesk } from "next/font/google"
 import { DM_Sans } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
-import "./globals.css"
+import "@/styles/globals.css"
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],

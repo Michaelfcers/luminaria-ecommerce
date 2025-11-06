@@ -5,25 +5,25 @@ export function AboutTeam() {
     {
       name: "María González",
       role: "Directora General",
-      image: "/placeholder.svg?height=300&width=300",
+      image: "/brands/philips-logo.webp",
       description: "25 años de experiencia en el sector de la iluminación y diseño de interiores.",
     },
     {
       name: "Carlos Ruiz",
       role: "Director Técnico",
-      image: "/placeholder.svg?height=300&width=300",
+      image: "/brands/philips-logo.webp",
       description: "Especialista en tecnología LED y sistemas de iluminación inteligente.",
     },
     {
       name: "Ana Martín",
       role: "Responsable de Diseño",
-      image: "/placeholder.svg?height=300&width=300",
+      image: "/brands/philips-logo.webp",
       description: "Diseñadora industrial con enfoque en iluminación arquitectónica y decorativa.",
     },
     {
       name: "David López",
       role: "Atención al Cliente",
-      image: "/placeholder.svg?height=300&width=300",
+      image: "/brands/philips-logo.webp",
       description: "Experto en asesoramiento personalizado y soluciones de iluminación a medida.",
     },
   ]
@@ -44,7 +44,7 @@ export function AboutTeam() {
               <CardContent className="p-6">
                 <div className="mb-4">
                   <img
-                    src={member.image || "/placeholder.svg"}
+                    src={member.image}
                     alt={member.name}
                     className="w-24 h-24 rounded-full mx-auto object-cover mb-4"
                   />

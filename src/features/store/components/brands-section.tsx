@@ -7,11 +7,11 @@ export function BrandsSection() {
 
   const brands = [
     { name: "Philips", logo: "/brands/philips-logo.webp" },
-    { name: "Osram", logo: "/brands/osram-logo.webp" },
-    { name: "Artemide", logo: "/brands/artemide-logo.webp" },
-    { name: "Flos", logo: "/brands/flos-logo.webp" },
-    { name: "Louis Poulsen", logo: "/brands/louis-poulsen-logo.webp" },
-    { name: "Foscarini", logo: "/brands/foscarini-logo.webp" },
+    { name: "Osram", logo: "/brands/philips-logo.webp" },
+    { name: "Artemide", logo: "/brands/philips-logo.webp" },
+    { name: "Flos", logo: "/brands/philips-logo.webp" },
+    { name: "Louis Poulsen", logo: "/brands/philips-logo.webp" },
+    { name: "Foscarini", logo: "/brands/philips-logo.webp" },
   ]
 
   useEffect(() => {

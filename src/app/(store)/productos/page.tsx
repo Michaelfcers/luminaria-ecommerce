@@ -1,7 +1,7 @@
-import { Navigation } from "@/components/navigation"
-import { ProductsGrid } from "@/components/products-grid"
-import { ProductFilters } from "@/components/product-filters"
-import { Footer } from "@/components/footer"
+import { Navigation } from "@/components/layout/navigation"
+import { ProductsGrid } from "@/features/store/components/products-grid"
+import { ProductFilters } from "@/features/store/components/product-filters"
+import { Footer } from "@/components/layout/footer"
 
 export default function ProductsPage() {
   return (

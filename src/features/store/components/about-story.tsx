@@ -25,7 +25,7 @@ export function AboutStory() {
 
           <div className="relative">
             <img
-              src="/placeholder.svg?height=500&width=600"
+              src="/brands/philips-logo.webp"
               alt="Historia de Luminaria"
               className="rounded-lg elegant-shadow w-full"
             />
