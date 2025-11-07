@@ -1,6 +1,6 @@
 "use client"
 import Link from "next/link"
-import { Search, ShoppingBag, User } from "lucide-react"
+import { LayoutDashboard, Package, Search, ShoppingBag, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   NavigationMenu,
@@ -98,6 +98,16 @@ export function Navigation() {
             <Button variant="ghost" size="icon">
               <Search className="h-4 w-4" />
             </Button>
+            <Link href="/dashboard">
+              <Button variant="ghost" size="icon">
+                <LayoutDashboard className="h-4 w-4" />
+              </Button>
+            </Link>
+            <Link href="/products">
+              <Button variant="ghost" size="icon">
+                <Package className="h-4 w-4" />
+              </Button>
+            </Link>
             <Link href="/login">
               <Button variant="ghost" size="icon">
                 <User className="h-4 w-4" />
@@ -108,11 +118,7 @@ export function Navigation() {
                 <ShoppingBag className="h-4 w-4" />
               </Button>
             </Link>
-            <Link href="/dashboard">
-               <Button variant="ghost" size="icon">
-                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-               </Button>
-            </Link>
+
           </div>
         </div>
       </div>
