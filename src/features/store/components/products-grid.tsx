@@ -7,147 +7,26 @@ import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Grid, List } from "lucide-react"
 
-export function ProductsGrid() {
+// Define a type for the product prop for better type safety
+type Product = {
+  id: number | string;
+  name: string;
+  price: number;
+  originalPrice?: number;
+  image: string;
+  category?: string;
+  brand?: string;
+  isNew?: boolean;
+  rating?: number;
+  reviews?: number;
+};
+
+export function ProductsGrid({ products = [] }: { products: Product[] }) {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [sortBy, setSortBy] = useState("featured")
 
-  const products = [
-    {
-      id: 1,
-      name: "Lámpara Colgante Moderna Minimalista",
-      price: 299,
-      originalPrice: 399,
-      image: "/modern-pendant-lamp-minimalist.jpg",
-      category: "Lámparas",
-      brand: "Artemide",
-      isNew: true,
-      rating: 4.8,
-      reviews: 24,
-    },
-    {
-      id: 2,
-      name: "Plafón LED Circular Premium",
-      price: 189,
-      image: "/circular-led-ceiling-light.jpg",
-      category: "Luminarias",
-      brand: "Philips",
-      isNew: false,
-      rating: 4.6,
-      reviews: 18,
-    },
-    {
-      id: 3,
-      name: "Aplique de Pared Elegante",
-      price: 149,
-      image: "/elegant-wall-sconce-light.jpg",
-      category: "Lámparas",
-      brand: "Flos",
-      isNew: false,
-      rating: 4.7,
-      reviews: 32,
-    },
-    {
-      id: 4,
-      name: "Lámpara de Mesa Premium Luxury",
-      price: 229,
-      image: "/premium-table-lamp-luxury.jpg",
-      category: "Lámparas",
-      brand: "Louis Poulsen",
-      isNew: true,
-      rating: 4.9,
-      reviews: 15,
-    },
-    {
-      id: 5,
-      name: "Spot Empotrado LED Regulable",
-      price: 79,
-      image: "/recessed-led-spotlight.png",
-      category: "Luminarias",
-      brand: "Osram",
-      isNew: false,
-      rating: 4.5,
-      reviews: 41,
-    },
-    {
-      id: 6,
-      name: "Interruptor Táctil Moderno",
-      price: 45,
-      image: "/touch-light-switch-modern.jpg",
-      category: "Accesorios",
-      brand: "Philips",
-      isNew: false,
-      rating: 4.4,
-      reviews: 28,
-    },
-    {
-      id: 7,
-      name: "Lámpara de Pie Minimalista Blanca",
-      price: 349,
-      image: "/minimalist-floor-lamp-white.jpg",
-      category: "Lámparas",
-      brand: "Foscarini",
-      isNew: true,
-      rating: 4.8,
-      reviews: 12,
-    },
-    {
-      id: 8,
-      name: "Tira LED Regulable Smart",
-      price: 89,
-      image: "/placeholder.svg?height=300&width=300",
-      category: "Luminarias",
-      brand: "Philips",
-      isNew: false,
-      rating: 4.3,
-      reviews: 67,
-    },
-    // Add more products...
-    {
-      id: 9,
-      name: "Chandelier Cristal Elegante",
-      price: 899,
-      image: "/placeholder.svg?height=300&width=300",
-      category: "Lámparas",
-      brand: "Artemide",
-      isNew: false,
-      rating: 4.9,
-      reviews: 8,
-    },
-    {
-      id: 10,
-      name: "Panel LED Cuadrado",
-      price: 125,
-      image: "/placeholder.svg?height=300&width=300",
-      category: "Luminarias",
-      brand: "Osram",
-      isNew: false,
-      rating: 4.6,
-      reviews: 22,
-    },
-    {
-      id: 11,
-      name: "Lámpara Escritorio Articulada",
-      price: 179,
-      image: "/placeholder.svg?height=300&width=300",
-      category: "Lámparas",
-      brand: "Flos",
-      isNew: true,
-      rating: 4.7,
-      reviews: 19,
-    },
-    {
-      id: 12,
-      name: "Regulador de Intensidad WiFi",
-      price: 65,
-      image: "/placeholder.svg?height=300&width=300",
-      category: "Accesorios",
-      brand: "Philips",
-      isNew: false,
-      rating: 4.5,
-      reviews: 35,
-    },
-  ]
-
+  // The hardcoded products array is removed. We now use the 'products' prop.
+  
   return (
     <div className="space-y-6">
       {/* Header with sorting and view options */}
@@ -226,31 +105,37 @@ export function ProductsGrid() {
 
             <CardContent className={`p-4 ${viewMode === "list" ? "flex-1" : ""}`}>
               <div className="mb-2">
-                <Badge variant="secondary" className="text-xs">
-                  {product.category}
-                </Badge>
-                <Badge variant="outline" className="text-xs ml-2">
-                  {product.brand}
-                </Badge>
+                {product.category && (
+                  <Badge variant="secondary" className="text-xs">
+                    {product.category}
+                  </Badge>
+                )}
+                {product.brand && (
+                  <Badge variant="outline" className="text-xs ml-2">
+                    {product.brand}
+                  </Badge>
+                )}
               </div>
 
               <h3 className={`font-semibold mb-2 line-clamp-2 ${viewMode === "list" ? "text-base" : "text-sm"}`}>
                 {product.name}
               </h3>
 
-              <div className="flex items-center gap-2 mb-2">
-                <div className="flex items-center">
-                  <span className="text-yellow-400">★</span>
-                  <span className="text-sm text-muted-foreground ml-1">
-                    {product.rating} ({product.reviews})
-                  </span>
+              {product.rating && (
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="flex items-center">
+                    <span className="text-yellow-400">★</span>
+                    <span className="text-sm text-muted-foreground ml-1">
+                      {product.rating} ({product.reviews})
+                    </span>
+                  </div>
                 </div>
-              </div>
+              )}
 
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-lg font-bold text-primary">€{product.price}</span>
+                <span className="text-lg font-bold text-primary">${product.price}</span>
                 {product.originalPrice && (
-                  <span className="text-sm text-muted-foreground line-through">€{product.originalPrice}</span>
+                  <span className="text-sm text-muted-foreground line-through">${product.originalPrice}</span>
                 )}
               </div>
 

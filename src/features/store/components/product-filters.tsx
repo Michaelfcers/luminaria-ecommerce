@@ -1,54 +1,77 @@
 "use client"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Slider } from "@/components/ui/slider"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
+import { useRouter, useSearchParams } from "next/navigation"
 
-export function ProductFilters() {
+// Define types for the filter items
+type FilterItem = {
+  id: string;
+  name: string;
+  count: number;
+};
+
+export function ProductFilters({ categories, brands }: { categories: FilterItem[]; brands: FilterItem[] }) {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+
   const [priceRange, setPriceRange] = useState([0, 1000])
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [selectedBrands, setSelectedBrands] = useState<string[]>([])
 
-  const categories = [
-    { id: "luminarias", name: "Luminarias", count: 45 },
-    { id: "lamparas-techo", name: "Lámparas de Techo", count: 32 },
-    { id: "lamparas-mesa", name: "Lámparas de Mesa", count: 28 },
-    { id: "lamparas-pie", name: "Lámparas de Pie", count: 18 },
-    { id: "apliques", name: "Apliques de Pared", count: 24 },
-    { id: "accesorios", name: "Accesorios Eléctricos", count: 36 },
-  ]
+  // Initialize state from URL search params on component mount
+  useEffect(() => {
+    const categoriesParam = searchParams.get("categories")
+    if (categoriesParam) {
+      setSelectedCategories(categoriesParam.split(","))
+    }
+    const brandsParam = searchParams.get("brands")
+    if (brandsParam) {
+      setSelectedBrands(brandsParam.split(","))
+    }
+    // Price range initialization could be added here if needed
+  }, [searchParams])
 
-  const brands = [
-    { id: "philips", name: "Philips", count: 42 },
-    { id: "osram", name: "Osram", count: 38 },
-    { id: "artemide", name: "Artemide", count: 15 },
-    { id: "flos", name: "Flos", count: 12 },
-    { id: "louis-poulsen", name: "Louis Poulsen", count: 8 },
-    { id: "foscarini", name: "Foscarini", count: 6 },
-  ]
+  const updateSearchParams = (newCategories: string[], newBrands: string[]) => {
+    const params = new URLSearchParams(searchParams.toString())
+    if (newCategories.length > 0) {
+      params.set("categories", newCategories.join(","))
+    } else {
+      params.delete("categories")
+    }
+    if (newBrands.length > 0) {
+      params.set("brands", newBrands.join(","))
+    } else {
+      params.delete("brands")
+    }
+    // Price range could be added here
+    router.push(`/productos?${params.toString()}`)
+  }
 
   const handleCategoryChange = (categoryId: string, checked: boolean) => {
-    if (checked) {
-      setSelectedCategories([...selectedCategories, categoryId])
-    } else {
-      setSelectedCategories(selectedCategories.filter((id) => id !== categoryId))
-    }
+    const newCategories = checked
+      ? [...selectedCategories, categoryId]
+      : selectedCategories.filter((id) => id !== categoryId)
+    setSelectedCategories(newCategories)
+    updateSearchParams(newCategories, selectedBrands)
   }
 
   const handleBrandChange = (brandId: string, checked: boolean) => {
-    if (checked) {
-      setSelectedBrands([...selectedBrands, brandId])
-    } else {
-      setSelectedBrands(selectedBrands.filter((id) => id !== brandId))
-    }
+    const newBrands = checked
+      ? [...selectedBrands, brandId]
+      : selectedBrands.filter((id) => id !== brandId)
+    setSelectedBrands(newBrands)
+    updateSearchParams(selectedCategories, newBrands)
   }
 
   const clearFilters = () => {
     setSelectedCategories([])
     setSelectedBrands([])
-    setPriceRange([0, 1000])
+    setPriceRange([0, 1000]) // Reset price range state
+    router.push("/productos") // Clear all search params
   }
 
   return (
@@ -65,12 +88,12 @@ export function ProductFilters() {
               {categories.map((category) => (
                 <div key={category.id} className="flex items-center space-x-2">
                   <Checkbox
-                    id={category.id}
+                    id={`category-${category.id}`} // Use a unique ID for checkbox
                     checked={selectedCategories.includes(category.id)}
                     onCheckedChange={(checked) => handleCategoryChange(category.id, checked as boolean)}
                   />
                   <label
-                    htmlFor={category.id}
+                    htmlFor={`category-${category.id}`}
                     className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex-1 cursor-pointer"
                   >
                     {category.name}
@@ -90,12 +113,12 @@ export function ProductFilters() {
               {brands.map((brand) => (
                 <div key={brand.id} className="flex items-center space-x-2">
                   <Checkbox
-                    id={brand.id}
+                    id={`brand-${brand.id}`} // Use a unique ID for checkbox
                     checked={selectedBrands.includes(brand.id)}
                     onCheckedChange={(checked) => handleBrandChange(brand.id, checked as boolean)}
                   />
                   <label
-                    htmlFor={brand.id}
+                    htmlFor={`brand-${brand.id}`}
                     className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex-1 cursor-pointer"
                   >
                     {brand.name}

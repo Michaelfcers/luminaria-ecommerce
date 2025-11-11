@@ -1,16 +1,44 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import Link from "next/link";
+import { Button } from "@/components/ui/button"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { DeleteProductButton } from "@/features/admin/components/delete-product-button"
+import { createClient } from "@/lib/supabase/server"
+import Link from "next/link"
 
-export default function ProductsPage() {
-  // Dummy data for products
-  const products = [
-    { id: "1", name: "Lámpara de Techo LED Circular", price: 120.00, stock: 50 },
-    { id: "2", name: "Lámpara de Mesa Moderna", price: 75.50, stock: 30 },
-    { id: "3", name: "Aplique de Pared Elegante", price: 45.00, stock: 100 },
-    { id: "4", name: "Lámpara de Pie Minimalista", price: 99.99, stock: 20 },
-  ];
+export default async function ProductsPage() {
+  const supabase = createClient()
+  const { data: products, error } = await supabase
+    .from("products")
+    .select(
+      `
+      id,
+      name,
+      status,
+      list_price_usd,
+      stock,
+      brands (name)
+    `
+    )
+    .is("deleted_at", null) // Fetch only non-deleted products
+
+  if (error) {
+    console.error("Error fetching products:", error)
+    // Handle error state appropriately
+    return <div>Error loading products.</div>
+  }
 
   return (
     <div className="flex flex-col gap-8 p-4 md:p-8">
@@ -18,14 +46,10 @@ export default function ProductsPage() {
         <h1 className="text-3xl font-bold">Gestión de Productos</h1>
         <div className="flex gap-2">
           <Button asChild>
-            <Link href="/dashboard">
-              Dashboard
-            </Link>
+            <Link href="/dashboard">Dashboard</Link>
           </Button>
           <Button asChild>
-            <Link href="/products/create">
-              Crear Nuevo Producto
-            </Link>
+            <Link href="/products/create">Crear Nuevo Producto</Link>
           </Button>
         </div>
       </div>
@@ -41,8 +65,9 @@ export default function ProductsPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>ID</TableHead>
                 <TableHead>Nombre</TableHead>
+                <TableHead>Marca</TableHead>
+                <TableHead>Estado</TableHead>
                 <TableHead>Precio</TableHead>
                 <TableHead>Stock</TableHead>
                 <TableHead className="text-right">Acciones</TableHead>
@@ -51,19 +76,23 @@ export default function ProductsPage() {
             <TableBody>
               {products.map((product) => (
                 <TableRow key={product.id}>
-                  <TableCell>{product.id}</TableCell>
-                  <TableCell>{product.name}</TableCell>
-                  <TableCell>${product.price.toFixed(2)}</TableCell>
+                  <TableCell className="font-medium">{product.name}</TableCell>
+                  <TableCell>
+                    {/* @ts-ignore */}
+                    {product.brands?.name || "N/A"}
+                  </TableCell>
+                  <TableCell>{product.status}</TableCell>
+                  <TableCell>
+                    ${product.list_price_usd?.toFixed(2) ?? "0.00"}
+                  </TableCell>
                   <TableCell>{product.stock}</TableCell>
                   <TableCell className="text-right">
-                    <Link href={`/products/${product.id}/edit`}>
-                      <Button variant="outline" size="sm" className="mr-2">
+                    <Button asChild variant="outline" size="sm" className="mr-2">
+                      <Link href={`/products/${product.id}/edit`}>
                         Editar
-                      </Button>
-                    </Link>
-                    <Button variant="destructive" size="sm">
-                      Eliminar
+                      </Link>
                     </Button>
+                    <DeleteProductButton productId={product.id} />
                   </TableCell>
                 </TableRow>
               ))}
@@ -72,5 +101,5 @@ export default function ProductsPage() {
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }

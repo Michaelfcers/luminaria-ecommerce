@@ -1,3 +1,5 @@
+import { createClient } from "@/lib/supabase/server"
+import { notFound } from "next/navigation"
 import { Navigation } from "@/components/layout/navigation"
 import { ProductGallery } from "@/features/store/components/product-gallery"
 import { ProductInfo } from "@/features/store/components/product-info"
@@ -5,52 +7,65 @@ import { ProductSpecs } from "@/features/store/components/product-specs"
 import { RecommendedProducts } from "@/features/store/components/recommended-products"
 import { Footer } from "@/components/layout/footer"
 
-// This would typically come from a database or API
-const getProduct = (id: string) => {
-  return {
-    id: Number.parseInt(id),
-    name: "Lámpara Colgante Moderna Minimalista",
-    price: 299,
-    originalPrice: 399,
-    brand: "Artemide",
-    category: "Lámparas Colgantes",
-    rating: 4.8,
-    reviews: 24,
-    inStock: true,
-    description:
-      "Elegante lámpara colgante de diseño minimalista que combina funcionalidad y estética. Perfecta para espacios modernos que buscan una iluminación sofisticada y contemporánea.",
-    features: [
-      "Diseño minimalista y elegante",
-      "Iluminación LED de alta eficiencia",
-      "Regulable con dimmer compatible",
-      "Instalación fácil y segura",
-      "Garantía de 3 años",
-      "Certificación CE y RoHS",
-    ],
-    specifications: {
-      Potencia: "15W LED",
-      "Flujo luminoso": "1200 lúmenes",
-      "Temperatura de color": "3000K (Blanco cálido)",
-      Dimensiones: "Ø 25cm x 120cm altura",
-      Material: "Aluminio anodizado y vidrio",
-      Peso: "1.2 kg",
-      Voltaje: "220-240V AC",
-      "Vida útil": "50,000 horas",
-      "Índice de protección": "IP20",
-      Regulable: "Sí (dimmer no incluido)",
-    },
-    images: [
-      "/modern-pendant-lamp-minimalist.jpg",
-      "/brands/philips-logo.webp",
-      "/brands/philips-logo.webp",
-      "/brands/philips-logo.webp",
-    ],
-    technicalSheet: "/docs/lampara-colgante-moderna-ficha-tecnica.pdf",
-  }
+// Define a type for the data structure returned by the Supabase query
+type ProductDetailFromDB = {
+  id: string
+  name: string
+  description: string | null
+  list_price_usd: number | null
+  stock: number
+  attributes: Record<string, any> | null // jsonb type
+  brands: { name: string } | null
+  product_media: { url: string; type: string; alt_text: string | null; is_primary: boolean }[] | null
 }
 
-export default function ProductDetailPage({ params }: { params: { id: string } }) {
-  const product = getProduct(params.id)
+export default async function ProductDetailPage({ params }: { params: { id: string } }) {
+  const supabase = createClient()
+
+  // Fetch product data from Supabase
+  const { data: productData, error } = await supabase
+    .from("products")
+    .select(
+      `
+      *,
+      brands ( name ),
+      product_media ( url, type, alt_text, is_primary )
+    `
+    )
+    .eq("id", params.id)
+    .single()
+
+  if (error || !productData) {
+    console.error("Error fetching product details:", error?.message || "Product not found")
+    notFound() // Render Next.js 404 page
+  }
+
+  // Process fetched data to match component props
+  const images =
+    productData.product_media
+      ?.filter((media) => media.type === "image")
+      .map((media) => media.url) || []
+
+  const technicalSheet = productData.product_media?.find(
+    (media) => media.type === "pdf"
+  )?.url || undefined
+
+  const processedProduct = {
+    id: productData.id,
+    name: productData.name,
+    price: productData.list_price_usd ?? 0,
+    originalPrice: undefined, // Not available in schema
+    brand: productData.brands?.name || "Sin Marca",
+    category: "Sin Categoría", // Not directly available in this query
+    rating: 0, // Not available in schema
+    reviews: 0, // Not available in schema
+    inStock: productData.stock > 0,
+    description: productData.description || "",
+    features: [], // Not directly available in schema, could parse from description or attributes
+    specifications: productData.attributes || {},
+    images: images.length > 0 ? images : ["/placeholder.svg"], // Fallback to placeholder
+    technicalSheet: technicalSheet,
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -66,24 +81,24 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
             Productos
           </a>
           <span>/</span>
-          <span className="text-foreground">{product.name}</span>
+          <span className="text-foreground">{processedProduct.name}</span>
         </nav>
 
         {/* Product Details */}
         <div className="grid lg:grid-cols-2 gap-12 mb-16">
-          <ProductGallery images={product.images} productName={product.name} />
-          <ProductInfo product={product} />
+          <ProductGallery images={processedProduct.images} productName={processedProduct.name} />
+          <ProductInfo product={processedProduct} />
         </div>
 
         {/* Product Specifications */}
         <ProductSpecs
-          features={product.features}
-          specifications={product.specifications}
-          technicalSheet={product.technicalSheet}
+          features={processedProduct.features}
+          specifications={processedProduct.specifications}
+          technicalSheet={processedProduct.technicalSheet}
         />
 
         {/* Recommended Products */}
-        <RecommendedProducts currentProductId={product.id} />
+        <RecommendedProducts currentProductId={processedProduct.id} />
       </main>
       <Footer />
     </div>

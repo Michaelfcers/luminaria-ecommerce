@@ -14,6 +14,16 @@ export default function DashboardPage() {
               Gestionar Productos
             </Link>
           </Button>
+          <Button asChild>
+            <Link href="/brands">
+              Gestionar Marcas
+            </Link>
+          </Button>
+          <Button asChild>
+            <Link href="/categories">
+              Gestionar Categorías
+            </Link>
+          </Button>
         </div>
       </div>
       
