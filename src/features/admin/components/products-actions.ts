@@ -42,7 +42,7 @@ export async function addProduct(formData: FormData) {
   if (rawFormData.category_ids.length > 0) {
     const productCategories = rawFormData.category_ids.map((categoryId) => ({
       product_id: productId,
-      category_id: categoryId,
+      category_id: Number(categoryId),
     }))
 
     const { error: categoryError } = await supabase
@@ -108,7 +108,7 @@ export async function updateProduct(id: string, formData: FormData) {
   if (rawFormData.category_ids.length > 0) {
     const productCategories = rawFormData.category_ids.map((categoryId) => ({
       product_id: id,
-      category_id: categoryId,
+      category_id: Number(categoryId),
     }))
 
     const { error: insertError } = await supabase
