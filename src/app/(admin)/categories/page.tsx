@@ -33,7 +33,7 @@ export default async function CategoriesPage() {
   }
 
   // Transform the data to a flatter structure for the client component
-  const transformedCategories = categories.map((c) => ({
+  const transformedCategories = categories.map((c: any) => ({
     ...c,
     // @ts-ignore
     parent_name: c.parent?.name,
