@@ -2,34 +2,51 @@
 
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
+import * as z from "zod"
 
-export async function addProduct(formData: FormData) {
-  const supabase = createClient()
-
-  const rawFormData = {
-    name: formData.get("name") as string,
-    description: formData.get("description") as string,
-    brand_id: formData.get("brand_id") as string,
-    status: formData.get("status") as string,
-    list_price_usd: Number(formData.get("list_price_usd")),
-    stock: Number(formData.get("stock")),
-    category_ids: formData.getAll("category_ids[]") as string[],
-  }
-
-  // TODO: Add validation logic here (e.g., using Zod)
-
-  const { data: productData, error: productError } = await supabase
-    .from("products")
-    .insert([
-      {
-        name: rawFormData.name,
-        description: rawFormData.description,
-        brand_id: rawFormData.brand_id,
-        status: rawFormData.status,
-        list_price_usd: rawFormData.list_price_usd,
-        stock: rawFormData.stock,
+const productFormSchema = z.object({
+  name: z.string().min(2, "El nombre debe tener al menos 2 caracteres."),
+  description: z.string().optional(),
+  code: z.string().optional(),
+  store_id: z.string().nonempty("La tienda es obligatoria."),
+  brand_id: z.string().nonempty("La marca es obligatoria."),
+  status: z.enum(["draft", "active", "inactive"]),
+  sourcing_status: z
+    .enum(["active", "backorder", "discontinued"])
+    .optional(),
+  life_hours: z.coerce.number().int().optional(),
+  lumens: z.coerce.number().int().optional(),
+  pieces_per_box: z.coerce.number().int().optional(),
+  list_price_usd: z.coerce.number().min(0, "El precio debe ser positivo."),
+  currency: z.string().optional(),
+  stock: z.coerce.number().int("El stock debe ser un número entero."),
+  attributes: z
+    .string()
+    .optional()
+    .refine(
+      (val) => {
+        if (!val) return true
+        try {
+          JSON.parse(val)
+          return true
+        } catch (e) {
+          return false
+        }
       },
-    ])
+      { message: "Debe ser un JSON válido." }
+    ),
+  category_ids: z.array(z.string()).optional(),
+})
+
+type ProductFormValues = z.infer<typeof productFormSchema>
+
+export async function addProduct(values: ProductFormValues) {
+  const supabase = createClient()
+  const { category_ids, ...productData } = values
+
+  const { data: newProduct, error: productError } = await supabase
+    .from("products")
+    .insert([productData])
     .select()
     .single()
 
@@ -38,9 +55,9 @@ export async function addProduct(formData: FormData) {
     return { error: productError.message }
   }
 
-  const productId = productData.id
-  if (rawFormData.category_ids.length > 0) {
-    const productCategories = rawFormData.category_ids.map((categoryId) => ({
+  const productId = newProduct.id
+  if (category_ids && category_ids.length > 0) {
+    const productCategories = category_ids.map((categoryId) => ({
       product_id: productId,
       category_id: Number(categoryId),
     }))
@@ -51,40 +68,21 @@ export async function addProduct(formData: FormData) {
 
     if (categoryError) {
       console.error("Error adding product categories:", categoryError)
-      // Optionally handle rollback or further error logging
       return { error: categoryError.message }
     }
   }
 
   revalidatePath("/products")
-  return { data: productData }
+  return { data: newProduct }
 }
 
-export async function updateProduct(id: string, formData: FormData) {
+export async function updateProduct(id: string, values: ProductFormValues) {
   const supabase = createClient()
-
-  const rawFormData = {
-    name: formData.get("name") as string,
-    description: formData.get("description") as string,
-    brand_id: formData.get("brand_id") as string,
-    status: formData.get("status") as string,
-    list_price_usd: Number(formData.get("list_price_usd")),
-    stock: Number(formData.get("stock")),
-    category_ids: formData.getAll("category_ids[]") as string[],
-  }
-
-  // TODO: Add validation
+  const { category_ids, ...productData } = values
 
   const { data, error } = await supabase
     .from("products")
-    .update({
-      name: rawFormData.name,
-      description: rawFormData.description,
-      brand_id: rawFormData.brand_id,
-      status: rawFormData.status,
-      list_price_usd: rawFormData.list_price_usd,
-      stock: rawFormData.stock,
-    })
+    .update(productData)
     .eq("id", id)
     .select()
 
@@ -93,7 +91,6 @@ export async function updateProduct(id: string, formData: FormData) {
     return { error: error.message }
   }
 
-  // First, delete existing categories for the product
   const { error: deleteError } = await supabase
     .from("product_categories")
     .delete()
@@ -104,9 +101,8 @@ export async function updateProduct(id: string, formData: FormData) {
     return { error: deleteError.message }
   }
 
-  // Then, insert the new ones
-  if (rawFormData.category_ids.length > 0) {
-    const productCategories = rawFormData.category_ids.map((categoryId) => ({
+  if (category_ids && category_ids.length > 0) {
+    const productCategories = category_ids.map((categoryId) => ({
       product_id: id,
       category_id: Number(categoryId),
     }))
@@ -141,4 +137,3 @@ export async function deleteProduct(id: string) {
 
   revalidatePath("/products")
 }
-

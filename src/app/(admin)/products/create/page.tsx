@@ -21,11 +21,15 @@ export default async function CreateProductPage() {
     .from("categories")
     .select("id, name")
     .is("deleted_at", null)
+  const { data: stores, error: storesError } = await supabase
+    .from("stores")
+    .select("id, name")
+    .is("deleted_at", null)
 
-  if (brandsError || categoriesError) {
+  if (brandsError || categoriesError || storesError) {
     console.error(
-      "Error fetching brands or categories:",
-      brandsError || categoriesError
+      "Error fetching brands, categories or stores:",
+      brandsError || categoriesError || storesError
     )
     return <div>Error loading form data.</div>
   }
@@ -48,8 +52,11 @@ export default async function CreateProductPage() {
         </CardHeader>
         <CardContent>
           <ProductForm
-            brands={brands || []}
-            categories={categories || []}
+            brands={brands?.map((b) => ({ ...b, id: String(b.id) })) || []}
+            categories={
+              categories?.map((c) => ({ ...c, id: String(c.id) })) || []
+            }
+            stores={stores || []}
           />
         </CardContent>
       </Card>

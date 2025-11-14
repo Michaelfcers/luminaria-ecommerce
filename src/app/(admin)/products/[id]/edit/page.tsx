@@ -35,16 +35,32 @@ export default async function EditProductPage({
     .select("id, name")
     .is("deleted_at", null)
 
+  const { data: stores, error: storesError } = await supabase
+    .from("stores")
+    .select("id, name")
+    .is("deleted_at", null)
+
   if (productError || !product) {
     notFound()
   }
 
-  if (brandsError || categoriesError) {
+  if (brandsError || categoriesError || storesError) {
     console.error(
-      "Error fetching brands or categories:",
-      brandsError || categoriesError
+      "Error fetching brands, categories or stores:",
+      brandsError || categoriesError || storesError
     )
     return <div>Error loading form data.</div>
+  }
+
+  const transformedProduct = {
+    ...product,
+    brand_id: product.brand_id ? String(product.brand_id) : "",
+    product_categories:
+      product.product_categories?.map(
+        (pc: { category_id: number }) => ({
+          category_id: String(pc.category_id),
+        })
+      ) || [],
   }
 
   return (
@@ -65,9 +81,12 @@ export default async function EditProductPage({
         </CardHeader>
         <CardContent>
           <ProductForm
-            product={product}
-            brands={brands || []}
-            categories={categories || []}
+            product={transformedProduct}
+            brands={brands?.map((b) => ({ ...b, id: String(b.id) })) || []}
+            categories={
+              categories?.map((c) => ({ ...c, id: String(c.id) })) || []
+            }
+            stores={stores || []}
           />
         </CardContent>
       </Card>
