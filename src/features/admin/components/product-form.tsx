@@ -77,14 +77,14 @@ interface ProductFormProps {
   }
   brands?: { id: string; name: string }[]
   categories?: { id: string; name: string }[]
-  stores?: { id: string; name: string }[]
+  store_id: string;
 }
 
 export function ProductForm({
   product,
   brands = [],
   categories = [],
-  stores = [],
+  store_id,
 }: ProductFormProps) {
   const router = useRouter()
   const form = useForm<ProductFormValues>({
@@ -93,7 +93,7 @@ export function ProductForm({
       name: product?.name ?? "",
       description: product?.description ?? "",
       code: product?.code ?? "",
-      store_id: product?.store_id ?? "",
+      store_id: product?.store_id ?? store_id,
       brand_id: product?.brand_id ?? "",
       status: product?.status ?? "draft",
       sourcing_status: product?.sourcing_status ?? "active",
@@ -167,33 +167,6 @@ export function ProductForm({
                 <FormControl>
                   <Input placeholder="SKU12345" {...field} />
                 </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="store_id"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Tienda</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecciona una tienda" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {stores.map((store) => (
-                      <SelectItem key={store.id} value={String(store.id)}>
-                        {store.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
                 <FormMessage />
               </FormItem>
             )}

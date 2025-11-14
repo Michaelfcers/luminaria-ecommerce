@@ -1,3 +1,5 @@
+import { cookies } from "next/headers"
+import { redirect } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -17,13 +19,57 @@ export default async function EditProductPage({
   params: { id: string }
 }) {
   const { id } = params
-  const supabase = createClient()
+  const cookieStore = cookies()
+  const supabase = createClient(cookieStore)
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    redirect("/login")
+  }
+
+  console.log("Logged in user ID (edit page):", user.id)
+
+  // Get the user's profile ID
+  const { data: userProfile, error: userProfileError } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("id", user.id)
+    .single()
+
+  if (userProfileError || !userProfile) {
+    console.error("Error fetching user profile:", userProfileError)
+    return <div>Error: No se pudo cargar el perfil del usuario.</div>
+  }
+
+  // Now, find the store_id associated with this user's profile ID
+  const { data: storeMember, error: storeMemberError } = await supabase
+    .from("store_members")
+    .select("store_id")
+    .eq("user_id", userProfile.id)
+    .single()
+
+  if (storeMemberError || !storeMember || !storeMember.store_id) {
+    console.error("Error fetching store membership:", storeMemberError)
+    return <div>Error: El usuario no está asociado a ninguna tienda.</div>
+  }
+
+  const store_id = storeMember.store_id
+  console.log("Determined store ID for user (edit page):", store_id)
 
   const { data: product, error: productError } = await supabase
     .from("products")
     .select("*, product_categories(category_id)")
     .eq("id", id)
+    .eq("store_id", store_id) // Ensure product belongs to the user's store
     .single()
+
+  if (productError || !product) {
+    console.error("Error fetching product or product not found for store:", productError)
+    notFound()
+  }
+  console.log("Fetched product (edit page):", product)
 
   const { data: brands, error: brandsError } = await supabase
     .from("brands")
@@ -35,19 +81,10 @@ export default async function EditProductPage({
     .select("id, name")
     .is("deleted_at", null)
 
-  const { data: stores, error: storesError } = await supabase
-    .from("stores")
-    .select("id, name")
-    .is("deleted_at", null)
-
-  if (productError || !product) {
-    notFound()
-  }
-
-  if (brandsError || categoriesError || storesError) {
+  if (brandsError || categoriesError) {
     console.error(
-      "Error fetching brands, categories or stores:",
-      brandsError || categoriesError || storesError
+      "Error fetching brands or categories:",
+      brandsError || categoriesError
     )
     return <div>Error loading form data.</div>
   }
@@ -86,7 +123,7 @@ export default async function EditProductPage({
             categories={
               categories?.map((c) => ({ ...c, id: String(c.id) })) || []
             }
-            stores={stores || []}
+            store_id={store_id}
           />
         </CardContent>
       </Card>

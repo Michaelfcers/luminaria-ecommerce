@@ -1,6 +1,5 @@
-"use client"
 import Link from "next/link"
-import { LayoutDashboard, Package, Search, ShoppingBag, User } from "lucide-react"
+import { LayoutDashboard, Package, Search, ShoppingBag } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   NavigationMenu,
@@ -10,6 +9,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu"
+import { UserNav } from "./user-nav"
 
 const categories = {
   luminarias: {
@@ -41,7 +41,7 @@ const categories = {
   },
 }
 
-export function Navigation() {
+export async function Navigation() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
@@ -59,6 +59,14 @@ export function Navigation() {
                 <Link href="/" legacyBehavior passHref>
                   <NavigationMenuLink className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50">
                     Inicio
+                  </NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
+
+              <NavigationMenuItem>
+                <Link href="/productos" legacyBehavior passHref>
+                  <NavigationMenuLink className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50">
+                    Productos
                   </NavigationMenuLink>
                 </Link>
               </NavigationMenuItem>
@@ -98,21 +106,7 @@ export function Navigation() {
             <Button variant="ghost" size="icon">
               <Search className="h-4 w-4" />
             </Button>
-            <Link href="/dashboard">
-              <Button variant="ghost" size="icon">
-                <LayoutDashboard className="h-4 w-4" />
-              </Button>
-            </Link>
-            <Link href="/products">
-              <Button variant="ghost" size="icon">
-                <Package className="h-4 w-4" />
-              </Button>
-            </Link>
-            <Link href="/login">
-              <Button variant="ghost" size="icon">
-                <User className="h-4 w-4" />
-              </Button>
-            </Link>
+            <UserNav />
             <Link href="/carrito">
               <Button variant="ghost" size="icon">
                 <ShoppingBag className="h-4 w-4" />

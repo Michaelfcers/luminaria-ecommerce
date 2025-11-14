@@ -1,3 +1,4 @@
+import { cookies } from "next/headers"
 import { createClient } from "@/lib/supabase/server"
 import { ProductsGrid } from "@/features/store/components/products-grid"
 import { ProductFilters } from "@/features/store/components/product-filters"
@@ -25,7 +26,8 @@ export default async function ProductsPage({
 }: {
   searchParams: { [key: string]: string | string[] | undefined }
 }) {
-  const supabase = createClient()
+  const cookieStore = cookies()
+  const supabase = createClient(cookieStore)
 
   // Extract filter values from searchParams
   const selectedCategoryIds = Array.isArray(searchParams.categories)

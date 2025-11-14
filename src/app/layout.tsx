@@ -5,6 +5,7 @@ import { DM_Sans } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
 import "@/styles/globals.css"
+import { Navigation } from "@/components/layout/navigation"
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -32,13 +33,12 @@ export default function RootLayout({
   return (
     <html lang="es" className={`${spaceGrotesk.variable} ${dmSans.variable}`}>
       <body className="font-sans antialiased">
-        <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
+        <Suspense fallback={<div>Loading...</div>}>
+          <Navigation />
+          {children}
+        </Suspense>
         <Analytics />
       </body>
     </html>
   )
 }
-
-//AVION lyph:p
-
-

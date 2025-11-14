@@ -1,3 +1,4 @@
+import { cookies } from "next/headers"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -11,7 +12,8 @@ import { createClient } from "@/lib/supabase/server"
 import Link from "next/link"
 
 export default async function CategoriesPage() {
-  const supabase = createClient()
+  const cookieStore = cookies()
+  const supabase = createClient(cookieStore)
   // We perform a left join on the same table to get the parent category's name
   const { data: categories, error } = await supabase
     .from("categories")

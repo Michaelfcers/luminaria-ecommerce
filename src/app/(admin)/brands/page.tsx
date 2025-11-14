@@ -1,3 +1,4 @@
+import { cookies } from "next/headers"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -11,7 +12,8 @@ import { createClient } from "@/lib/supabase/server"
 import Link from "next/link"
 
 export default async function BrandsPage() {
-  const supabase = createClient()
+  const cookieStore = cookies()
+  const supabase = createClient(cookieStore)
   const { data: brands, error } = await supabase
     .from("brands")
     .select("id, name, slug")

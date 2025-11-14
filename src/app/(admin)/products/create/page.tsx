@@ -1,3 +1,5 @@
+import { cookies } from "next/headers"
+import { redirect } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -11,7 +13,29 @@ import { createClient } from "@/lib/supabase/server"
 import Link from "next/link"
 
 export default async function CreateProductPage() {
-  const supabase = createClient()
+  const cookieStore = cookies()
+  const supabase = createClient(cookieStore)
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    redirect("/login")
+  }
+
+  // Fetch the user's store_id from their profile
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("store_id")
+    .eq("user_id", user.id)
+    .single()
+
+  if (profileError || !profile || !profile.store_id) {
+    console.error("Error fetching user profile or store_id:", profileError)
+    return <div>Error: No se pudo determinar la tienda del usuario.</div>
+  }
+
+  const store_id = profile.store_id
 
   const { data: brands, error: brandsError } = await supabase
     .from("brands")
@@ -21,15 +45,11 @@ export default async function CreateProductPage() {
     .from("categories")
     .select("id, name")
     .is("deleted_at", null)
-  const { data: stores, error: storesError } = await supabase
-    .from("stores")
-    .select("id, name")
-    .is("deleted_at", null)
 
-  if (brandsError || categoriesError || storesError) {
+  if (brandsError || categoriesError) {
     console.error(
-      "Error fetching brands, categories or stores:",
-      brandsError || categoriesError || storesError
+      "Error fetching brands or categories:",
+      brandsError || categoriesError
     )
     return <div>Error loading form data.</div>
   }
@@ -56,7 +76,7 @@ export default async function CreateProductPage() {
             categories={
               categories?.map((c) => ({ ...c, id: String(c.id) })) || []
             }
-            stores={stores || []}
+            store_id={store_id}
           />
         </CardContent>
       </Card>

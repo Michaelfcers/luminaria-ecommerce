@@ -1,4 +1,3 @@
-import { Navigation } from "@/components/layout/navigation"
 import { Footer } from "@/components/layout/footer"
 
 export default function AuthLayout({
@@ -8,7 +7,6 @@ export default function AuthLayout({
 }) {
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
       <main>{children}</main>
       <Footer />
     </div>
