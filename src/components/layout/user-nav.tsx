@@ -25,8 +25,20 @@ export async function UserNav() {
   const { data: { user } } = await supabase.auth.getUser()
 
   let storeName = "My Store"; // Default store name
+  let userDisplayName: string | null = null;
 
   if (user) {
+    // Fetch user's display_name from profiles table
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('display_name')
+      .eq('id', user.id)
+      .single();
+
+    if (profile && !profileError) {
+      userDisplayName = profile.display_name;
+    }
+
     // Try to find a store where the user is the owner
     const { data: ownedStore, error: ownedStoreError } = await supabase
       .from('stores')
@@ -93,7 +105,7 @@ export async function UserNav() {
               {storeName}
             </p>
             <p className="text-sm font-medium leading-none">
-              {user.user_metadata?.name || user.email}
+              {userDisplayName || user.email}
             </p>
             <p className="text-xs leading-none text-muted-foreground">
               {user.email}
