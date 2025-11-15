@@ -23,19 +23,34 @@ export default async function CreateProductPage() {
     redirect("/login")
   }
 
-  // Fetch the user's store_id from their profile
-  const { data: profile, error: profileError } = await supabase
-    .from("profiles")
-    .select("store_id")
-    .eq("user_id", user.id)
-    .single()
+  let store_id: string | null = null;
 
-  if (profileError || !profile || !profile.store_id) {
-    console.error("Error fetching user profile or store_id:", profileError)
-    return <div>Error: No se pudo determinar la tienda del usuario.</div>
+  // 1. Try to find a store where the user is the owner
+  const { data: ownedStore, error: ownedStoreError } = await supabase
+    .from("stores")
+    .select("id")
+    .eq("owner_id", user.id)
+    .single();
+
+  if (ownedStore && !ownedStoreError) {
+    store_id = ownedStore.id;
+  } else {
+    // 2. If not an owner, try to find a store where the user is a member
+    const { data: storeMember, error: storeMemberError } = await supabase
+      .from("store_members")
+      .select("store_id")
+      .eq("user_id", user.id)
+      .single(); // Assuming a user is primarily associated with one store for product management
+
+    if (storeMember && !storeMemberError) {
+      store_id = storeMember.store_id;
+    }
   }
 
-  const store_id = profile.store_id
+  if (!store_id) {
+    console.error("Error: No se pudo determinar la tienda del usuario.");
+    return <div>Error: No se pudo determinar la tienda del usuario.</div>;
+  }
 
   const { data: brands, error: brandsError } = await supabase
     .from("brands")

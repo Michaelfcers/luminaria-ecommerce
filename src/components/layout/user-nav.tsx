@@ -24,6 +24,40 @@ export async function UserNav() {
   const supabase = createClient(cookieStore)
   const { data: { user } } = await supabase.auth.getUser()
 
+  let storeName = "My Store"; // Default store name
+
+  if (user) {
+    // Try to find a store where the user is the owner
+    const { data: ownedStore, error: ownedStoreError } = await supabase
+      .from('stores')
+      .select('name')
+      .eq('owner_id', user.id)
+      .single();
+
+    if (ownedStore && !ownedStoreError) {
+      storeName = ownedStore.name;
+    } else {
+      // If not an owner, check if the user is a member of any store
+      const { data: memberStores, error: memberStoresError } = await supabase
+        .from('store_members')
+        .select('store_id')
+        .eq('user_id', user.id)
+        .limit(1); // Get the first store the user is a member of
+
+      if (memberStores && memberStores.length > 0 && !memberStoresError) {
+        const { data: storeData, error: storeDataError } = await supabase
+          .from('stores')
+          .select('name')
+          .eq('id', memberStores[0].store_id)
+          .single();
+
+        if (storeData && !storeDataError) {
+          storeName = storeData.name;
+        }
+      }
+    }
+  }
+
   const signOut = async () => {
     "use server"
     const cookieStore = cookies()
@@ -55,6 +89,9 @@ export async function UserNav() {
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
+            <p className="text-lg font-bold leading-none">
+              {storeName}
+            </p>
             <p className="text-sm font-medium leading-none">
               {user.user_metadata?.name || user.email}
             </p>

@@ -31,31 +31,34 @@ export default async function EditProductPage({
 
   console.log("Logged in user ID (edit page):", user.id)
 
-  // Get the user's profile ID
-  const { data: userProfile, error: userProfileError } = await supabase
-    .from("profiles")
+  let store_id: string | null = null;
+
+  // 1. Try to find a store where the user is the owner
+  const { data: ownedStore, error: ownedStoreError } = await supabase
+    .from("stores")
     .select("id")
-    .eq("id", user.id)
-    .single()
+    .eq("owner_id", user.id)
+    .single();
 
-  if (userProfileError || !userProfile) {
-    console.error("Error fetching user profile:", userProfileError)
-    return <div>Error: No se pudo cargar el perfil del usuario.</div>
+  if (ownedStore && !ownedStoreError) {
+    store_id = ownedStore.id;
+  } else {
+    // 2. If not an owner, try to find a store where the user is a member
+    const { data: storeMember, error: storeMemberError } = await supabase
+      .from("store_members")
+      .select("store_id")
+      .eq("user_id", user.id)
+      .single(); // Assuming a user is primarily associated with one store for product management
+
+    if (storeMember && !storeMemberError) {
+      store_id = storeMember.store_id;
+    }
   }
 
-  // Now, find the store_id associated with this user's profile ID
-  const { data: storeMember, error: storeMemberError } = await supabase
-    .from("store_members")
-    .select("store_id")
-    .eq("user_id", userProfile.id)
-    .single()
-
-  if (storeMemberError || !storeMember || !storeMember.store_id) {
-    console.error("Error fetching store membership:", storeMemberError)
-    return <div>Error: El usuario no está asociado a ninguna tienda.</div>
+  if (!store_id) {
+    console.error("Error: No se pudo determinar la tienda del usuario.");
+    return <div>Error: No se pudo determinar la tienda del usuario.</div>;
   }
-
-  const store_id = storeMember.store_id
   console.log("Determined store ID for user (edit page):", store_id)
 
   const { data: product, error: productError } = await supabase
