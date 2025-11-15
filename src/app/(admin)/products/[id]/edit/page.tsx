@@ -19,8 +19,7 @@ export default async function EditProductPage({
   params: { id: string }
 }) {
   const { id } = params
-  const cookieStore = cookies()
-  const supabase = createClient(cookieStore)
+  const supabase = createClient()
 
   const {
     data: { user },

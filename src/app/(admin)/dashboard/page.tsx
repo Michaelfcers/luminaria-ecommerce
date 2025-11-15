@@ -2,8 +2,35 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { createClient } from "@/lib/supabase/server";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const supabase = createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  let isStoreOwner = false;
+  let storeId: string | null = null;
+
+  const { data: ownedStore, error: ownedStoreError } = await supabase
+    .from("stores")
+    .select("id")
+    .eq("owner_id", user.id)
+    .single();
+
+  if (ownedStore && !ownedStoreError) {
+    isStoreOwner = true;
+    storeId = ownedStore.id;
+  }
+
   return (
     <div className="flex flex-col gap-8 p-4 md:p-8">
       <div className="flex items-center justify-between">
@@ -24,6 +51,13 @@ export default function DashboardPage() {
               Gestionar Categorías
             </Link>
           </Button>
+          {isStoreOwner && (
+            <Button asChild>
+              <Link href={`/dashboard/members?store_id=${storeId}`}>
+                Gestionar Miembros
+              </Link>
+            </Button>
+          )}
         </div>
       </div>
       

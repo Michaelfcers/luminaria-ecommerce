@@ -13,8 +13,7 @@ import { createClient } from "@/lib/supabase/server"
 import Link from "next/link"
 
 export default async function CreateProductPage() {
-  const cookieStore = cookies()
-  const supabase = createClient(cookieStore)
+  const supabase = createClient()
 
   const {
     data: { user },
