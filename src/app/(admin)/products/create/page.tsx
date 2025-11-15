@@ -19,43 +19,73 @@ export default async function CreateProductPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser()
+
   if (!user) {
     redirect("/login")
   }
 
-  let store_id: string | null = null;
+  console.log("User ID (create page):", user.id)
 
-  // 1. Try to find a store where the user is the owner
-  const { data: ownedStore, error: ownedStoreError } = await supabase
+  let store_id: string | null = null
+
+  // 1. Intentar encontrar una tienda donde el usuario sea el owner
+  const { data: ownedStores, error: ownedStoresError } = await supabase
     .from("stores")
-    .select("id")
+    .select("id, created_at")
     .eq("owner_id", user.id)
-    .single();
+    .order("created_at", { ascending: true }) // o false si quieres la más reciente
+    .limit(1)
 
-  if (ownedStore && !ownedStoreError) {
-    store_id = ownedStore.id;
+  console.log("Owned Store Data:", ownedStores)
+  console.log("Owned Store Error:", ownedStoresError)
+
+  if (ownedStoresError) {
+    console.error("Error buscando tienda como owner:", ownedStoresError)
+  }
+
+  if (ownedStores && ownedStores.length > 0) {
+    store_id = ownedStores[0].id
   } else {
-    // 2. If not an owner, try to find a store where the user is a member
-    const { data: storeMember, error: storeMemberError } = await supabase
+    // 2. Si no es owner (o no se tomó ninguna), buscar una tienda donde sea miembro
+    const { data: memberStores, error: memberStoresError } = await supabase
       .from("store_members")
-      .select("store_id")
+      .select("store_id, created_at")
       .eq("user_id", user.id)
-      .single(); // Assuming a user is primarily associated with one store for product management
+      .order("created_at", { ascending: true })
+      .limit(1)
 
-    if (storeMember && !storeMemberError) {
-      store_id = storeMember.store_id;
+    console.log("Store Member Data:", memberStores)
+    console.log("Store Member Error:", memberStoresError)
+
+    if (memberStoresError) {
+      console.error("Error buscando tienda como miembro:", memberStoresError)
+    }
+
+    if (memberStores && memberStores.length > 0) {
+      store_id = memberStores[0].store_id
     }
   }
 
   if (!store_id) {
-    console.error("Error: No se pudo determinar la tienda del usuario.");
-    return <div>Error: No se pudo determinar la tienda del usuario.</div>;
+    console.error(
+      "Error: No se pudo determinar la tienda del usuario. User ID:",
+      user.id
+    )
+    return (
+      <div className="p-4">
+        Error: No se pudo determinar la tienda del usuario. Por favor, asegúrate
+        de que tu usuario esté asociado a una tienda.
+      </div>
+    )
   }
+
+  console.log("Determined store ID for user (create page):", store_id)
 
   const { data: brands, error: brandsError } = await supabase
     .from("brands")
     .select("id, name")
     .is("deleted_at", null)
+
   const { data: categories, error: categoriesError } = await supabase
     .from("categories")
     .select("id, name")
