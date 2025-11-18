@@ -4,9 +4,18 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useCart } from "@/hooks/use-cart"
+import { Loader2 } from "lucide-react";
 
 export default function CartPage() {
-  const { items, removeItem, updateQuantity, total } = useCart()
+  const { items, removeItem, updateQuantity, total, isLoading } = useCart()
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto py-8 px-4 md:px-6 flex justify-center items-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    )
+  }
 
   return (
     <div className="container mx-auto py-8 px-4 md:px-6">
@@ -18,7 +27,7 @@ export default function CartPage() {
         <div className="grid md:grid-cols-[2fr_1fr] gap-8">
           <div className="space-y-6">
             {items.map((item) => (
-              <Card key={item.id}>
+              <Card key={item.cartItemId}>
                 <CardContent className="p-6 flex items-center gap-6">
                   <img src={item.image || "/placeholder.svg"} alt={item.name} width={100} height={100} className="rounded-md" />
                   <div className="flex-1">
@@ -30,10 +39,10 @@ export default function CartPage() {
                       value={String(item.quantity)}
                       min={1}
                       className="w-20"
-                      onChange={(e) => updateQuantity(item.id, Math.max(1, Number(e.target.value) || 1))}
+                      onChange={(e) => item.cartItemId && updateQuantity(item.cartItemId, Math.max(1, Number(e.target.value) || 1))}
                     />
                     <span className="font-semibold text-lg">€{item.price.toFixed(2)}</span>
-                    <Button variant="ghost" size="icon" onClick={() => removeItem(item.id)}>
+                    <Button variant="ghost" size="icon" onClick={() => item.cartItemId && removeItem(item.cartItemId)}>
                       <Trash2Icon className="h-5 w-5" />
                     </Button>
                   </div>

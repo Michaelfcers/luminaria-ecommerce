@@ -7,6 +7,8 @@ import { Suspense } from "react"
 import "@/styles/globals.css"
 import { Navigation } from "@/components/layout/navigation"
 
+import { AuthProvider } from "@/features/auth/components/auth-provider"
+
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   variable: "--font-space-grotesk",
@@ -33,10 +35,12 @@ export default function RootLayout({
   return (
     <html lang="es" className={`${spaceGrotesk.variable} ${dmSans.variable}`}>
       <body className="font-sans antialiased">
-        <Suspense fallback={<div>Loading...</div>}>
-          <Navigation />
-          {children}
-        </Suspense>
+        <AuthProvider>
+          <Suspense fallback={<div>Loading...</div>}>
+            <Navigation />
+            {children}
+          </Suspense>
+        </AuthProvider>
         <Analytics />
       </body>
     </html>

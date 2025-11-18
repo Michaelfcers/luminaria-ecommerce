@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/navigation-menu"
 import { UserNav } from "./user-nav"
 
+import { CartIcon } from "./cart-icon"
+
 const categories = {
   luminarias: {
     title: "Luminarias",
@@ -107,12 +109,7 @@ export async function Navigation() {
               <Search className="h-4 w-4" />
             </Button>
             <UserNav />
-            <Link href="/carrito">
-              <Button variant="ghost" size="icon">
-                <ShoppingBag className="h-4 w-4" />
-              </Button>
-            </Link>
-
+            <CartIcon />
           </div>
         </div>
       </div>

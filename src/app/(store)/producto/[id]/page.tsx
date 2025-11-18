@@ -52,7 +52,7 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
   const technicalSheet = product.product_media?.find((media) => media.type === "pdf")?.url || undefined
 
   const processedProduct = {
-    id: Number(product.id),
+    id: product.id,
     name: product.name,
     price: product.list_price_usd ?? 0,
     originalPrice: undefined, // Not available in schema

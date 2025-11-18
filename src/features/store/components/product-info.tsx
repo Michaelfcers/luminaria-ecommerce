@@ -12,7 +12,7 @@ import { ToastAction } from "@/components/ui/toast"
 import { Star, ShoppingCart, Heart, Share2, Truck, Shield, RotateCcw } from "lucide-react"
 
 interface Product {
-  id: number
+  id: string
   name: string
   price: number
   originalPrice?: number
@@ -120,22 +120,6 @@ export function ProductInfo({ product }: ProductInfoProps) {
             disabled={!product.inStock}
             onClick={() => {
               addItem({ id: product.id, name: product.name, price: product.price, image: undefined }, quantity)
-              // show success message with two actions: Ver carrito and Seguir comprando
-              toast({
-                title: "el producto ha sido agregado con exito",
-                action: (
-                  <>
-                    <ToastAction asChild>
-                      <Link href="/carrito">
-                        <button className="">Ver carrito</button>
-                      </Link>
-                    </ToastAction>
-                    <ToastAction asChild>
-                      <button className="">Seguir comprando</button>
-                    </ToastAction>
-                  </>
-                ),
-              })
             }}
           >
             <ShoppingCart className="h-4 w-4 mr-2" />
