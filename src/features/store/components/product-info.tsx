@@ -4,6 +4,11 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
+import { useCart } from "@/hooks/use-cart"
+import { useToast } from "@/hooks/use-toast"
+import { useRouter } from "next/navigation"
+import Link from "next/link"
+import { ToastAction } from "@/components/ui/toast"
 import { Star, ShoppingCart, Heart, Share2, Truck, Shield, RotateCcw } from "lucide-react"
 
 interface Product {
@@ -26,6 +31,9 @@ interface ProductInfoProps {
 export function ProductInfo({ product }: ProductInfoProps) {
   const [quantity, setQuantity] = useState(1)
   const [isFavorite, setIsFavorite] = useState(false)
+  const { addItem } = useCart()
+  const { toast } = useToast()
+  const router = useRouter()
 
   const discount = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
@@ -106,7 +114,30 @@ export function ProductInfo({ product }: ProductInfoProps) {
         </div>
 
         <div className="flex gap-3">
-          <Button size="lg" className="flex-1" disabled={!product.inStock}>
+          <Button
+            size="lg"
+            className="flex-1"
+            disabled={!product.inStock}
+            onClick={() => {
+              addItem({ id: product.id, name: product.name, price: product.price, image: undefined }, quantity)
+              // show success message with two actions: Ver carrito and Seguir comprando
+              toast({
+                title: "el producto ha sido agregado con exito",
+                action: (
+                  <>
+                    <ToastAction asChild>
+                      <Link href="/carrito">
+                        <button className="">Ver carrito</button>
+                      </Link>
+                    </ToastAction>
+                    <ToastAction asChild>
+                      <button className="">Seguir comprando</button>
+                    </ToastAction>
+                  </>
+                ),
+              })
+            }}
+          >
             <ShoppingCart className="h-4 w-4 mr-2" />
             Hacer Pedido
           </Button>

@@ -114,7 +114,8 @@ ToastDescription.displayName = ToastPrimitives.Description.displayName
 
 type ToastProps = React.ComponentPropsWithoutRef<typeof Toast>
 
-type ToastActionElement = React.ReactElement<typeof ToastAction>
+// Allow action to be any renderable node (one or many ToastAction elements)
+type ToastActionElement = React.ReactNode
 
 export {
   type ToastProps,
