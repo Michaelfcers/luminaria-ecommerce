@@ -40,36 +40,37 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
     notFound() // Render Next.js 404 page
   }
 
+  // Tell TypeScript the shape of the returned product so callbacks get proper types
+  const product = productData as ProductDetailFromDB
+
   // Process fetched data to match component props
   const images =
-    productData.product_media
+    product.product_media
       ?.filter((media) => media.type === "image")
       .map((media) => media.url) || []
 
-  const technicalSheet = productData.product_media?.find(
-    (media) => media.type === "pdf"
-  )?.url || undefined
+  const technicalSheet = product.product_media?.find((media) => media.type === "pdf")?.url || undefined
 
   const processedProduct = {
-    id: productData.id,
-    name: productData.name,
-    price: productData.list_price_usd ?? 0,
+    id: Number(product.id),
+    name: product.name,
+    price: product.list_price_usd ?? 0,
     originalPrice: undefined, // Not available in schema
-    brand: productData.brands?.name || "Sin Marca",
+    brand: product.brands?.name || "Sin Marca",
     category: "Sin Categoría", // Not directly available in this query
     rating: 0, // Not available in schema
     reviews: 0, // Not available in schema
-    inStock: productData.stock > 0,
-    description: productData.description || "",
+    inStock: product.stock > 0,
+    description: product.description || "",
     features: [], // Not directly available in schema, could parse from description or attributes
-    specifications: productData.attributes || {},
+    specifications: product.attributes || {},
     images: images.length > 0 ? images : ["/placeholder.svg"], // Fallback to placeholder
-    technicalSheet: technicalSheet,
+    technicalSheet: technicalSheet ?? "",
   }
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
+      
       <main className="container mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <nav className="flex items-center space-x-2 text-sm text-muted-foreground mb-8">
@@ -100,7 +101,7 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
         {/* Recommended Products */}
         <RecommendedProducts currentProductId={processedProduct.id} />
       </main>
-      <Footer />
+      
     </div>
   )
 }
