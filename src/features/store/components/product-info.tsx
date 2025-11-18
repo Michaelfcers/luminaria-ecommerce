@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ToastAction } from "@/components/ui/toast"
-import { Star, ShoppingCart, Heart, Share2, Truck, Shield, RotateCcw } from "lucide-react"
+import { Star, ShoppingCart, Heart, Share2, Truck, Shield, RotateCcw, Check } from "lucide-react"
 
 interface Product {
   id: string
@@ -31,6 +31,7 @@ interface ProductInfoProps {
 export function ProductInfo({ product }: ProductInfoProps) {
   const [quantity, setQuantity] = useState(1)
   const [isFavorite, setIsFavorite] = useState(false)
+  const [isAdded, setIsAdded] = useState(false)
   const { addItem } = useCart()
   const { toast } = useToast()
   const router = useRouter()
@@ -38,6 +39,14 @@ export function ProductInfo({ product }: ProductInfoProps) {
   const discount = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0
+
+  const handleAddToCart = async () => {
+    await addItem({ id: product.id, name: product.name, price: product.price, image: undefined }, quantity)
+    setIsAdded(true)
+    setTimeout(() => {
+      setIsAdded(false)
+    }, 2000)
+  }
 
   return (
     <div className="space-y-6">
@@ -117,13 +126,20 @@ export function ProductInfo({ product }: ProductInfoProps) {
           <Button
             size="lg"
             className="flex-1"
-            disabled={!product.inStock}
-            onClick={() => {
-              addItem({ id: product.id, name: product.name, price: product.price, image: undefined }, quantity)
-            }}
+            disabled={!product.inStock || isAdded}
+            onClick={handleAddToCart}
           >
-            <ShoppingCart className="h-4 w-4 mr-2" />
-            Hacer Pedido
+            {isAdded ? (
+              <>
+                <Check className="h-4 w-4 mr-2" />
+                Añadido
+              </>
+            ) : (
+              <>
+                <ShoppingCart className="h-4 w-4 mr-2" />
+                Hacer Pedido
+              </>
+            )}
           </Button>
           <Button variant="outline" size="lg" onClick={() => setIsFavorite(!isFavorite)}>
             <Heart className={`h-4 w-4 ${isFavorite ? "fill-red-500 text-red-500" : ""}`} />

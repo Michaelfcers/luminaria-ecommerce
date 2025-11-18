@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
 interface RecommendedProductsProps {
-  currentProductId: number
+  currentProductId: string
 }
 
 export function RecommendedProducts({ currentProductId }: RecommendedProductsProps) {
