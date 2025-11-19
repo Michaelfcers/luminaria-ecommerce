@@ -51,6 +51,11 @@ export default async function DashboardPage() {
               Gestionar Categorías
             </Link>
           </Button>
+          <Button asChild>
+            <Link href="/dashboard/orders">
+              Ver Órdenes
+            </Link>
+          </Button>
           {isStoreOwner && (
             <Button asChild>
               <Link href={`/dashboard/members?store_id=${storeId}`}>
