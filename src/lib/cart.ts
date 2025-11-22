@@ -62,7 +62,7 @@ export async function getCartItems(cartId: string): Promise<CartItem[]> {
     id: item.products.id,
     name: item.products.name,
     price: item.products.list_price_usd,
-    image: item.products.product_media.find((m: any) => m.is_primary)?.url || item.products.product_media[0]?.url,
+    image: "/products/luminaria-plafon.webp",
     quantity: item.quantity,
     cartItemId: item.id,
   }))

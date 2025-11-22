@@ -125,7 +125,7 @@ export default async function ProductsPage({
         id: product.id,
         name: product.name,
         price: product.list_price_usd ?? 0,
-        image: primaryMedia?.url || "/placeholder.svg",
+        image: "/products/luminaria-plafon.webp",
         brand: product.brands?.name || "Sin Marca",
         isNew: isNew,
         // category, rating, and reviews are not in the DB schema provided

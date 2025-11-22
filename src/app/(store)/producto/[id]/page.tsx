@@ -64,7 +64,7 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
     description: product.description || "",
     features: [], // Not directly available in schema, could parse from description or attributes
     specifications: product.attributes || {},
-    images: images.length > 0 ? images : ["/placeholder.svg"], // Fallback to placeholder
+    images: ["/products/luminaria-plafon.webp"], // Using a placeholder for all products
     technicalSheet: technicalSheet ?? "",
   }
 
