@@ -80,6 +80,9 @@ export default async function ProductsPage() {
           <Button asChild>
             <Link href="/products/create">Crear Nuevo Producto</Link>
           </Button>
+          <Button asChild>
+            <Link href="/categories">Categorías</Link>
+          </Button>
         </div>
       </div>
 
