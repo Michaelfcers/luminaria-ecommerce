@@ -40,13 +40,16 @@ export async function getCartItems(cartId: string): Promise<CartItem[]> {
       `
       id,
       quantity,
-      products (
+      product_variants (
         id,
         name,
         list_price_usd,
-        product_media (
-          url,
-          is_primary
+        products (
+          name,
+          product_media (
+            url,
+            is_primary
+          )
         )
       )
     `
@@ -59,19 +62,19 @@ export async function getCartItems(cartId: string): Promise<CartItem[]> {
   }
 
   return items.map((item: any) => ({
-    id: item.products.id,
-    name: item.products.name,
-    price: item.products.list_price_usd,
+    id: item.product_variants.id,
+    name: `${item.product_variants.products.name} - ${item.product_variants.name}`,
+    price: item.product_variants.list_price_usd,
     image: "/products/luminaria-plafon.webp",
     quantity: item.quantity,
     cartItemId: item.id,
   }))
 }
 
-export async function addItemToCart(cartId: string, productId: string, quantity: number, price: number) {
+export async function addItemToCart(cartId: string, variantId: string, quantity: number, price: number) {
   const { error } = await supabase.from("cart_items").insert({
     cart_id: cartId,
-    product_id: productId,
+    variant_id: variantId,
     quantity,
     price_at_add: price,
   })

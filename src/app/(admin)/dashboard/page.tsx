@@ -31,6 +31,18 @@ export default async function DashboardPage() {
     storeId = ownedStore.id;
   }
 
+  const [
+    { count: totalCategories },
+    { count: totalProducts },
+    { count: totalVariants },
+    { count: totalOrders },
+  ] = await Promise.all([
+    supabase.from("categories").select("*", { count: "exact", head: true }),
+    supabase.from("products").select("*", { count: "exact", head: true }),
+    supabase.from("product_variants").select("*", { count: "exact", head: true }),
+    supabase.from("orders").select("*", { count: "exact", head: true }),
+  ]);
+
   return (
     <div className="flex flex-col gap-8 p-4 md:p-8">
       <div className="flex items-center justify-between">
@@ -69,38 +81,34 @@ export default async function DashboardPage() {
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Ventas Totales</CardTitle>
+            <CardTitle>Total de Categorías</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-4xl font-bold">$25,430</p>
-            <p className="text-sm text-gray-500">+15% desde el mes pasado</p>
+            <p className="text-4xl font-bold">{totalCategories}</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Pedidos Nuevos</CardTitle>
+            <CardTitle>Total de Productos</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-4xl font-bold">120</p>
-            <p className="text-sm text-gray-500">+5% desde la semana pasada</p>
+            <p className="text-4xl font-bold">{totalProducts}</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Nuevos Clientes</CardTitle>
+            <CardTitle>Total de Variantes</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-4xl font-bold">32</p>
-            <p className="text-sm text-gray-500">+10% desde el mes pasado</p>
+            <p className="text-4xl font-bold">{totalVariants}</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Productos Activos</CardTitle>
+            <CardTitle>Total de Órdenes</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-4xl font-bold">540</p>
-            <p className="text-sm text-gray-500">+20 añadidos esta semana</p>
+            <p className="text-4xl font-bold">{totalOrders}</p>
           </CardContent>
         </Card>
       </div>

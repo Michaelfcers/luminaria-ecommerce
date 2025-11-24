@@ -18,6 +18,7 @@ import { FileText } from "lucide-react"
 
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
+import { AddToCartButton } from "./add-to-cart-button"
 // A helper function to format attributes for display
 const formatAttributes = (attributes: Record<string, any>): string => {
   return Object.entries(attributes)
@@ -148,6 +149,7 @@ export function ProductDetailClient({
                   </Tooltip>
                 </TooltipProvider>
               )}
+              <AddToCartButton variant={selectedVariant} product={product} />
             </CardContent>
           </Card>
 
