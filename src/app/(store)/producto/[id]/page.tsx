@@ -2,28 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import { notFound } from "next/navigation"
 import { ProductDetailClient } from "@/features/store/components/product-detail-client"
 import { RecommendedProducts } from "@/features/store/components/recommended-products"
-
-type ProductVariant = {
-  id: string
-  [key: string]: any
-}
-
-type ProductMedia = {
-  url: string
-  type: string
-  alt_text: string | null
-  is_primary: boolean
-}
-
-type ProductDetailFromDB = {
-  id: string
-  name: string
-  description: string | null
-  attributes: Record<string, any> | null
-  product_media: ProductMedia[] | null
-  product_variants: ProductVariant[] | null
-  [key: string]: any
-}
+import { Product, ProductMedia } from "@/features/store/types"
 
 export type RecommendedProduct = {
   id: string
@@ -41,8 +20,7 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
       `
       *,
       brands ( name ),
-      product_media ( url, type, alt_text, is_primary ),
-      product_variants ( * )
+      product_variants ( *, product_variant_media ( url, type, alt_text, is_primary ) )
     `
     )
     .eq("id", params.id)
@@ -60,8 +38,9 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
     .neq("id", params.id)
     .limit(10)
 
-  const product = productData as ProductDetailFromDB
-  const technicalSheet = product.product_media?.find((media) => media.type === "pdf")?.url
+  const product = productData as Product
+  // technicalSheet will now be handled within ProductDetailClient
+
 
   const recommendedProducts: RecommendedProduct[] = (recommendedProductsData || []).map(
     (p: any) => ({
@@ -73,12 +52,9 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
   )
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-100">
       <main className="container mx-auto px-4 py-8">
-        <ProductDetailClient
-          product={product}
-          technicalSheet={technicalSheet}
-        />
+        <ProductDetailClient product={product} />
         <div className="mt-16">
           <RecommendedProducts
             currentProductId={product.id}

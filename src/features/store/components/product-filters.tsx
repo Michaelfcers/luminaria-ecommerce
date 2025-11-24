@@ -76,7 +76,7 @@ export function ProductFilters({ categories, brands }: { categories: FilterItem[
 
   return (
     <div className="space-y-6">
-      <Card>
+      <Card className="bg-white rounded-2xl">
         <CardHeader>
           <CardTitle className="text-lg">Filtros</CardTitle>
         </CardHeader>

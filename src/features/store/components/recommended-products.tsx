@@ -42,7 +42,7 @@ export function RecommendedProducts({
   }
 
   return (
-    <section>
+    <section className="p-8 rounded-lg">
       <div className="flex items-center justify-between mb-8">
         <h2 className="text-2xl font-bold text-foreground">Productos Recomendados</h2>
         <div className="flex gap-2">
@@ -63,7 +63,7 @@ export function RecommendedProducts({
         {products.map((product) => (
           <Card
             key={product.id}
-            className="flex-shrink-0 w-80 group overflow-hidden border-0 elegant-shadow hover-lift"
+            className="flex-shrink-0 w-80 group overflow-hidden bg-white rounded-2xl elegant-shadow hover-lift"
           >
             <div className="relative overflow-hidden">
               <img

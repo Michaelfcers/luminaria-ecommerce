@@ -6,13 +6,14 @@ import { ShoppingCart, Check } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { getOrCreateUserCart, addItemToCart } from "@/lib/cart"
 import { useToast } from "@/components/ui/use-toast"
+import { Product, ProductVariant } from "../types"
 
 export function AddToCartButton({
   variant,
   product,
 }: {
-  variant: any
-  product: any
+  variant: ProductVariant | null
+  product: Product
 }) {
   const [isAdding, setIsAdding] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)

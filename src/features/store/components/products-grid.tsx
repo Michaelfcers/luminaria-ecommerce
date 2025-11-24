@@ -71,13 +71,13 @@ export function ProductsGrid({ products = [] }: { products: Product[] }) {
       {/* Products Grid */}
       <div
         className={
-          viewMode === "grid" ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" : "space-y-4"
+          viewMode === "grid" ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8" : "space-y-4"
         }
       >
         {products.map((product) => (
           <Card
             key={product.id}
-            className={`group overflow-hidden border-0 elegant-shadow hover-lift ${
+            className={`group overflow-hidden border-0 elegant-shadow hover-lift rounded-2xl bg-white ${
               viewMode === "list" ? "flex flex-row" : ""
             }`}
           >
@@ -86,7 +86,7 @@ export function ProductsGrid({ products = [] }: { products: Product[] }) {
                 src={product.image || "/placeholder.svg"}
                 alt={product.name}
                 className={`object-cover transition-transform duration-300 group-hover:scale-105 ${
-                  viewMode === "list" ? "h-32 w-full" : "h-64 w-full"
+                  viewMode === "list" ? "h-32 w-full" : "h-48 w-full"
                 }`}
               />
               {product.isNew && (
