@@ -7,7 +7,6 @@ import { ProductFilters } from "@/features/store/components/product-filters"
 type ProductWithRelations = {
   id: string
   name: string
-  list_price_usd: number | null
   created_at: string
   brands: { name: string } | null
   product_media: { url: string; is_primary: boolean }[] | null
@@ -29,6 +28,16 @@ export default async function ProductsPage({
   const cookieStore = cookies()
   const supabase = createClient(cookieStore)
 
+  // Fetch all categories to determine hierarchy
+  const { data: allCategoriesData, error: categoriesError } = await supabase
+    .from("categories")
+    .select("id, name, parent_id")
+
+  if (categoriesError) {
+    console.error("Error fetching categories:", categoriesError)
+  }
+  const allCategories = allCategoriesData || []
+
   // Extract filter values from searchParams
   const selectedCategoryIds = Array.isArray(searchParams.categories)
     ? searchParams.categories
@@ -41,6 +50,17 @@ export default async function ProductsPage({
     ? searchParams.brands.split(",")
     : []
 
+  // Expand selected categories to include sub-categories
+  let idsToFilter = [...selectedCategoryIds]
+  selectedCategoryIds.forEach((id) => {
+    const subCategories = allCategories
+      .filter((cat) => String(cat.parent_id) === String(id))
+      .map((cat) => String(cat.id))
+    idsToFilter.push(...subCategories)
+  })
+  // Remove duplicates
+  idsToFilter = [...new Set(idsToFilter)]
+
   // Build the Supabase query for products
   let productsQuery = supabase
     .from("products")
@@ -48,7 +68,6 @@ export default async function ProductsPage({
       `
       id,
       name,
-      list_price_usd,
       created_at,
       brands ( name ),
       product_media ( url, is_primary ),
@@ -61,11 +80,8 @@ export default async function ProductsPage({
     productsQuery = productsQuery.in("brand_id", selectedBrandIds)
   }
 
-  if (selectedCategoryIds.length > 0) {
-    productsQuery = productsQuery.in(
-      "product_categories.category_id",
-      selectedCategoryIds
-    )
+  if (idsToFilter.length > 0) {
+    productsQuery = productsQuery.in("product_categories.category_id", idsToFilter)
   }
 
   const { data: productsData, error: productsError } = await productsQuery
@@ -75,20 +91,11 @@ export default async function ProductsPage({
     // Optionally, render an error state
   }
 
-  // Fetch categories
-  const { data: categoriesData, error: categoriesError } = await supabase
-    .from("categories")
-    .select("id, name")
-
-  if (categoriesError) {
-    console.error("Error fetching categories:", categoriesError)
-  }
-
-  const categories: FilterItem[] =
-    categoriesData?.map((cat) => ({
-      id: String(cat.id), // Ensure ID is string for FilterItem
+  const categoriesForFilter: FilterItem[] =
+    allCategories.map((cat) => ({
+      id: String(cat.id),
       name: cat.name,
-      count: 0, // Placeholder, actual count would require a more complex query
+      count: 0, // Placeholder
     })) || []
 
   // Fetch brands
@@ -102,7 +109,7 @@ export default async function ProductsPage({
 
   const brands: FilterItem[] =
     brandsData?.map((brand) => ({
-      id: String(brand.id), // Ensure ID is string for FilterItem
+      id: String(brand.id),
       name: brand.name,
       count: 0, // Placeholder
     })) || []
@@ -124,11 +131,9 @@ export default async function ProductsPage({
       return {
         id: product.id,
         name: product.name,
-        price: product.list_price_usd ?? 0,
         image: "/products/luminaria-plafon.webp",
         brand: product.brands?.name || "Sin Marca",
         isNew: isNew,
-        // category, rating, and reviews are not in the DB schema provided
       }
     }) ?? []
 
@@ -147,7 +152,7 @@ export default async function ProductsPage({
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Filters Sidebar */}
         <aside className="lg:w-64 flex-shrink-0">
-          <ProductFilters categories={categories} brands={brands} />
+          <ProductFilters categories={categoriesForFilter} brands={brands} />
         </aside>
 
         {/* Products Grid */}

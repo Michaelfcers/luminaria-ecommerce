@@ -121,6 +121,11 @@ export default async function ProductsPage() {
                         Editar
                       </Link>
                     </Button>
+                    <Button asChild variant="outline" size="sm" className="mr-2">
+                      <Link href={`/products/${product.id}/versions`}>
+                        Editar Versiones
+                      </Link>
+                    </Button>
                     <DeleteProductButton productId={product.id} />
                   </TableCell>
                 </TableRow>

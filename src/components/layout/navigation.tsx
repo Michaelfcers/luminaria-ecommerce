@@ -1,5 +1,7 @@
 import Link from "next/link"
+import { cookies } from "next/headers"
 import { LayoutDashboard, Package, Search, ShoppingBag } from "lucide-react"
+import { createClient } from "@/lib/supabase/server"
 import { Button } from "@/components/ui/button"
 import {
   NavigationMenu,
@@ -10,40 +12,32 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu"
 import { UserNav } from "./user-nav"
-
 import { CartIcon } from "./cart-icon"
 
-const categories = {
-  luminarias: {
-    title: "Luminarias",
-    items: [
-      { name: "Lámparas de Techo", href: "/productos?categoria=lamparas-techo" },
-      { name: "Lámparas Colgantes", href: "/productos?categoria=lamparas-colgantes" },
-      { name: "Plafones", href: "/productos?categoria=plafones" },
-      { name: "Spots Empotrados", href: "/productos?categoria=spots" },
-    ],
-  },
-  lamparas: {
-    title: "Lámparas",
-    items: [
-      { name: "Lámparas de Mesa", href: "/productos?categoria=lamparas-mesa" },
-      { name: "Lámparas de Pie", href: "/productos?categoria=lamparas-pie" },
-      { name: "Apliques de Pared", href: "/productos?categoria=apliques" },
-      { name: "Lámparas Decorativas", href: "/productos?categoria=decorativas" },
-    ],
-  },
-  accesorios: {
-    title: "Accesorios Eléctricos",
-    items: [
-      { name: "Interruptores", href: "/productos?categoria=interruptores" },
-      { name: "Enchufes", href: "/productos?categoria=enchufes" },
-      { name: "Reguladores", href: "/productos?categoria=reguladores" },
-      { name: "Cables y Conectores", href: "/productos?categoria=cables" },
-    ],
-  },
+type Category = {
+  id: string
+  name: string
+  slug: string
+  parent_id: string | null
 }
 
 export async function Navigation() {
+  const cookieStore = cookies()
+  const supabase = createClient(cookieStore)
+
+  const { data: categoriesData, error } = await supabase
+    .from("categories")
+    .select("id, name, slug, parent_id")
+    .is("deleted_at", null)
+
+  if (error) {
+    console.error("Error fetching categories:", error)
+  }
+
+  const allCategories = (categoriesData as Category[]) || []
+
+  const mainCategories = allCategories.filter((cat) => cat.parent_id === null)
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
@@ -73,23 +67,13 @@ export async function Navigation() {
                 </Link>
               </NavigationMenuItem>
 
-              {Object.entries(categories).map(([key, category]) => (
-                <NavigationMenuItem key={key}>
-                  <NavigationMenuTrigger className="text-sm font-medium">{category.title}</NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <div className="grid w-[400px] gap-3 p-4">
-                      {category.items.map((item) => (
-                        <NavigationMenuLink key={item.name} asChild>
-                          <Link
-                            href={item.href}
-                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                          >
-                            <div className="text-sm font-medium leading-none">{item.name}</div>
-                          </Link>
-                        </NavigationMenuLink>
-                      ))}
-                    </div>
-                  </NavigationMenuContent>
+              {mainCategories.map((category) => (
+                <NavigationMenuItem key={category.id}>
+                  <Link href={`/productos?categories=${category.id}`} legacyBehavior passHref>
+                    <NavigationMenuLink className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50">
+                      {category.name}
+                    </NavigationMenuLink>
+                  </Link>
                 </NavigationMenuItem>
               ))}
 

@@ -3,58 +3,29 @@ import { useRef } from "react"
 import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { ChevronLeft, ChevronRight } from "lucide-react"
+
+export type RecommendedProduct = {
+  id: string
+  name: string
+  price: number | null
+  image: string
+}
 
 interface RecommendedProductsProps {
   currentProductId: string
+  recommendedProducts: RecommendedProduct[]
 }
 
-export function RecommendedProducts({ currentProductId }: RecommendedProductsProps) {
+export function RecommendedProducts({
+  currentProductId,
+  recommendedProducts,
+}: RecommendedProductsProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
 
-  const recommendedProducts = [
-    {
-      id: 2,
-      name: "Plafón LED Circular Premium",
-      price: 189,
-      image: "/products/luminaria-plafon.webp",
-      category: "Luminarias",
-      rating: 4.6,
-    },
-    {
-      id: 3,
-      name: "Aplique de Pared Elegante",
-      price: 149,
-      image: "/products/luminaria-plafon.webp",
-      category: "Lámparas",
-      rating: 4.7,
-    },
-    {
-      id: 4,
-      name: "Lámpara de Mesa Premium",
-      price: 229,
-      image: "/products/luminaria-plafon.webp",
-      category: "Lámparas",
-      rating: 4.9,
-    },
-    {
-      id: 7,
-      name: "Lámpara de Pie Minimalista",
-      price: 349,
-      image: "/products/luminaria-plafon.webp",
-      category: "Lámparas",
-      rating: 4.8,
-    },
-    {
-      id: 5,
-      name: "Spot Empotrado LED",
-      price: 79,
-      image: "/products/luminaria-plafon.webp",
-      category: "Luminarias",
-      rating: 4.5,
-    },
-  ].filter((product) => product.id !== currentProductId)
+  const products = recommendedProducts.filter(
+    (product) => String(product.id) !== String(currentProductId)
+  )
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
@@ -64,6 +35,10 @@ export function RecommendedProducts({ currentProductId }: RecommendedProductsPro
         behavior: "smooth",
       })
     }
+  }
+
+  if (products.length === 0) {
+    return null
   }
 
   return (
@@ -85,7 +60,7 @@ export function RecommendedProducts({ currentProductId }: RecommendedProductsPro
         className="flex gap-6 overflow-x-auto scrollbar-hide pb-4"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
-        {recommendedProducts.map((product) => (
+        {products.map((product) => (
           <Card
             key={product.id}
             className="flex-shrink-0 w-80 group overflow-hidden border-0 elegant-shadow hover-lift"
@@ -98,16 +73,11 @@ export function RecommendedProducts({ currentProductId }: RecommendedProductsPro
               />
             </div>
             <CardContent className="p-4">
-              <Badge variant="secondary" className="text-xs mb-2">
-                {product.category}
-              </Badge>
-              <h3 className="font-semibold text-sm mb-2 line-clamp-2">{product.name}</h3>
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-yellow-400">★</span>
-                <span className="text-sm text-muted-foreground">{product.rating}</span>
-              </div>
+              <h3 className="font-semibold text-sm mb-2 line-clamp-2 h-10">{product.name}</h3>
               <div className="flex items-center justify-between">
-                <span className="text-lg font-bold text-primary">€{product.price}</span>
+                {product.price && (
+                  <span className="text-lg font-bold text-primary">${product.price}</span>
+                )}
                 <Button asChild size="sm">
                   <Link href={`/producto/${product.id}`}>Ver</Link>
                 </Button>

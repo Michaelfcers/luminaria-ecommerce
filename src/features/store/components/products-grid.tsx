@@ -11,8 +11,6 @@ import { Grid, List } from "lucide-react"
 type Product = {
   id: number | string;
   name: string;
-  price: number;
-  originalPrice?: number;
   image: string;
   category?: string;
   brand?: string;
@@ -43,8 +41,6 @@ export function ProductsGrid({ products = [] }: { products: Product[] }) {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="featured">Destacados</SelectItem>
-              <SelectItem value="price-low">Precio: Menor a Mayor</SelectItem>
-              <SelectItem value="price-high">Precio: Mayor a Menor</SelectItem>
               <SelectItem value="newest">Más Nuevos</SelectItem>
               <SelectItem value="rating">Mejor Valorados</SelectItem>
             </SelectContent>
@@ -96,11 +92,6 @@ export function ProductsGrid({ products = [] }: { products: Product[] }) {
               {product.isNew && (
                 <Badge className="absolute top-3 left-3 bg-primary text-primary-foreground">Nuevo</Badge>
               )}
-              {product.originalPrice && (
-                <Badge variant="destructive" className="absolute top-3 right-3">
-                  Oferta
-                </Badge>
-              )}
             </div>
 
             <CardContent className={`p-4 ${viewMode === "list" ? "flex-1" : ""}`}>
@@ -132,15 +123,8 @@ export function ProductsGrid({ products = [] }: { products: Product[] }) {
                 </div>
               )}
 
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-lg font-bold text-primary">${product.price}</span>
-                {product.originalPrice && (
-                  <span className="text-sm text-muted-foreground line-through">${product.originalPrice}</span>
-                )}
-              </div>
-
-              <Button asChild size="sm" className="w-full">
-                <Link href={`/producto/${product.id}`}>Ver Detalles</Link>
+              <Button asChild size="sm" className="w-full mt-3">
+                <Link href={`/producto/${product.id}`}>Ver todas las versiones</Link>
               </Button>
             </CardContent>
           </Card>
