@@ -3,16 +3,9 @@ import { cookies } from "next/headers"
 import { LayoutDashboard, Package, Search, ShoppingBag } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { Button } from "@/components/ui/button"
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu"
 import { UserNav } from "./user-nav"
 import { CartIcon } from "./cart-icon"
+import { ProductsDropdown } from "./products-dropdown" // Import the new component
 
 type Category = {
   id: string
@@ -49,52 +42,33 @@ export async function Navigation() {
           </Link>
 
           {/* Navigation Menu */}
-          <NavigationMenu className="hidden md:flex">
-            <NavigationMenuList>
-              <NavigationMenuItem>
-                <Link href="/" legacyBehavior passHref>
-                  <NavigationMenuLink className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50">
-                    Inicio
-                  </NavigationMenuLink>
+          <nav className="hidden md:flex">
+            <ul className="flex flex-1 list-none items-center justify-center gap-1">
+              <li>
+                <Link href="/" className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50">
+                  Inicio
                 </Link>
-              </NavigationMenuItem>
+              </li>
               
-              <NavigationMenuItem>
-                <NavigationMenuTrigger>Productos</NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
-                    {mainCategories.map((category) => (
-                      <li key={category.id}>
-                        <Link href={`/productos?categories=${category.id}`} legacyBehavior passHref>
-                          <NavigationMenuLink className="text-foreground block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                            <div className="text-sm font-medium leading-none">{category.name}</div>
-                          </NavigationMenuLink>
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
+              <li>
+                <ProductsDropdown mainCategories={mainCategories} />
+              </li>
 
-              <NavigationMenuItem>
-                <Link href="/sobre-nosotros" legacyBehavior passHref>
-                  <NavigationMenuLink className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50">
-                    Sobre Nosotros
-                  </NavigationMenuLink>
+              <li>
+                <Link href="/sobre-nosotros" className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50">
+                  Sobre Nosotros
                 </Link>
-              </NavigationMenuItem>
+              </li>
 
-              <NavigationMenuItem>
-                <Link href="/ofertas" legacyBehavior passHref>
-                  <NavigationMenuLink className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50">
-                    Ofertas
-                  </NavigationMenuLink>
+              <li>
+                <Link href="/ofertas" className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50">
+                  Ofertas
                 </Link>
-              </NavigationMenuItem>
+              </li>
 
               
-            </NavigationMenuList>
-          </NavigationMenu>
+            </ul>
+          </nav>
 
           {/* Actions */}
           <div className="flex items-center space-x-2">

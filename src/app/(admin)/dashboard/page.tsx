@@ -79,7 +79,7 @@ export default async function DashboardPage() {
       </div>
       
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card>
+        <Card className="rounded-3xl elegant-shadow bg-white">
           <CardHeader>
             <CardTitle>Total de Categorías</CardTitle>
           </CardHeader>
@@ -87,7 +87,7 @@ export default async function DashboardPage() {
             <p className="text-4xl font-bold">{totalCategories}</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="rounded-3xl elegant-shadow bg-white">
           <CardHeader>
             <CardTitle>Total de Productos</CardTitle>
           </CardHeader>
@@ -95,7 +95,7 @@ export default async function DashboardPage() {
             <p className="text-4xl font-bold">{totalProducts}</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="rounded-3xl elegant-shadow bg-white">
           <CardHeader>
             <CardTitle>Total de Variantes</CardTitle>
           </CardHeader>
@@ -103,7 +103,7 @@ export default async function DashboardPage() {
             <p className="text-4xl font-bold">{totalVariants}</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="rounded-3xl elegant-shadow bg-white">
           <CardHeader>
             <CardTitle>Total de Órdenes</CardTitle>
           </CardHeader>
@@ -115,7 +115,7 @@ export default async function DashboardPage() {
 
       <div>
         <h2 className="text-2xl font-bold mb-4">Pedidos Recientes</h2>
-        <Card>
+        <Card className="rounded-3xl elegant-shadow bg-white">
           <Table>
             <TableHeader>
               <TableRow>

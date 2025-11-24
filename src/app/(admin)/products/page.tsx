@@ -54,7 +54,6 @@ export default async function ProductsPage() {
       id,
       name,
       status,
-      list_price_usd,
       stock,
       brands (name)
     `
@@ -83,7 +82,7 @@ export default async function ProductsPage() {
         </div>
       </div>
 
-      <Card>
+      <Card className="rounded-3xl elegant-shadow bg-white">
         <CardHeader>
           <CardTitle>Listado de Productos</CardTitle>
           <CardDescription>
@@ -97,7 +96,6 @@ export default async function ProductsPage() {
                 <TableHead>Nombre</TableHead>
                 <TableHead>Marca</TableHead>
                 <TableHead>Estado</TableHead>
-                <TableHead>Precio</TableHead>
                 <TableHead>Stock</TableHead>
                 <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
@@ -111,9 +109,6 @@ export default async function ProductsPage() {
                     {product.brands?.name || "N/A"}
                   </TableCell>
                   <TableCell>{product.status}</TableCell>
-                  <TableCell>
-                    ${product.list_price_usd?.toFixed(2) ?? "0.00"}
-                  </TableCell>
                   <TableCell>{product.stock}</TableCell>
                   <TableCell className="text-right">
                     <Button asChild variant="outline" size="sm" className="mr-2">

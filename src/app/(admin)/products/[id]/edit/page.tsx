@@ -111,7 +111,7 @@ export default async function EditProductPage({
         </Button>
       </div>
 
-      <Card>
+      <Card className="rounded-3xl elegant-shadow bg-white">
         <CardHeader>
           <CardTitle>{product.name}</CardTitle>
           <CardDescription>

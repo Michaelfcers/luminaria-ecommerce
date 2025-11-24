@@ -203,7 +203,7 @@ export function ProductForm({
           />
         </div>
 
-        <Card>
+        <Card className="rounded-3xl elegant-shadow bg-white">
           <CardHeader>
             <CardTitle>Disponibilidad y Estado</CardTitle>
           </CardHeader>
@@ -291,7 +291,7 @@ export function ProductForm({
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="rounded-3xl elegant-shadow bg-white">
           <CardHeader>
             <CardTitle>Precios</CardTitle>
           </CardHeader>
@@ -327,7 +327,7 @@ export function ProductForm({
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="rounded-3xl elegant-shadow bg-white">
           <CardHeader>
             <CardTitle>Especificaciones Técnicas</CardTitle>
           </CardHeader>

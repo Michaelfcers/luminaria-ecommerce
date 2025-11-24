@@ -77,7 +77,7 @@ export default async function ProductVersionsPage({
         </div>
       </div>
 
-      <Card>
+      <Card className="rounded-3xl elegant-shadow bg-white">
         <CardHeader>
           <CardTitle>Listado de Versiones</CardTitle>
           <CardDescription>
