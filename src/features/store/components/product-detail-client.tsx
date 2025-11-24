@@ -72,7 +72,7 @@ export function ProductDetailClient({
       <div className="grid lg:grid-cols-2 gap-12">
         {/* Left side: Image & Attributes */}
         <div className="space-y-6">
-          <Card className="overflow-hidden w-full rounded-2xl elegant-shadow">
+          <Card className="overflow-hidden w-full rounded-3xl elegant-shadow bg-white">
             <CardContent className="p-0">
               <Image
                 src={primaryProductImage}
@@ -86,7 +86,7 @@ export function ProductDetailClient({
           </Card>
 
           {product.attributes && Object.keys(product.attributes).length > 0 && (
-            <Card className="rounded-2xl elegant-shadow">
+            <Card className="rounded-3xl elegant-shadow bg-white">
               <CardHeader>
                 <CardTitle>Atributos Generales</CardTitle>
               </CardHeader>
@@ -108,7 +108,7 @@ export function ProductDetailClient({
             <h2 className="text-3xl font-bold">{selectedVariant.name || formatAttributes(selectedVariant.attributes)}</h2>
           )}
 
-          <Card className="rounded-2xl elegant-shadow">
+          <Card className="rounded-3xl elegant-shadow bg-white">
             <CardHeader>
               <CardTitle>Selecciona una Versión</CardTitle>
             </CardHeader>
@@ -157,7 +157,7 @@ export function ProductDetailClient({
           </Card>
 
           {selectedVariant && (
-            <Card className="rounded-2xl elegant-shadow">
+            <Card className="rounded-3xl elegant-shadow bg-white">
               <CardHeader>
                 <CardTitle>Detalles</CardTitle>
               </CardHeader>

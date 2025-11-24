@@ -27,7 +27,7 @@ export default function CartPage() {
         <div className="grid md:grid-cols-[2fr_1fr] gap-8">
           <div className="space-y-6">
             {items.map((item) => (
-              <Card key={item.cartItemId}>
+              <Card key={item.cartItemId} className="rounded-3xl elegant-shadow bg-white">
                 <CardContent className="p-6 flex items-center gap-6">
                   <img src={item.image || "/placeholder.svg"} alt={item.name} width={100} height={100} className="rounded-md" />
                   <div className="flex-1">
@@ -52,7 +52,7 @@ export default function CartPage() {
           </div>
 
           <div className="space-y-6">
-            <Card>
+            <Card className="rounded-3xl elegant-shadow bg-white">
               <CardHeader>
                 <CardTitle>Resumen del Pedido</CardTitle>
               </CardHeader>
