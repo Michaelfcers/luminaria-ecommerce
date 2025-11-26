@@ -25,3 +25,24 @@ export async function updateVariant(variantId: string, data: any) {
 
   return { error: null }
 }
+
+export async function createVariant(productId: string, data: any) {
+  const cookieStore = cookies()
+  const supabase = createClient(cookieStore)
+
+  const { data: newVariant, error } = await supabase
+    .from("product_variants")
+    .insert({ ...data, product_id: productId })
+    .select()
+    .single()
+
+  if (error) {
+    console.error("Error creating variant:", error)
+    return { error: error.message }
+  }
+
+  revalidatePath(`/products/${productId}/versions`)
+  revalidatePath(`/products/${productId}`)
+
+  return { error: null, data: newVariant }
+}
