@@ -1,11 +1,12 @@
 import Link from "next/link"
 import { cookies } from "next/headers"
-import { LayoutDashboard, Package, Search, ShoppingBag } from "lucide-react"
+import { LayoutDashboard, Package, ShoppingBag } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { Button } from "@/components/ui/button"
 import { UserNav } from "./user-nav"
 import { CartIcon } from "./cart-icon"
 import { ProductsDropdown } from "./products-dropdown" // Import the new component
+import { SearchDialog } from "./search-dialog"
 
 type Category = {
   id: string
@@ -49,7 +50,7 @@ export async function Navigation() {
                   Inicio
                 </Link>
               </li>
-              
+
               <li>
                 <ProductsDropdown mainCategories={mainCategories} />
               </li>
@@ -66,15 +67,13 @@ export async function Navigation() {
                 </Link>
               </li>
 
-              
+
             </ul>
           </nav>
 
           {/* Actions */}
           <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="icon">
-              <Search className="h-4 w-4" />
-            </Button>
+            <SearchDialog />
             <UserNav />
             <CartIcon />
           </div>

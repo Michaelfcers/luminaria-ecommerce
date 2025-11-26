@@ -26,17 +26,19 @@ export async function UserNav() {
 
   let storeName = "My Store"; // Default store name
   let userDisplayName: string | null = null;
+  let userRole: string | null = null;
 
   if (user) {
-    // Fetch user's display_name from profiles table
+    // Fetch user's role from profiles table
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('display_name')
+      .select('display_name, role')
       .eq('id', user.id)
       .single();
 
     if (profile && !profileError) {
       userDisplayName = profile.display_name;
+      userRole = profile.role;
     }
 
     // Try to find a store where the user is the owner
@@ -114,18 +116,28 @@ export async function UserNav() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <Link href="/dashboard">
+          <Link href="/account">
             <DropdownMenuItem>
-              <LayoutDashboard className="mr-2 h-4 w-4" />
-              <span>Dashboard</span>
+              <User className="mr-2 h-4 w-4" />
+              <span>Mi Cuenta</span>
             </DropdownMenuItem>
           </Link>
-          <Link href="/products">
-            <DropdownMenuItem>
-              <Package className="mr-2 h-4 w-4" />
-              <span>Products</span>
-            </DropdownMenuItem>
-          </Link>
+          {userRole !== 'buyer' && (
+            <>
+              <Link href="/dashboard">
+                <DropdownMenuItem>
+                  <LayoutDashboard className="mr-2 h-4 w-4" />
+                  <span>Dashboard</span>
+                </DropdownMenuItem>
+              </Link>
+              <Link href="/products">
+                <DropdownMenuItem>
+                  <Package className="mr-2 h-4 w-4" />
+                  <span>Products</span>
+                </DropdownMenuItem>
+              </Link>
+            </>
+          )}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <form action={signOut}>
