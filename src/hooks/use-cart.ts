@@ -39,10 +39,16 @@ export function useCart() {
     if (user) {
       setIsLoading(true)
       try {
-        const userCart = await getOrCreateUserCart(user.id)
-        setCart(userCart)
-        const cartItems = await getCartItems(userCart.id)
-        setItems(cartItems)
+        let currentCart = cart
+        if (!currentCart) {
+          currentCart = await getOrCreateUserCart(user.id)
+          setCart(currentCart)
+        }
+
+        if (currentCart) {
+          const cartItems = await getCartItems(currentCart.id)
+          setItems(cartItems)
+        }
       } catch (error) {
         console.error(error)
         toast({ title: "Error", description: "No se pudo cargar el carrito." })
@@ -55,7 +61,7 @@ export function useCart() {
       setItems([])
       setIsLoading(false)
     }
-  }, [user, isAuthLoading, toast])
+  }, [user, isAuthLoading, toast, cart])
 
   useEffect(() => {
     loadCart()

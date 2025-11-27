@@ -20,6 +20,7 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
       `
       *,
       brands ( name ),
+      product_media ( url, is_primary ),
       product_variants ( *, product_variant_media ( url, type, alt_text, is_primary ) )
     `
     )
@@ -43,12 +44,18 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
 
 
   const recommendedProducts: RecommendedProduct[] = (recommendedProductsData || []).map(
-    (p: any) => ({
-      id: p.id,
-      name: p.name,
-      price: p.list_price_usd,
-      image: "/products/luminaria-plafon.webp",
-    })
+    (p: any) => {
+      const primaryMedia = Array.isArray(p.product_media)
+        ? p.product_media.find((media: any) => media.is_primary) || p.product_media[0]
+        : null
+
+      return {
+        id: p.id,
+        name: p.name,
+        price: p.list_price_usd,
+        image: primaryMedia ? primaryMedia.url : "/placeholder-image.jpg",
+      }
+    }
   )
 
   return (

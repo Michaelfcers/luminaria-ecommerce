@@ -42,13 +42,13 @@ export default async function ProductsPage({
   const selectedCategoryIds = Array.isArray(searchParams.categories)
     ? searchParams.categories
     : searchParams.categories
-    ? searchParams.categories.split(",")
-    : []
+      ? searchParams.categories.split(",")
+      : []
   const selectedBrandIds = Array.isArray(searchParams.brands)
     ? searchParams.brands
     : searchParams.brands
-    ? searchParams.brands.split(",")
-    : []
+      ? searchParams.brands.split(",")
+      : []
 
   // Expand selected categories to include sub-categories
   let idsToFilter = [...selectedCategoryIds]
@@ -131,7 +131,7 @@ export default async function ProductsPage({
       return {
         id: product.id,
         name: product.name,
-        image: "/products/luminaria-plafon.webp",
+        image: primaryMedia ? primaryMedia.url : "/placeholder-image.jpg",
         brand: product.brands?.name || "Sin Marca",
         isNew: isNew,
       }

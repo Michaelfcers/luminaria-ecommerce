@@ -55,20 +55,33 @@ export async function getCartItems(cartId: string): Promise<CartItem[]> {
     `
     )
     .eq("cart_id", cartId)
+  // We can't strictly filter by is_primary here easily in a nested query without potentially filtering out the parent row if no primary image exists.
+  // So we fetch media and filter in JS, or we could use a more complex query.
+  // Given the schema, fetching all media for the product might be okay if there aren't many, but let's try to be efficient.
+  // For now, fetching all and finding primary in JS is safer than a complex join that might exclude items without images.
 
   if (error) {
     console.error("Error fetching cart items:", error)
     return []
   }
 
-  return items.map((item: any) => ({
-    id: item.product_variants.id,
-    name: `${item.product_variants.products.name} - ${item.product_variants.name}`,
-    price: item.product_variants.list_price_usd,
-    image: "/products/luminaria-plafon.webp",
-    quantity: item.quantity,
-    cartItemId: item.id,
-  }))
+  return items.map((item: any) => {
+    const product = item.product_variants.products
+    const variant = item.product_variants
+
+    // Find primary image, or fallback to first image, or default placeholder
+    const primaryImage = product.product_media?.find((m: any) => m.is_primary) || product.product_media?.[0]
+    const imageUrl = primaryImage ? primaryImage.url : "/placeholder-image.jpg" // You might want a real placeholder asset
+
+    return {
+      id: variant.id,
+      name: `${product.name} ${variant.name ? `- ${variant.name}` : ""}`,
+      price: variant.list_price_usd,
+      image: imageUrl,
+      quantity: item.quantity,
+      cartItemId: item.id,
+    }
+  })
 }
 
 export async function addItemToCart(cartId: string, variantId: string, quantity: number, price: number) {
