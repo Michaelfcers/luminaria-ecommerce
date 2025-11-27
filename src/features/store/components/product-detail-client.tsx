@@ -30,8 +30,10 @@ const formatAttributes = (attributes: Record<string, any>): string => {
 
 export function ProductDetailClient({
   product,
+  promotion,
 }: {
   product: Product
+  promotion?: any
 }) {
   // Initialize with the first variant, or null if there are no variants
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(
@@ -39,6 +41,39 @@ export function ProductDetailClient({
       ? product.product_variants[0]
       : null
   )
+
+  const getActivePromotion = (variant: any) => {
+    // 1. Check for variant-specific promotion
+    const variantPromo = variant?.promotion_variants?.find((pv: any) => {
+      const promo = pv.promotions
+      if (promo.status !== 'active') return false
+      const now = new Date()
+      const start = promo.starts_at ? new Date(promo.starts_at) : null
+      const end = promo.ends_at ? new Date(promo.ends_at) : null
+
+      if (start && now < start) return false
+      if (end && now > end) return false
+
+      return true
+    })?.promotions
+
+    if (variantPromo) return variantPromo
+
+    // 2. Fallback to product-level promotion
+    return promotion
+  }
+
+  const calculateDiscountedPrice = (price: number, variant: any) => {
+    const activePromo = getActivePromotion(variant)
+    if (!activePromo) return null
+
+    if (activePromo.type === 'percentage') {
+      return price * (1 - activePromo.value / 100)
+    } else if (activePromo.type === 'amount') {
+      return Math.max(0, price - activePromo.value)
+    }
+    return null
+  }
 
   const handleVariantChange = (variantId: string) => {
     if (!product.product_variants) return
@@ -54,6 +89,8 @@ export function ProductDetailClient({
 
   // Find the primary image for the main product
   const primaryProductImage = "/products/luminaria-plafon.webp"
+
+  const activePromo = selectedVariant ? getActivePromotion(selectedVariant) : null
 
   return (
     <div className="space-y-8">
@@ -121,11 +158,21 @@ export function ProductDetailClient({
                   <SelectValue placeholder="Elige una versión..." />
                 </SelectTrigger>
                 <SelectContent>
-                  {product.product_variants?.map((variant) => (
-                    <SelectItem key={variant.id} value={variant.id}>
-                      {variant.name || formatAttributes(variant.attributes)}
-                    </SelectItem>
-                  ))}
+                  {product.product_variants?.map((variant) => {
+                    const variantPromo = getActivePromotion(variant)
+                    return (
+                      <SelectItem key={variant.id} value={variant.id}>
+                        <div className="flex items-center gap-2">
+                          <span>{variant.name || formatAttributes(variant.attributes)}</span>
+                          {variantPromo && (
+                            <Badge variant="destructive" className="h-5 px-1.5 text-[10px]">
+                              {variantPromo.type === 'percentage' ? `-${variantPromo.value}%` : `-$${variantPromo.value}`}
+                            </Badge>
+                          )}
+                        </div>
+                      </SelectItem>
+                    )
+                  })}
                 </SelectContent>
               </Select>
               {variantTechnicalSheet ? (
@@ -164,29 +211,47 @@ export function ProductDetailClient({
               <CardContent className="space-y-4">
                 <div className="pb-2">
                   <h3 className="font-semibold">Precio:</h3>
-                  <p className="text-3xl font-bold text-primary">
-                    ${selectedVariant.list_price_usd}
-                  </p>
+                  {selectedVariant && (
+                    <div className="flex items-center gap-2">
+                      {calculateDiscountedPrice(selectedVariant.list_price_usd, selectedVariant) ? (
+                        <>
+                          <p className="text-3xl font-bold text-primary">
+                            ${calculateDiscountedPrice(selectedVariant.list_price_usd, selectedVariant)?.toFixed(2)}
+                          </p>
+                          <p className="text-xl text-muted-foreground line-through">
+                            ${selectedVariant.list_price_usd}
+                          </p>
+                          <Badge variant="destructive">
+                            {activePromo?.type === 'percentage' ? `-${activePromo.value}%` : `-$${activePromo?.value}`}
+                          </Badge>
+                        </>
+                      ) : (
+                        <p className="text-3xl font-bold text-primary">
+                          ${selectedVariant.list_price_usd}
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
-                
+
                 <Separator />
                 <div>
                   <h3 className="font-semibold">Horas de vida:</h3>
                   <p>{selectedVariant.life_hours}</p>
                 </div>
-                
+
                 <Separator />
                 <div>
                   <h3 className="font-semibold">Lúmenes:</h3>
                   <p>{selectedVariant.lumens}</p>
                 </div>
-                
+
                 <Separator />
                 <div>
                   <h3 className="font-semibold">Piezas por caja:</h3>
                   <p>{selectedVariant.pieces_per_box}</p>
                 </div>
-                
+
                 <Separator />
                 <div>
                   <h3 className="font-semibold">Atributos:</h3>

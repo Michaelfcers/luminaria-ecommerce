@@ -23,6 +23,8 @@ export interface CartItem {
   id: string // Product ID
   name: string
   price: number
+  originalPrice?: number
+  discount?: number
   image?: string
   quantity: number
   cartItemId?: number // This is the id from the cart_items table

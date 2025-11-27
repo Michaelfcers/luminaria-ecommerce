@@ -21,7 +21,32 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
       *,
       brands ( name ),
       product_media ( url, is_primary ),
-      product_variants ( *, product_variant_media ( url, type, alt_text, is_primary ) )
+      promotion_products (
+        promotions (
+            id,
+            name,
+            type,
+            value,
+            status,
+            starts_at,
+            ends_at
+        )
+      ),
+      product_variants (
+        *,
+        product_variant_media ( url, type, alt_text, is_primary ),
+        promotion_variants (
+            promotions (
+                id,
+                name,
+                type,
+                value,
+                status,
+                starts_at,
+                ends_at
+            )
+        )
+      )
     `
     )
     .eq("id", params.id)
@@ -58,10 +83,24 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
     }
   )
 
+  // Extract active promotion
+  const activePromotion = productData.promotion_products?.find((pp: any) => {
+    const promo = pp.promotions
+    if (promo.status !== 'active') return false
+    const now = new Date()
+    const start = promo.starts_at ? new Date(promo.starts_at) : null
+    const end = promo.ends_at ? new Date(promo.ends_at) : null
+
+    if (start && now < start) return false
+    if (end && now > end) return false
+
+    return true
+  })?.promotions
+
   return (
     <div className="min-h-screen bg-gray-100">
       <main className="container mx-auto px-4 py-8">
-        <ProductDetailClient product={product} />
+        <ProductDetailClient product={product} promotion={activePromotion} />
         <div className="mt-16">
           <RecommendedProducts
             currentProductId={product.id}

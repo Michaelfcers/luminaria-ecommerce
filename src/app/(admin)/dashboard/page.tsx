@@ -75,9 +75,14 @@ export default async function DashboardPage() {
               </Link>
             </Button>
           )}
+          <Button asChild>
+            <Link href="/promotions">
+              Gestionar Promociones
+            </Link>
+          </Button>
         </div>
       </div>
-      
+
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="rounded-3xl elegant-shadow bg-white">
           <CardHeader>

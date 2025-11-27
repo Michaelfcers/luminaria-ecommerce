@@ -41,7 +41,14 @@ export default function CartPage() {
                       className="w-20"
                       onChange={(e) => item.cartItemId && updateQuantity(item.cartItemId, Math.max(1, Number(e.target.value) || 1))}
                     />
-                    <span className="font-semibold text-lg">€{item.price.toFixed(2)}</span>
+                    <div className="flex flex-col items-end">
+                      <span className="font-semibold text-lg">€{item.price.toFixed(2)}</span>
+                      {item.originalPrice && (
+                        <span className="text-sm text-muted-foreground line-through">
+                          €{item.originalPrice.toFixed(2)}
+                        </span>
+                      )}
+                    </div>
                     <Button variant="ghost" size="icon" onClick={() => item.cartItemId && removeItem(item.cartItemId)}>
                       <Trash2Icon className="h-5 w-5" />
                     </Button>

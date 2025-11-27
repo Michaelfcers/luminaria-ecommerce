@@ -49,7 +49,27 @@ export async function getCartItems(cartId: string): Promise<CartItem[]> {
           product_media (
             url,
             is_primary
+          ),
+          promotion_products (
+            promotions (
+                id,
+                type,
+                value,
+                status,
+                starts_at,
+                ends_at
+            )
           )
+        ),
+        promotion_variants (
+            promotions (
+                id,
+                type,
+                value,
+                status,
+                starts_at,
+                ends_at
+            )
         )
       )
     `
@@ -69,14 +89,62 @@ export async function getCartItems(cartId: string): Promise<CartItem[]> {
     const product = item.product_variants.products
     const variant = item.product_variants
 
-    // Find primary image, or fallback to first image, or default placeholder
+    // Find primary image
     const primaryImage = product.product_media?.find((m: any) => m.is_primary) || product.product_media?.[0]
     const imageUrl = primaryImage ? primaryImage.url : "/placeholder-image.jpg" // You might want a real placeholder asset
+
+    // Calculate Price with Promotion
+    let price = variant.list_price_usd
+    let originalPrice = undefined
+    let discount = undefined
+
+    // 1. Check for variant-specific promotion
+    let activePromotion = variant.promotion_variants?.find((pv: any) => {
+      const promo = pv.promotions
+      if (promo.status !== 'active') return false
+      const now = new Date()
+      const start = promo.starts_at ? new Date(promo.starts_at) : null
+      const end = promo.ends_at ? new Date(promo.ends_at) : null
+
+      if (start && now < start) return false
+      if (end && now > end) return false
+
+      return true
+    })?.promotions
+
+    // 2. Fallback to product-level promotion
+    if (!activePromotion) {
+      activePromotion = product.promotion_products?.find((pp: any) => {
+        const promo = pp.promotions
+        if (promo.status !== 'active') return false
+        const now = new Date()
+        const start = promo.starts_at ? new Date(promo.starts_at) : null
+        const end = promo.ends_at ? new Date(promo.ends_at) : null
+
+        if (start && now < start) return false
+        if (end && now > end) return false
+
+        return true
+      })?.promotions
+    }
+
+    if (activePromotion) {
+      originalPrice = price
+      if (activePromotion.type === 'percentage') {
+        price = price * (1 - activePromotion.value / 100)
+        discount = activePromotion.value
+      } else if (activePromotion.type === 'amount') {
+        price = Math.max(0, price - activePromotion.value)
+        discount = activePromotion.value
+      }
+    }
 
     return {
       id: variant.id,
       name: `${product.name} ${variant.name ? `- ${variant.name}` : ""}`,
-      price: variant.list_price_usd,
+      price: price,
+      originalPrice: originalPrice,
+      discount: discount,
       image: imageUrl,
       quantity: item.quantity,
       cartItemId: item.id,

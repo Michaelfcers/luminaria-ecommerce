@@ -55,7 +55,16 @@ export default async function ProductsPage() {
       name,
       status,
       stock,
-      brands (name)
+      brands (name),
+      promotion_products (
+        promotions (
+            id,
+            name,
+            status,
+            value,
+            type
+        )
+      )
     `
     )
     .eq("store_id", store_id) // Filter by store_id
@@ -108,7 +117,15 @@ export default async function ProductsPage() {
                     {/* @ts-ignore */}
                     {product.brands?.name || "N/A"}
                   </TableCell>
-                  <TableCell>{product.status}</TableCell>
+                  <TableCell>
+                    {/* @ts-ignore */}
+                    {product.promotion_products?.some((pp: any) => pp.promotions?.status === 'active') && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-pink-100 text-pink-800 mr-2">
+                        Oferta
+                      </span>
+                    )}
+                    {product.status}
+                  </TableCell>
                   <TableCell>{product.stock}</TableCell>
                   <TableCell className="text-right">
                     <Button asChild variant="outline" size="sm" className="mr-2">
