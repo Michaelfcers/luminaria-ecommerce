@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
-import { cookies } from "next/headers"
+
 import { redirect } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -8,8 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { updateProfile } from "@/lib/actions/profile"
 
 export default async function AccountPage() {
-    const cookieStore = cookies()
-    const supabase = createClient(cookieStore)
+    const supabase = await createClient()
 
     const { data: { user } } = await supabase.auth.getUser()
 
@@ -33,7 +32,10 @@ export default async function AccountPage() {
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <form action={updateProfile} className="space-y-6">
+                    <form action={async (formData) => {
+                        "use server"
+                        await updateProfile(formData)
+                    }} className="space-y-6">
                         <div className="space-y-2">
                             <Label htmlFor="email">Correo Electrónico</Label>
                             <Input

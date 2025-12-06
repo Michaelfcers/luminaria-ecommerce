@@ -2,11 +2,10 @@
 
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
-import { cookies } from "next/headers"
+
 
 export async function updateVariant(variantId: string, data: any) {
-  const cookieStore = cookies()
-  const supabase = createClient(cookieStore)
+  const supabase = await createClient()
 
   const { error } = await supabase
     .from("product_variants")
@@ -27,8 +26,7 @@ export async function updateVariant(variantId: string, data: any) {
 }
 
 export async function createVariant(productId: string, data: any) {
-  const cookieStore = cookies()
-  const supabase = createClient(cookieStore)
+  const supabase = await createClient()
 
   const { data: newVariant, error } = await supabase
     .from("product_variants")

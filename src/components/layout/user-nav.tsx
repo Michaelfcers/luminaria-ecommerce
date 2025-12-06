@@ -14,14 +14,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { createClient } from "@/lib/supabase/server"
-import { cookies } from "next/headers"
+
 import { redirect } from "next/navigation"
 import Link from "next/link"
 import { LayoutDashboard, Package, User } from "lucide-react"
 
 export async function UserNav() {
-  const cookieStore = cookies()
-  const supabase = createClient(cookieStore)
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   let storeName = "My Store"; // Default store name
@@ -74,8 +73,7 @@ export async function UserNav() {
 
   const signOut = async () => {
     "use server"
-    const cookieStore = cookies()
-    const supabase = createClient(cookieStore)
+    const supabase = await createClient()
     await supabase.auth.signOut()
     return redirect("/login")
   }

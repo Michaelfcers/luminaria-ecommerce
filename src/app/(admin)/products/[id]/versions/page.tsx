@@ -1,4 +1,4 @@
-import { cookies } from "next/headers"
+
 import { notFound, redirect } from "next/navigation"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/server"
@@ -29,10 +29,10 @@ const formatAttributes = (attributes: Record<string, any>): string => {
 export default async function ProductVersionsPage({
   params,
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
-  const cookieStore = cookies()
-  const supabase = createClient(cookieStore)
+  const resolvedParams = await params
+  const supabase = await createClient()
 
   const {
     data: { user },
@@ -50,7 +50,7 @@ export default async function ProductVersionsPage({
       product_variants ( * )
     `
     )
-    .eq("id", params.id)
+    .eq("id", resolvedParams.id)
     .single()
 
   if (error || !product) {

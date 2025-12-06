@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { cookies } from "next/headers"
+
 import { LayoutDashboard, Package, ShoppingBag } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { Button } from "@/components/ui/button"
@@ -16,8 +16,7 @@ type Category = {
 }
 
 export async function Navigation() {
-  const cookieStore = cookies()
-  const supabase = createClient(cookieStore)
+  const supabase = await createClient()
 
   const { data: categoriesData, error } = await supabase
     .from("categories")

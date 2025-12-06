@@ -16,10 +16,11 @@ import { notFound } from "next/navigation"
 export default async function EditProductPage({
   params,
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
-  const { id } = params
-  const supabase = createClient()
+  const resolvedParams = await params
+  const { id } = resolvedParams
+  const supabase = await createClient()
 
   const {
     data: { user },

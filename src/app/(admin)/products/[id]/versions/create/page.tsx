@@ -1,4 +1,4 @@
-import { cookies } from "next/headers"
+
 import { notFound, redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { CreateVariantForm } from "@/features/admin/components/create-variant-form"
@@ -6,10 +6,10 @@ import { CreateVariantForm } from "@/features/admin/components/create-variant-fo
 export default async function CreateProductVersionPage({
     params,
 }: {
-    params: { id: string }
+    params: Promise<{ id: string }>
 }) {
-    const cookieStore = cookies()
-    const supabase = createClient(cookieStore)
+    const resolvedParams = await params
+    const supabase = await createClient()
 
     const {
         data: { user },
@@ -22,7 +22,7 @@ export default async function CreateProductVersionPage({
     const { data: product, error } = await supabase
         .from("products")
         .select("id, name")
-        .eq("id", params.id)
+        .eq("id", resolvedParams.id)
         .single()
 
     if (error || !product) {

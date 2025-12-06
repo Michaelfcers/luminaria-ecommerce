@@ -7,8 +7,9 @@ import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
-export default async function OrderDetailsPage({ params }: { params: { id: string } }) {
-  const supabase = createClient();
+export default async function OrderDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params
+  const supabase = await createClient();
 
   const {
     data: { user },
@@ -37,7 +38,7 @@ export default async function OrderDetailsPage({ params }: { params: { id: strin
         product_snapshot
       )
     `)
-    .eq("id", params.id)
+    .eq("id", resolvedParams.id)
     .single();
 
   if (error || !order) {

@@ -1,13 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { createClient } from "@/lib/supabase/server";
-import { cookies } from "next/headers";
+
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 export default async function OrdersPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },

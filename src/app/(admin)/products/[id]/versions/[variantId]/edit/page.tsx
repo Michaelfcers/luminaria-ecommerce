@@ -1,4 +1,4 @@
-import { cookies } from "next/headers"
+
 import { notFound, redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { EditVariantForm } from "@/features/admin/components/edit-variant-form"
@@ -6,10 +6,10 @@ import { EditVariantForm } from "@/features/admin/components/edit-variant-form"
 export default async function EditProductVersionPage({
   params,
 }: {
-  params: { id: string; variantId: string }
+  params: Promise<{ id: string; variantId: string }>
 }) {
-  const cookieStore = cookies()
-  const supabase = createClient(cookieStore)
+  const resolvedParams = await params
+  const supabase = await createClient()
 
   const {
     data: { user },
@@ -21,8 +21,8 @@ export default async function EditProductVersionPage({
   const { data: variant, error } = await supabase
     .from("product_variants")
     .select("*")
-    .eq("id", params.variantId)
-    .eq("product_id", params.id)
+    .eq("id", resolvedParams.variantId)
+    .eq("product_id", resolvedParams.id)
     .single()
 
   if (error || !variant) {
@@ -33,7 +33,7 @@ export default async function EditProductVersionPage({
   return (
     <div className="flex flex-col gap-8 p-4 md:p-8">
       <h1 className="text-3xl font-bold">Editar Versión de Producto</h1>
-      
+
       <EditVariantForm variant={variant} />
     </div>
   )

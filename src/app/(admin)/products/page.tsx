@@ -1,4 +1,4 @@
-import { cookies } from "next/headers"
+
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -21,8 +21,7 @@ import Link from "next/link"
 import { redirect } from "next/navigation"
 
 export default async function ProductsPage() {
-  const cookieStore = cookies()
-  const supabase = createClient(cookieStore)
+  const supabase = await createClient()
 
   const {
     data: { user },

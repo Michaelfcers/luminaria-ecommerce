@@ -2,11 +2,10 @@
 
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
-import { cookies } from "next/headers"
+
 
 export async function createPromotion(data: any, productIds: string[], variantIds: string[] = []) {
-    const cookieStore = cookies()
-    const supabase = createClient(cookieStore)
+    const supabase = await createClient()
 
     // 1. Create Promotion
     const { data: promotion, error: promoError } = await supabase
@@ -60,8 +59,7 @@ export async function createPromotion(data: any, productIds: string[], variantId
 }
 
 export async function updatePromotion(id: string, data: any, productIds: string[], variantIds: string[] = []) {
-    const cookieStore = cookies()
-    const supabase = createClient(cookieStore)
+    const supabase = await createClient()
 
     // 1. Update Promotion Details
     const { error: promoError } = await supabase
@@ -138,8 +136,7 @@ export async function updatePromotion(id: string, data: any, productIds: string[
 }
 
 export async function deletePromotion(id: string) {
-    const cookieStore = cookies()
-    const supabase = createClient(cookieStore)
+    const supabase = await createClient()
 
     const { error } = await supabase.from("promotions").delete().eq("id", id)
 

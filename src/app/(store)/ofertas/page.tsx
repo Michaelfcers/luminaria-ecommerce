@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import { ProductsGrid } from "@/features/store/components/products-grid"
 
 export default async function OffersPage() {
-    const supabase = createClient()
+    const supabase = await createClient()
 
     // Fetch products that have active promotions
     const { data: productsData, error } = await supabase

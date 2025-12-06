@@ -8,11 +8,11 @@ export async function registerUser(prevState: any, formData: FormData) {
     const email = rawEmail?.trim()
     const password = formData.get("password") as string
     const fullName = formData.get("fullName") as string
-    const origin = headers().get("origin")
+    const origin = (await headers()).get("origin")
 
     console.log("Registering user:", { email, fullName, origin })
 
-    const supabase = createClient()
+    const supabase = await createClient()
 
     const { data, error } = await supabase.auth.signUp({
         email,

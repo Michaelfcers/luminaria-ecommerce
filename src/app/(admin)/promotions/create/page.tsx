@@ -1,11 +1,10 @@
-import { cookies } from "next/headers"
+
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { PromotionForm } from "@/features/admin/components/promotion-form"
 
 export default async function CreatePromotionPage() {
-    const cookieStore = cookies()
-    const supabase = createClient(cookieStore)
+    const supabase = await createClient()
 
     const {
         data: { user },

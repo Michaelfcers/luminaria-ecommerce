@@ -1,4 +1,4 @@
-import { cookies } from "next/headers"
+
 import { Button } from "@/components/ui/button"
 import {
     Card,
@@ -22,8 +22,7 @@ import { format } from "date-fns"
 import { es } from "date-fns/locale"
 
 export default async function PromotionsPage() {
-    const cookieStore = cookies()
-    const supabase = createClient(cookieStore)
+    const supabase = await createClient()
 
     const {
         data: { user },
@@ -103,8 +102,8 @@ export default async function PromotionsPage() {
                                     </TableCell>
                                     <TableCell>
                                         <span className={`px-2 py-1 rounded-full text-xs ${promo.status === 'active' ? 'bg-green-100 text-green-800' :
-                                                promo.status === 'scheduled' ? 'bg-blue-100 text-blue-800' :
-                                                    'bg-gray-100 text-gray-800'
+                                            promo.status === 'scheduled' ? 'bg-blue-100 text-blue-800' :
+                                                'bg-gray-100 text-gray-800'
                                             }`}>
                                             {promo.status === 'active' ? 'Activa' :
                                                 promo.status === 'scheduled' ? 'Programada' : 'Expirada'}

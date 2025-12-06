@@ -41,7 +41,7 @@ const productFormSchema = z.object({
 type ProductFormValues = z.infer<typeof productFormSchema>
 
 export async function addProduct(values: ProductFormValues) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { category_ids, ...productData } = values
 
   const { data: newProduct, error: productError } = await supabase
@@ -77,7 +77,7 @@ export async function addProduct(values: ProductFormValues) {
 }
 
 export async function updateProduct(id: string, values: ProductFormValues) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { category_ids, ...productData } = values
 
   const { data, error } = await supabase
@@ -123,7 +123,7 @@ export async function updateProduct(id: string, values: ProductFormValues) {
 }
 
 export async function deleteProduct(id: string) {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const { error } = await supabase
     .from("products")

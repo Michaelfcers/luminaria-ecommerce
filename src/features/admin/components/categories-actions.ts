@@ -11,7 +11,7 @@ const categorySchema = z.object({
 })
 
 export async function addCategory(formData: FormData) {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const rawFormData = {
     name: formData.get("name") as string,
@@ -39,7 +39,7 @@ export async function addCategory(formData: FormData) {
 }
 
 export async function updateCategory(id: string, formData: FormData) {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const rawFormData = {
     name: formData.get("name") as string,
@@ -68,7 +68,7 @@ export async function updateCategory(id: string, formData: FormData) {
 }
 
 export async function deleteCategory(id: string) {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const { error } = await supabase
     .from("categories")

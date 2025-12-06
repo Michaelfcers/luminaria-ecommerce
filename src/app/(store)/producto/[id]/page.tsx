@@ -11,8 +11,9 @@ export type RecommendedProduct = {
   image: string
 }
 
-export default async function ProductDetailPage({ params }: { params: { id: string } }) {
-  const supabase = createClient()
+export default async function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params
+  const supabase = await createClient()
 
   const { data: productData, error } = await supabase
     .from("products")
@@ -49,7 +50,7 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
       )
     `
     )
-    .eq("id", params.id)
+    .eq("id", resolvedParams.id)
     .single()
 
   if (error || !productData) {
@@ -61,7 +62,7 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
   const { data: recommendedProductsData } = await supabase
     .from("products")
     .select("id, name, list_price_usd, product_media(url, is_primary)")
-    .neq("id", params.id)
+    .neq("id", resolvedParams.id)
     .limit(10)
 
   const product = productData as Product

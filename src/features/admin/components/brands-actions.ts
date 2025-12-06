@@ -10,7 +10,7 @@ const brandSchema = z.object({
 })
 
 export async function addBrand(formData: FormData) {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const rawFormData = {
     name: formData.get("name") as string,
@@ -37,7 +37,7 @@ export async function addBrand(formData: FormData) {
 }
 
 export async function updateBrand(id: string, formData: FormData) {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const rawFormData = {
     name: formData.get("name") as string,
@@ -65,7 +65,7 @@ export async function updateBrand(id: string, formData: FormData) {
 }
 
 export async function deleteBrand(id: string) {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const { error } = await supabase
     .from("brands")

@@ -1,11 +1,11 @@
-import { cookies } from "next/headers"
+
 import { createClient } from "@/lib/supabase/server"
 import { redirect, notFound } from "next/navigation"
 import { PromotionForm } from "@/features/admin/components/promotion-form"
 
-export default async function EditPromotionPage({ params }: { params: { id: string } }) {
-    const cookieStore = cookies()
-    const supabase = createClient(cookieStore)
+export default async function EditPromotionPage({ params }: { params: Promise<{ id: string }> }) {
+    const resolvedParams = await params
+    const supabase = await createClient()
 
     const {
         data: { user },
@@ -29,7 +29,7 @@ export default async function EditPromotionPage({ params }: { params: { id: stri
     const { data: promotion, error: promoError } = await supabase
         .from("promotions")
         .select("*")
-        .eq("id", params.id)
+        .eq("id", resolvedParams.id)
         .single()
 
     if (promoError || !promotion) {
@@ -41,7 +41,7 @@ export default async function EditPromotionPage({ params }: { params: { id: stri
     const { data: linkedProducts } = await supabase
         .from("promotion_products")
         .select("product_id")
-        .eq("promotion_id", params.id)
+        .eq("promotion_id", resolvedParams.id)
 
     const initialProductIds = linkedProducts?.map(p => p.product_id) || []
 
@@ -49,7 +49,7 @@ export default async function EditPromotionPage({ params }: { params: { id: stri
     const { data: linkedVariants } = await supabase
         .from("promotion_variants")
         .select("variant_id")
-        .eq("promotion_id", params.id)
+        .eq("promotion_id", resolvedParams.id)
 
     const initialVariantIds = linkedVariants?.map(v => v.variant_id) || []
 

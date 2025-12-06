@@ -1,7 +1,7 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
-import { cookies } from "next/headers"
+
 
 export type SearchResult = {
     id: string
@@ -14,8 +14,7 @@ export type SearchResult = {
 export async function searchProducts(query: string): Promise<SearchResult[]> {
     if (!query || query.length < 2) return []
 
-    const cookieStore = cookies()
-    const supabase = createClient(cookieStore)
+    const supabase = await createClient()
     const searchQuery = `%${query}%`
 
     // Search Products

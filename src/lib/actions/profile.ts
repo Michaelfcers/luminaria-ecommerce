@@ -2,11 +2,10 @@
 
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
-import { cookies } from "next/headers"
+
 
 export async function updateProfile(formData: FormData) {
-    const cookieStore = cookies()
-    const supabase = createClient(cookieStore)
+    const supabase = await createClient()
 
     const { data: { user } } = await supabase.auth.getUser()
 

@@ -1,4 +1,4 @@
-import { cookies } from "next/headers"
+
 import { createClient } from "@/lib/supabase/server"
 import { ProductsGrid } from "@/features/store/components/products-grid"
 import { ProductFilters } from "@/features/store/components/product-filters"
@@ -23,10 +23,10 @@ type FilterItem = {
 export default async function ProductsPage({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined }
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
-  const cookieStore = cookies()
-  const supabase = createClient(cookieStore)
+  const resolvedSearchParams = await searchParams
+  const supabase = await createClient()
 
   // Fetch all categories to determine hierarchy
   const { data: allCategoriesData, error: categoriesError } = await supabase
@@ -39,15 +39,15 @@ export default async function ProductsPage({
   const allCategories = allCategoriesData || []
 
   // Extract filter values from searchParams
-  const selectedCategoryIds = Array.isArray(searchParams.categories)
-    ? searchParams.categories
-    : searchParams.categories
-      ? searchParams.categories.split(",")
+  const selectedCategoryIds = Array.isArray(resolvedSearchParams.categories)
+    ? resolvedSearchParams.categories
+    : resolvedSearchParams.categories
+      ? resolvedSearchParams.categories.split(",")
       : []
-  const selectedBrandIds = Array.isArray(searchParams.brands)
-    ? searchParams.brands
-    : searchParams.brands
-      ? searchParams.brands.split(",")
+  const selectedBrandIds = Array.isArray(resolvedSearchParams.brands)
+    ? resolvedSearchParams.brands
+    : resolvedSearchParams.brands
+      ? resolvedSearchParams.brands.split(",")
       : []
 
   // Expand selected categories to include sub-categories

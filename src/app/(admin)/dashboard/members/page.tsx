@@ -62,44 +62,44 @@ export async function updateMemberRole(formData: FormData): Promise<void> {
   const memberId = formData.get("memberId") as string | null;
   const newRole = formData.get("newRole") as string | null;
 
-    if (!storeId || !memberId || !newRole) {
+  if (!storeId || !memberId || !newRole) {
 
-      console.error("updateMemberRole: datos incompletos", {
+    console.error("updateMemberRole: datos incompletos", {
 
-        storeId,
+      storeId,
 
-        memberId,
+      memberId,
 
-        newRole,
+      newRole,
 
-      });
+    });
 
-      return; // Exit early if essential data is missing
+    return; // Exit early if essential data is missing
 
-    }
+  }
 
-  
 
-    const supabase = createClient();
 
-  
+  const supabase = await createClient();
 
-    const {
 
-      data: {
 
-        user
+  const {
 
-      },
+    data: {
 
-    } = await supabase.auth.getUser();
+      user
 
-      if (!user) {
-            console.error(
-              "updateMemberRole: usuario no autenticado intentando cambiar roles."
-            );
-            return; // Exit early if user is null
-          }  // Verificar que el usuario que llama la acción es el owner de esa tienda
+    },
+
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    console.error(
+      "updateMemberRole: usuario no autenticado intentando cambiar roles."
+    );
+    return; // Exit early if user is null
+  }  // Verificar que el usuario que llama la acción es el owner de esa tienda
   const { data: ownedStore, error: ownedStoreError } = await supabase
     .from("stores")
     .select("id")
@@ -164,7 +164,7 @@ export default async function StoreMembersPage({
 }: {
   searchParams: { store_id?: string };
 }) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },
