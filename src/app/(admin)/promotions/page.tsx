@@ -20,6 +20,7 @@ import Link from "next/link"
 import { redirect } from "next/navigation"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
+import { TerminatePromotionButton } from "@/features/admin/components/terminate-promotion-button"
 
 export default async function PromotionsPage() {
     const supabase = await createClient()
@@ -121,6 +122,7 @@ export default async function PromotionsPage() {
                                                 Editar
                                             </Link>
                                         </Button>
+                                        <TerminatePromotionButton promotionId={promo.id} />
                                     </TableCell>
                                 </TableRow>
                             ))}

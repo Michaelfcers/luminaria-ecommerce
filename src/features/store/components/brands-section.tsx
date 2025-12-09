@@ -1,17 +1,18 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import philipsLogo from "@/assets/brands/philips-logo.webp"
 
 export function BrandsSection() {
   const [currentIndex, setCurrentIndex] = useState(0)
 
   const brands = [
-    { name: "Philips", logo: "/brands/philips-logo.webp" },
-    { name: "Osram", logo: "/brands/philips-logo.webp" },
-    { name: "Artemide", logo: "/brands/philips-logo.webp" },
-    { name: "Flos", logo: "/brands/philips-logo.webp" },
-    { name: "Louis Poulsen", logo: "/brands/philips-logo.webp" },
-    { name: "Foscarini", logo: "/brands/philips-logo.webp" },
+    { name: "Philips", logo: philipsLogo.src },
+    { name: "Osram", logo: philipsLogo.src },
+    { name: "Artemide", logo: philipsLogo.src },
+    { name: "Flos", logo: philipsLogo.src },
+    { name: "Louis Poulsen", logo: philipsLogo.src },
+    { name: "Foscarini", logo: philipsLogo.src },
   ]
 
   useEffect(() => {

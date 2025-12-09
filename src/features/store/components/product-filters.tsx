@@ -1,11 +1,19 @@
 "use client"
+
 import { useEffect, useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Slider } from "@/components/ui/slider"
 import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
 import { useRouter, useSearchParams } from "next/navigation"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { X } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
 
 // Define types for the filter items
 type FilterItem = {
@@ -74,90 +82,85 @@ export function ProductFilters({ categories, brands }: { categories: FilterItem[
     router.push("/productos") // Clear all search params
   }
 
+  const hasActiveFilters = selectedCategories.length > 0 || selectedBrands.length > 0;
+
   return (
-    <div className="space-y-6">
-      <Card className="bg-white rounded-2xl">
-        <CardHeader>
-          <CardTitle className="text-lg">Filtros</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Categories Filter */}
-          <div>
-            <h3 className="font-semibold mb-3">Categorías</h3>
-            <div className="space-y-2">
-              {categories.map((category) => (
-                <div key={category.id} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`category-${category.id}`} // Use a unique ID for checkbox
-                    checked={selectedCategories.includes(category.id)}
-                    onCheckedChange={(checked) => handleCategoryChange(category.id, checked as boolean)}
-                  />
-                  <label
-                    htmlFor={`category-${category.id}`}
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex-1 cursor-pointer"
-                  >
-                    {category.name}
-                  </label>
-                  <span className="text-xs text-muted-foreground">({category.count})</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <Separator />
-
-          {/* Brands Filter */}
-          <div>
-            <h3 className="font-semibold mb-3">Marcas</h3>
-            <div className="space-y-2">
-              {brands.map((brand) => (
-                <div key={brand.id} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`brand-${brand.id}`} // Use a unique ID for checkbox
-                    checked={selectedBrands.includes(brand.id)}
-                    onCheckedChange={(checked) => handleBrandChange(brand.id, checked as boolean)}
-                  />
-                  <label
-                    htmlFor={`brand-${brand.id}`}
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex-1 cursor-pointer"
-                  >
-                    {brand.name}
-                  </label>
-                  <span className="text-xs text-muted-foreground">({brand.count})</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <Separator />
-
-          {/* Price Range Filter */}
-          <div>
-            <h3 className="font-semibold mb-3">Rango de Precio</h3>
-            <div className="space-y-4">
-              <Slider
-                value={priceRange}
-                onValueChange={setPriceRange}
-                max={1000}
-                min={0}
-                step={10}
-                className="w-full"
-              />
-              <div className="flex items-center justify-between text-sm text-muted-foreground">
-                <span>${priceRange[0]}</span>
-                <span>${priceRange[1]}</span>
-              </div>
-            </div>
-          </div>
-
-          <Separator />
-
-          {/* Clear Filters Button */}
-          <Button variant="outline" onClick={clearFilters} className="w-full bg-transparent">
-            Limpiar Filtros
+    <div className="bg-white rounded-3xl elegant-shadow p-6 sticky top-24">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-bold tracking-tight">Filtros</h2>
+        {hasActiveFilters && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={clearFilters}
+            className="h-8 px-2 text-muted-foreground hover:text-destructive transition-colors"
+          >
+            <span className="text-xs mr-1">Borrar</span>
+            <X className="h-3 w-3" />
           </Button>
-        </CardContent>
-      </Card>
+        )}
+      </div>
+
+      <Accordion type="multiple" defaultValue={["categories", "brands"]} className="w-full space-y-4">
+
+        {/* Categories Filter */}
+        <AccordionItem value="categories" className="border-none">
+          <AccordionTrigger className="py-2 hover:no-underline">
+            <span className="font-semibold text-base">Categorías</span>
+          </AccordionTrigger>
+          <AccordionContent>
+            <ScrollArea className="h-[200px] pr-4">
+              <div className="space-y-3 pt-1">
+                {categories.map((category) => (
+                  <div key={category.id} className="flex items-center space-x-3 group">
+                    <Checkbox
+                      id={`category-${category.id}`}
+                      checked={selectedCategories.includes(category.id)}
+                      onCheckedChange={(checked) => handleCategoryChange(category.id, checked as boolean)}
+                      className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                    />
+                    <label
+                      htmlFor={`category-${category.id}`}
+                      className="text-sm text-muted-foreground group-hover:text-foreground transition-colors flex-1 cursor-pointer flex justify-between items-center"
+                    >
+                      <span>{category.name}</span>
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+          </AccordionContent>
+        </AccordionItem>
+
+        {/* Brands Filter */}
+        <AccordionItem value="brands" className="border-none">
+          <AccordionTrigger className="py-2 hover:no-underline">
+            <span className="font-semibold text-base">Marcas</span>
+          </AccordionTrigger>
+          <AccordionContent>
+            <ScrollArea className="h-[200px] pr-4">
+              <div className="space-y-3 pt-1">
+                {brands.map((brand) => (
+                  <div key={brand.id} className="flex items-center space-x-3 group">
+                    <Checkbox
+                      id={`brand-${brand.id}`}
+                      checked={selectedBrands.includes(brand.id)}
+                      onCheckedChange={(checked) => handleBrandChange(brand.id, checked as boolean)}
+                      className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                    />
+                    <label
+                      htmlFor={`brand-${brand.id}`}
+                      className="text-sm text-muted-foreground group-hover:text-foreground transition-colors flex-1 cursor-pointer flex justify-between items-center"
+                    >
+                      <span>{brand.name}</span>
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
     </div>
   )
 }
