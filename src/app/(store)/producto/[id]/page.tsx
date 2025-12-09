@@ -3,6 +3,7 @@ import { notFound } from "next/navigation"
 import { ProductDetailClient } from "@/features/store/components/product-detail-client"
 import { RecommendedProducts } from "@/features/store/components/recommended-products"
 import { Product, ProductMedia } from "@/features/store/types"
+import { getLocalProductImage } from "@/lib/local-images"
 
 export type RecommendedProduct = {
   id: string
@@ -66,6 +67,48 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
     .limit(10)
 
   const product = productData as Product
+
+  // Enrich variants with local images
+  if (product.product_variants) {
+    product.product_variants = await Promise.all(
+      product.product_variants.map(async (variant) => {
+        const localImage = await getLocalProductImage(variant.code)
+        return {
+          ...variant,
+          localImage: localImage || undefined
+        }
+      })
+    )
+  }
+
+  // Determine initial image
+  let initialImage = "/placeholder-image.jpg"
+
+  // 1. Try product code
+  const productLocalImage = await getLocalProductImage(product.code)
+  if (productLocalImage) {
+    initialImage = productLocalImage
+  } else {
+    // 2. Try first variant code
+    if (product.product_variants && product.product_variants.length > 0) {
+      // @ts-ignore
+      const firstVariantImage = product.product_variants[0].localImage
+      if (firstVariantImage) {
+        initialImage = firstVariantImage
+      }
+    }
+
+    // 3. Fallback to product_media if no local image found (and if we hadn't already found one)
+    if (initialImage === "/placeholder-image.jpg") {
+      const primaryMedia = Array.isArray(product.product_media)
+        ? product.product_media.find((media) => media.is_primary)
+        : null
+      if (primaryMedia) {
+        initialImage = primaryMedia.url
+      }
+    }
+  }
+
   // technicalSheet will now be handled within ProductDetailClient
 
 
@@ -101,7 +144,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   return (
     <div className="min-h-screen bg-gray-100">
       <main className="container mx-auto px-4 py-8">
-        <ProductDetailClient product={product} promotion={activePromotion} />
+        <ProductDetailClient product={product} promotion={activePromotion} initialImage={initialImage} />
         <div className="mt-16">
           <RecommendedProducts
             currentProductId={product.id}

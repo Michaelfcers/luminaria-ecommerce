@@ -2,15 +2,18 @@
 import { createClient } from "@/lib/supabase/server"
 import { ProductsGrid } from "@/features/store/components/products-grid"
 import { ProductFilters } from "@/features/store/components/product-filters"
+import { getLocalProductImage } from "@/lib/local-images"
 
 // Define a type for the data structure returned by the Supabase query for products
 type ProductWithRelations = {
   id: string
   name: string
+  code: string | null
   created_at: string
   brands: { name: string } | null
   product_media: { url: string; is_primary: boolean }[] | null
   product_categories: { category_id: string }[] | null // Added for filtering
+  product_variants: { code: string }[] | null
 }
 
 // Define a type for the filter items
@@ -68,10 +71,12 @@ export default async function ProductsPage({
       `
       id,
       name,
+      code,
       created_at,
       brands ( name ),
       product_media ( url, is_primary ),
-      product_categories!inner(category_id)
+      product_categories!inner(category_id),
+      product_variants ( code )
     `
     )
     .eq("status", "active")
@@ -118,11 +123,32 @@ export default async function ProductsPage({
   const typedProductsData = productsData as ProductWithRelations[] | null
 
   // Transform the data to match the structure expected by ProductsGrid
-  const products =
-    typedProductsData?.map((product) => {
-      const primaryMedia = Array.isArray(product.product_media)
-        ? product.product_media.find((media) => media.is_primary)
-        : null
+  const products = await Promise.all(
+    (typedProductsData || []).map(async (product) => {
+      let imageUrl = "/placeholder-image.jpg"
+
+      // Determine the code to use for image lookup
+      let codeToUse = product.code
+      if (!codeToUse && product.product_variants && product.product_variants.length > 0) {
+        codeToUse = product.product_variants[0].code
+      }
+
+      // Try to get local image first
+      const localImage = await getLocalProductImage(codeToUse)
+
+      // console.log(`Product: ${product.name}, Code: ${codeToUse}, LocalImage: ${localImage}`);
+
+      if (localImage) {
+        imageUrl = localImage
+      } else {
+        const primaryMedia = Array.isArray(product.product_media)
+          ? product.product_media.find((media) => media.is_primary)
+          : null
+
+        if (primaryMedia) {
+          imageUrl = primaryMedia.url
+        }
+      }
 
       const sevenDaysAgo = new Date()
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
@@ -131,11 +157,12 @@ export default async function ProductsPage({
       return {
         id: product.id,
         name: product.name,
-        image: primaryMedia ? primaryMedia.url : "/placeholder-image.jpg",
+        image: imageUrl,
         brand: product.brands?.name || "Sin Marca",
         isNew: isNew,
       }
-    }) ?? []
+    })
+  )
 
   return (
     <main className="container mx-auto px-4 py-8">

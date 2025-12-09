@@ -65,9 +65,8 @@ export function ProductInfo({ product }: ProductInfoProps) {
           {[...Array(5)].map((_, i) => (
             <Star
               key={i}
-              className={`h-4 w-4 ${
-                i < Math.floor(product.rating) ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground"
-              }`}
+              className={`h-4 w-4 ${i < Math.floor(product.rating) ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground"
+                }`}
             />
           ))}
           <span className="ml-2 text-sm font-medium">{product.rating}</span>
@@ -77,10 +76,10 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
       {/* Price */}
       <div className="flex items-center gap-4">
-        <span className="text-3xl font-bold text-primary">€{product.price}</span>
+        <span className="text-3xl font-bold text-primary">${product.price}</span>
         {product.originalPrice && (
           <>
-            <span className="text-xl text-muted-foreground line-through">€{product.originalPrice}</span>
+            <span className="text-xl text-muted-foreground line-through">${product.originalPrice}</span>
             <Badge variant="destructive">-{discount}%</Badge>
           </>
         )}
@@ -156,7 +155,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
           <div className="grid gap-3">
             <div className="flex items-center gap-3">
               <Truck className="h-5 w-5 text-primary" />
-              <span className="text-sm">Envío gratuito en pedidos superiores a €100</span>
+              <span className="text-sm">Envío gratuito en pedidos superiores a $100</span>
             </div>
             <div className="flex items-center gap-3">
               <Shield className="h-5 w-5 text-primary" />

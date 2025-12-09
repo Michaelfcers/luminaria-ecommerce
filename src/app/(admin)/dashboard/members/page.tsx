@@ -162,8 +162,9 @@ export async function updateMemberRole(formData: FormData): Promise<void> {
 export default async function StoreMembersPage({
   searchParams,
 }: {
-  searchParams: { store_id?: string };
+  searchParams: Promise<{ store_id?: string }>;
 }) {
+  const resolvedSearchParams = await searchParams;
   const supabase = await createClient();
 
   const {
@@ -174,7 +175,7 @@ export default async function StoreMembersPage({
     redirect("/login");
   }
 
-  const storeId = searchParams.store_id;
+  const storeId = resolvedSearchParams.store_id;
 
   if (!storeId) {
     return <div>Error: Store ID not provided.</div>;

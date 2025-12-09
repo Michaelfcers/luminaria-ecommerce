@@ -42,10 +42,10 @@ export default function CartPage() {
                       onChange={(e) => item.cartItemId && updateQuantity(item.cartItemId, Math.max(1, Number(e.target.value) || 1))}
                     />
                     <div className="flex flex-col items-end">
-                      <span className="font-semibold text-lg">€{item.price.toFixed(2)}</span>
+                      <span className="font-semibold text-lg">${item.price.toFixed(2)}</span>
                       {item.originalPrice && (
                         <span className="text-sm text-muted-foreground line-through">
-                          €{item.originalPrice.toFixed(2)}
+                          ${item.originalPrice.toFixed(2)}
                         </span>
                       )}
                     </div>
@@ -66,15 +66,15 @@ export default function CartPage() {
               <CardContent className="space-y-4">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span>€{total.toFixed(2)}</span>
+                  <span>${total.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Envío</span>
-                  <span>€0.00</span>
+                  <span>$0.00</span>
                 </div>
                 <div className="flex justify-between font-bold text-lg">
                   <span>Total</span>
-                  <span>€{total.toFixed(2)}</span>
+                  <span>${total.toFixed(2)}</span>
                 </div>
                 <Button className="w-full">Proceder al Pago</Button>
               </CardContent>

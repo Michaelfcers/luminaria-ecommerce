@@ -31,9 +31,11 @@ const formatAttributes = (attributes: Record<string, any>): string => {
 export function ProductDetailClient({
   product,
   promotion,
+  initialImage,
 }: {
   product: Product
   promotion?: any
+  initialImage: string
 }) {
   // Initialize with the first variant, or null if there are no variants
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(
@@ -42,7 +44,10 @@ export function ProductDetailClient({
       : null
   )
 
+  const [currentImage, setCurrentImage] = useState(initialImage)
+
   const getActivePromotion = (variant: any) => {
+    // ... (existing code)
     // 1. Check for variant-specific promotion
     const variantPromo = variant?.promotion_variants?.find((pv: any) => {
       const promo = pv.promotions
@@ -82,13 +87,16 @@ export function ProductDetailClient({
     )
     if (newVariant) {
       setSelectedVariant(newVariant)
+      // Update image if variant has a local image
+      // @ts-ignore
+      if (newVariant.localImage) {
+        // @ts-ignore
+        setCurrentImage(newVariant.localImage)
+      }
     }
   }
 
   const variantTechnicalSheet = selectedVariant?.product_variant_media?.find((media) => media.type === "pdf")?.url
-
-  // Find the primary image for the main product
-  const primaryProductImage = "/products/luminaria-plafon.webp"
 
   const activePromo = selectedVariant ? getActivePromotion(selectedVariant) : null
 
@@ -112,7 +120,7 @@ export function ProductDetailClient({
           <Card className="overflow-hidden w-full rounded-3xl elegant-shadow bg-white">
             <CardContent className="p-0">
               <Image
-                src={primaryProductImage}
+                src={currentImage}
                 alt={product.name}
                 width={800}
                 height={800}

@@ -10,11 +10,13 @@ export type ProductVariant = {
   sourcing_status: string;
   stock: number;
   product_variant_media: ProductMedia[] | null;
+  localImage?: string; // Added for local image support
 };
 
 export type Product = {
   id: string;
   name: string;
+  code: string | null; // Added code
   description: string | null;
   attributes: Record<string, any> | null;
   product_variants: ProductVariant[] | null;

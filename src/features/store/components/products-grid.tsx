@@ -22,9 +22,12 @@ type Product = {
 export function ProductsGrid({ products = [] }: { products: Product[] }) {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [sortBy, setSortBy] = useState("featured")
+  const selectId = "product-sort-select"
+
+
 
   // The hardcoded products array is removed. We now use the 'products' prop.
-  
+
   return (
     <div className="space-y-6">
       {/* Header with sorting and view options */}
@@ -36,7 +39,7 @@ export function ProductsGrid({ products = [] }: { products: Product[] }) {
         <div className="flex items-center gap-4">
           {/* Sort dropdown */}
           <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger className="w-48">
+            <SelectTrigger className="w-48" id={selectId}>
               <SelectValue placeholder="Ordenar por" />
             </SelectTrigger>
             <SelectContent>
@@ -77,17 +80,15 @@ export function ProductsGrid({ products = [] }: { products: Product[] }) {
         {products.map((product) => (
           <Card
             key={product.id}
-            className={`group overflow-hidden border-0 elegant-shadow hover-lift rounded-2xl bg-white ${
-              viewMode === "list" ? "flex flex-row" : ""
-            }`}
+            className={`group overflow-hidden border-0 elegant-shadow hover-lift rounded-2xl bg-white ${viewMode === "list" ? "flex flex-row" : ""
+              }`}
           >
             <div className={`relative overflow-hidden ${viewMode === "list" ? "w-48 flex-shrink-0" : ""}`}>
               <img
                 src={product.image || "/placeholder.svg"}
                 alt={product.name}
-                className={`object-cover transition-transform duration-300 group-hover:scale-105 ${
-                  viewMode === "list" ? "h-32 w-full" : "h-48 w-full"
-                }`}
+                className={`object-cover transition-transform duration-300 group-hover:scale-105 ${viewMode === "list" ? "h-32 w-full" : "h-48 w-full"
+                  }`}
               />
               {product.isNew && (
                 <Badge className="absolute top-3 left-3 bg-primary text-primary-foreground">Nuevo</Badge>

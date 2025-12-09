@@ -2,6 +2,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { redirect, notFound } from "next/navigation"
 import { PromotionForm } from "@/features/admin/components/promotion-form"
+import { getLocalProductImage } from "@/lib/local-images"
 
 export default async function EditPromotionPage({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = await params
@@ -54,19 +55,46 @@ export default async function EditPromotionPage({ params }: { params: Promise<{ 
     const initialVariantIds = linkedVariants?.map(v => v.variant_id) || []
 
     // Fetch all products for selection
-    const { data: products } = await supabase
+    // Fetch all products for selection
+    const { data: products, error: productsError } = await supabase
         .from("products")
-        .select("id, name, product_variants(id, name, attributes)")
+        .select("id, name, code, product_variants(*), product_media(url, alt_text)")
         .eq("store_id", storeMembers.store_id)
         .eq("status", "active")
         .is("deleted_at", null)
+
+
+    if (productsError) {
+        console.error("Error fetching products:", productsError)
+        return <div>Error loading products.</div>
+    }
+
+
+    // Enrich products with local images if needed
+    const enrichedProducts = await Promise.all((products || []).map(async (product) => {
+        let codeToUse = product.code
+        if (!codeToUse && product.product_variants && product.product_variants.length > 0) {
+            codeToUse = product.product_variants[0].code
+        }
+
+        const localImage = await getLocalProductImage(codeToUse)
+
+        if (localImage) {
+            return {
+                ...product,
+                product_media: [{ url: localImage, alt_text: product.name }]
+            }
+        }
+
+        return product
+    }))
 
     return (
         <div className="flex flex-col gap-8 p-4 md:p-8">
             <h1 className="text-3xl font-bold">Editar Promoción</h1>
             <PromotionForm
                 storeId={storeMembers.store_id}
-                products={products || []}
+                products={enrichedProducts}
                 initialData={promotion}
                 initialProductIds={initialProductIds}
                 initialVariantIds={initialVariantIds}

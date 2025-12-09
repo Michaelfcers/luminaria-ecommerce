@@ -19,6 +19,8 @@ import { DeleteProductButton } from "@/features/admin/components/delete-product-
 import { createClient } from "@/lib/supabase/server"
 import Link from "next/link"
 import { redirect } from "next/navigation"
+import { getLocalProductImage } from "@/lib/local-images"
+import Image from "next/image"
 
 export default async function ProductsPage() {
   const supabase = await createClient()
@@ -46,15 +48,18 @@ export default async function ProductsPage() {
   const store_id = storeMembers[0].store_id
   console.log("Determined store ID for user:", store_id)
 
-  const { data: products, error } = await supabase
+  const { data: productsData, error } = await supabase
     .from("products")
     .select(
       `
       id,
       name,
+      code,
       status,
       stock,
       brands (name),
+      product_media (url),
+      product_variants (code),
       promotion_products (
         promotions (
             id,
@@ -74,6 +79,38 @@ export default async function ProductsPage() {
     // Handle error state appropriately
     return <div>Error loading products.</div>
   }
+
+  // Enrich products with images
+  const products = await Promise.all((productsData || []).map(async (product) => {
+    let imageUrl = "/placeholder-image.jpg"
+
+    // Determine the code to use for image lookup
+    let codeToUse = product.code
+    // @ts-ignore
+    if (!codeToUse && product.product_variants && product.product_variants.length > 0) {
+      // @ts-ignore
+      codeToUse = product.product_variants[0].code
+    }
+
+    // Try to get local image first
+    const localImage = await getLocalProductImage(codeToUse)
+
+    if (localImage) {
+      imageUrl = localImage
+    } else {
+      // @ts-ignore
+      if (product.product_media && product.product_media.length > 0) {
+        // @ts-ignore
+        imageUrl = product.product_media[0].url
+      }
+    }
+
+    return {
+      ...product,
+      imageUrl
+    }
+  }))
+
   console.log("Fetched products:", products)
 
   return (
@@ -101,6 +138,7 @@ export default async function ProductsPage() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>Imagen</TableHead>
                 <TableHead>Nombre</TableHead>
                 <TableHead>Marca</TableHead>
                 <TableHead>Estado</TableHead>
@@ -111,6 +149,16 @@ export default async function ProductsPage() {
             <TableBody>
               {products.map((product) => (
                 <TableRow key={product.id}>
+                  <TableCell>
+                    <div className="relative h-12 w-12 rounded-md overflow-hidden border">
+                      <Image
+                        src={product.imageUrl}
+                        alt={product.name}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  </TableCell>
                   <TableCell className="font-medium">{product.name}</TableCell>
                   <TableCell>
                     {/* @ts-ignore */}

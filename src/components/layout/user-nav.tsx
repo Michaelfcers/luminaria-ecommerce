@@ -90,7 +90,7 @@ export async function UserNav() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+      <DropdownMenuTrigger asChild id="user-nav-trigger">
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-8 w-8">
             <AvatarImage src={user.user_metadata?.avatar_url} alt="User avatar" />

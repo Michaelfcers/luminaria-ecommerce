@@ -5,12 +5,12 @@ import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/features/auth/components/auth-provider"
 import {
   getOrCreateUserCart,
-  getCartItems,
   addItemToCart as dbAddItem,
   updateCartItemQuantity as dbUpdateQuantity,
   removeCartItem as dbRemoveItem,
   clearCart as dbClearCart,
 } from "@/lib/cart"
+import { getCartItemsAction } from "@/lib/actions/cart"
 
 export interface Cart {
   id: string
@@ -48,7 +48,7 @@ export function useCart() {
         }
 
         if (currentCart) {
-          const cartItems = await getCartItems(currentCart.id)
+          const cartItems = await getCartItemsAction(currentCart.id)
           setItems(cartItems)
         }
       } catch (error) {
