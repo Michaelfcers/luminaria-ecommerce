@@ -1,3 +1,4 @@
+"use client"
 
 import Link from "next/link"
 import { IconBrandFacebook, IconBrandInstagram, IconBrandTwitter, IconMail, IconMapPin, IconPhone } from "@tabler/icons-react"
