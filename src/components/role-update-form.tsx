@@ -1,6 +1,6 @@
 "use client"
 import { Menu, Button, ActionIcon } from "@mantine/core";
-import { MoreHorizontal } from "lucide-react";
+import { IconDots } from "@tabler/icons-react";
 import { updateMemberRoleAction } from "@/actions/members";
 
 interface RoleUpdateFormProps {
@@ -20,7 +20,7 @@ export function RoleUpdateForm({ storeId, memberId, currentRole }: RoleUpdateFor
     <Menu shadow="md" width={200} position="bottom-end">
       <Menu.Target>
         <ActionIcon variant="subtle" color="gray">
-          <MoreHorizontal size={16} />
+          <IconDots size={16} />
         </ActionIcon>
       </Menu.Target>
 

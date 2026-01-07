@@ -1,10 +1,11 @@
+
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { Card, Table, Title, Text, Group, Stack, Badge, ActionIcon, Container } from "@mantine/core";
 import Link from "next/link";
-import { MoreHorizontal, ArrowLeft } from "lucide-react";
+import { IconDots, IconArrowLeft } from "@tabler/icons-react";
 import { RoleUpdateForm } from "@/components/role-update-form";
 import { LinkButton } from "@/components/link-button";
 
@@ -101,7 +102,7 @@ export default async function StoreMembersPage({
         <Stack gap="lg" p="md">
             <Group justify="space-between" align="center">
                 <Title order={1}>Miembros de la Tienda</Title>
-                <LinkButton href="/dashboard" variant="outline" leftSection={<ArrowLeft size={16} />}>
+                <LinkButton href="/dashboard" variant="outline" leftSection={<IconArrowLeft size={16} />}>
                     Volver al Dashboard
                 </LinkButton>
             </Group>

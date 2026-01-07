@@ -19,7 +19,7 @@ import {
   Box,
   Flex
 } from "@mantine/core"
-import { FileText } from "lucide-react"
+import { IconFileText } from "@tabler/icons-react"
 
 import { AddToCartButton } from "../../cart/components/add-to-cart-button"
 import { Product, ProductVariant } from "../types"
@@ -189,12 +189,12 @@ export function ProductDetailClient({
               />
 
               {variantTechnicalSheet ? (
-                <Button component={Link} href={variantTechnicalSheet} target="_blank" rel="noopener noreferrer" size="lg" fullWidth leftSection={<FileText size={18} />}>
+                <Button component={Link} href={variantTechnicalSheet} target="_blank" rel="noopener noreferrer" size="lg" fullWidth leftSection={<IconFileText size={18} />}>
                   Descargar ficha tecnica
                 </Button>
               ) : (
                 <Tooltip label="Ficha técnica no disponible para esta versión">
-                  <Button size="lg" fullWidth disabled leftSection={<FileText size={18} />}>
+                  <Button size="lg" fullWidth disabled leftSection={<IconFileText size={18} />}>
                     Descargar ficha tecnica
                   </Button>
                 </Tooltip>

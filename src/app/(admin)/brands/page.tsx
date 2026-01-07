@@ -3,7 +3,7 @@ import { LinkButton } from "@/components/link-button";
 import { BrandsCrudContainer } from "@/features/admin/components/brands-crud-container";
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { IconArrowLeft } from "@tabler/icons-react";
 
 export default async function BrandsPage() {
   const supabase = await createClient()
@@ -22,7 +22,7 @@ export default async function BrandsPage() {
     <Stack gap="lg" p="md">
       <Group justify="space-between">
         <Title order={1}>Gestión de Marcas</Title>
-        <LinkButton href="/dashboard" variant="outline" leftSection={<ArrowLeft size={16} />}>
+        <LinkButton href="/dashboard" variant="outline" leftSection={<IconArrowLeft size={16} />}>
           Volver al Dashboard
         </LinkButton>
       </Group>

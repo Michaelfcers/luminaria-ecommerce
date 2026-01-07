@@ -1,6 +1,6 @@
 "use client"
 import { useState } from "react"
-import { ChevronLeft, ChevronRight, ZoomIn } from "lucide-react"
+import { IconChevronLeft, IconChevronRight, IconZoomIn } from "@tabler/icons-react"
 import { ActionIcon, Image, Box, Grid, AspectRatio } from "@mantine/core"
 
 interface ProductGalleryProps {
@@ -52,7 +52,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
               style={{ transform: 'translateY(-50%)', opacity: 0.8 }}
               onClick={prevImage}
             >
-              <ChevronLeft size={18} />
+              <IconChevronLeft size={18} />
             </ActionIcon>
             <ActionIcon
               variant="default"
@@ -63,7 +63,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
               style={{ transform: 'translateY(-50%)', opacity: 0.8 }}
               onClick={nextImage}
             >
-              <ChevronRight size={18} />
+              <IconChevronRight size={18} />
             </ActionIcon>
           </>
         )}
@@ -77,7 +77,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
           right={10}
           onClick={() => setIsZoomed(!isZoomed)}
         >
-          <ZoomIn size={16} />
+          <IconZoomIn size={16} />
         </ActionIcon>
       </Box>
 

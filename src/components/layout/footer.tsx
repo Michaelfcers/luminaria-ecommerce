@@ -1,7 +1,6 @@
-"use client"
 
 import Link from "next/link"
-import { Facebook, Instagram, Twitter, Mail, MapPin, Phone } from "lucide-react"
+import { IconBrandFacebook, IconBrandInstagram, IconBrandTwitter, IconMail, IconMapPin, IconPhone } from "@tabler/icons-react"
 import { Container, Grid, Stack, Text, Title, Group, ActionIcon, Box } from "@mantine/core"
 
 export function Footer() {
@@ -22,13 +21,13 @@ export function Footer() {
               </Text>
               <Group gap="sm">
                 <ActionIcon component={Link} href="#" variant="subtle" color="gray" size="lg">
-                  <Facebook size={20} />
+                  <IconBrandFacebook size={20} />
                 </ActionIcon>
                 <ActionIcon component={Link} href="#" variant="subtle" color="gray" size="lg">
-                  <Instagram size={20} />
+                  <IconBrandInstagram size={20} />
                 </ActionIcon>
                 <ActionIcon component={Link} href="#" variant="subtle" color="gray" size="lg">
-                  <Twitter size={20} />
+                  <IconBrandTwitter size={20} />
                 </ActionIcon>
               </Group>
             </Stack>
@@ -82,15 +81,15 @@ export function Footer() {
               <Title order={4} c="white" size="h5">Contacto</Title>
               <Stack gap="sm">
                 <Group wrap="nowrap" align="flex-start">
-                  <MapPin size={18} style={{ marginTop: 4 }} />
+                  <IconMapPin size={18} style={{ marginTop: 4 }} />
                   <Text size="sm">Av. Principal 123, Ciudad de México, CP 12345</Text>
                 </Group>
                 <Group wrap="nowrap">
-                  <Phone size={18} />
+                  <IconPhone size={18} />
                   <Text size="sm">+52 (55) 1234-5678</Text>
                 </Group>
                 <Group wrap="nowrap">
-                  <Mail size={18} />
+                  <IconMail size={18} />
                   <Text size="sm">contacto@luminaria.com</Text>
                 </Group>
               </Stack>

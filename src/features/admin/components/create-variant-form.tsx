@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { Button, Card, TextInput, NumberInput, Select, Title, Stack, Group, ActionIcon, Divider, Text } from "@mantine/core"
 import { createVariant } from "@/lib/actions/product-variants"
 import { notifications } from "@mantine/notifications"
-import { Trash, Plus } from "lucide-react"
+import { IconTrash, IconPlus } from "@tabler/icons-react"
 
 export function CreateVariantForm({ productId }: { productId: string }) {
     const router = useRouter()
@@ -153,14 +153,14 @@ export function CreateVariantForm({ productId }: { productId: string }) {
                                     color="red"
                                     onClick={() => handleRemoveAttribute(index)}
                                 >
-                                    <Trash size={16} />
+                                    <IconTrash size={16} />
                                 </ActionIcon>
                             </Group>
                         ))}
                         <Button
                             variant="default"
                             size="xs"
-                            leftSection={<Plus size={14} />}
+                            leftSection={<IconPlus size={14} />}
                             onClick={handleAddAttribute}
                             style={{ alignSelf: 'flex-start' }}
                         >

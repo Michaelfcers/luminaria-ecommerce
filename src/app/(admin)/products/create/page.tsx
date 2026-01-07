@@ -4,7 +4,7 @@ import { Button, Card, Container, Group, Stack, Text, Title } from "@mantine/cor
 import { ProductForm } from "@/features/admin/components/product-form"
 import { createClient } from "@/lib/supabase/server"
 import Link from "next/link"
-import { ArrowLeft } from "lucide-react"
+import { IconArrowLeft } from "@tabler/icons-react"
 import { LinkButton } from "@/components/link-button"
 
 export default async function CreateProductPage() {
@@ -98,7 +98,7 @@ export default async function CreateProductPage() {
       <Stack gap="lg">
         <Group justify="space-between" align="center">
           <Title order={2}>Crear Nuevo Producto</Title>
-          <LinkButton href="/products" variant="default" leftSection={<ArrowLeft size={16} />}>
+          <LinkButton href="/products" variant="default" leftSection={<IconArrowLeft size={16} />}>
             Volver
           </LinkButton>
         </Group>

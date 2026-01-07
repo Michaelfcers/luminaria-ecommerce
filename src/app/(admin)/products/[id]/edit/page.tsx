@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { LinkButton } from "@/components/link-button";
-import { ArrowLeft } from "lucide-react"
+import { IconArrowLeft } from "@tabler/icons-react"
 
 export default async function EditProductPage({
   params,
@@ -103,7 +103,7 @@ export default async function EditProductPage({
       <Stack gap="lg">
         <Group justify="space-between" align="center">
           <Title order={2}>Editar Producto</Title>
-          <LinkButton href="/products" variant="default" leftSection={<ArrowLeft size={16} />}>
+          <LinkButton href="/products" variant="default" leftSection={<IconArrowLeft size={16} />}>
             Volver
           </LinkButton>
         </Group>

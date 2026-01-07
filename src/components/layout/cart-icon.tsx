@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { ShoppingBag } from "lucide-react"
+import { IconShoppingBag } from "@tabler/icons-react"
 import { ActionIcon, Indicator } from "@mantine/core"
 import { useCart } from "@/hooks/use-cart"
 
@@ -13,7 +13,7 @@ export function CartIcon() {
     <Link href="/carrito" passHref>
       <Indicator label={itemCount} size={16} disabled={itemCount === 0} offset={2} color="blue" withBorder>
         <ActionIcon variant="subtle" size="lg" color="dark">
-          <ShoppingBag className="h-5 w-5" />
+          <IconShoppingBag className="h-5 w-5" />
         </ActionIcon>
       </Indicator>
     </Link>

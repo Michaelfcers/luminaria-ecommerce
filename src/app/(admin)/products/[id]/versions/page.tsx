@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server"
 import { LinkButton } from "@/components/link-button";
 import { Button, Card, Badge, Title, Text, Group, Stack, Grid, Image } from "@mantine/core"
 import { getLocalProductImage } from "@/lib/local-images"
-import { Edit, Package, Tag, ArrowLeft, Plus } from "lucide-react"
+import { IconEdit, IconPackage, IconTag, IconArrowLeft, IconPlus } from "@tabler/icons-react"
 
 // Helper to format JSONB attributes for display
 const formatAttributes = (attributes: Record<string, any>): string => {
@@ -66,10 +66,10 @@ id,
           <Text c="dimmed" size="lg">{product.name}</Text>
         </div>
         <Group>
-          <LinkButton href="/products" variant="outline" leftSection={<ArrowLeft size={16} />}>
+          <LinkButton href="/products" variant="outline" leftSection={<IconArrowLeft size={16} />}>
             Volver a Productos
           </LinkButton>
-          <LinkButton href={`/ products / ${product.id} /versions/create`} leftSection={<Plus size={16} />}>
+          <LinkButton href={`/products/${product.id}/versions/create`} leftSection={<IconPlus size={16} />}>
             Nueva Versión
           </LinkButton>
         </Group>
@@ -119,7 +119,7 @@ id,
                     ))
                   ) : (
                     <Text size="sm" c="dimmed" fs="italic">
-                      <Tag size={12} style={{ display: 'inline', marginRight: 4 }} />
+                      <IconTag size={12} style={{ display: 'inline', marginRight: 4 }} />
                       Sin atributos
                     </Text>
                   )}
@@ -133,7 +133,7 @@ id,
                     <Text size="sm" c="dimmed">USD</Text>
                   </Group>
                   <Group align="center" gap={4} mt={4}>
-                    <Package size={14} className="text-gray-500" />
+                    <IconPackage size={14} className="text-gray-500" />
                     <Text size="sm" c="dimmed">Stock: <Text span fw={500} c="dark">{variant.stock}</Text> unidades</Text>
                   </Group>
                 </div>
@@ -142,7 +142,7 @@ id,
                 href={`/products/${product.id}/versions/${variant.id}/edit`}
                 fullWidth
                 mt="md"
-                leftSection={<Edit size={16} />}
+                leftSection={<IconEdit size={16} />}
               >
                 Editar Versión
               </LinkButton>
@@ -154,7 +154,7 @@ id,
       {
         enrichedVariants.length === 0 && (
           <Stack align="center" justify="center" py={64} style={{ border: '2px dashed #eee', borderRadius: 16 }}>
-            <Package size={32} className="text-gray-400" />
+            <IconPackage size={32} className="text-gray-400" />
             <Title order={3} mt="sm">No hay versiones creadas</Title>
             <Text c="dimmed" maw={400} ta="center">
               Este producto aún no tiene versiones. Crea la primera versión para comenzar a vender diferentes variantes.

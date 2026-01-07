@@ -7,7 +7,7 @@ import * as z from "zod"
 import { Button, TextInput, Select, Table, Modal, Group, Stack, Text, Title, ActionIcon } from "@mantine/core"
 import { addCategory, updateCategory, deleteCategory } from "./categories-actions"
 import { notifications } from "@mantine/notifications"
-import { Edit, Trash } from "lucide-react"
+import { IconEdit, IconTrash } from "@tabler/icons-react"
 
 const categoryFormSchema = z.object({
   name: z.string().min(2, "El nombre debe tener al menos 2 caracteres."),
@@ -190,10 +190,10 @@ export function CategoriesCrudContainer({ categories: initialCategories }: Categ
                 <td style={{ textAlign: 'right' }}>
                   <Group justify="flex-end" gap="xs">
                     <ActionIcon variant="subtle" color="blue" onClick={() => handleEdit(category)}>
-                      <Edit size={16} />
+                      <IconEdit size={16} />
                     </ActionIcon>
                     <ActionIcon variant="subtle" color="red" onClick={() => openDeleteDialog(category.id)}>
-                      <Trash size={16} />
+                      <IconTrash size={16} />
                     </ActionIcon>
                   </Group>
                 </td>

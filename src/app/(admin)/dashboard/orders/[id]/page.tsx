@@ -1,9 +1,10 @@
+
 import { Card, Table, Button, Title, Text, Group, Stack, Badge, Grid } from "@mantine/core";
 import { LinkButton } from "@/components/link-button";
 import { createClient } from "@/lib/supabase/server";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { IconArrowLeft } from "@tabler/icons-react";
 
 export default async function OrderDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params
@@ -47,7 +48,7 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
     <Stack gap="lg" p="md">
       <Group justify="space-between" align="center">
         <Title order={1}>Detalles del Pedido</Title>
-        <LinkButton href="/dashboard/orders" variant="outline" leftSection={<ArrowLeft size={16} />}>
+        <LinkButton href="/dashboard/orders" variant="outline" leftSection={<IconArrowLeft size={16} />}>
           Volver a Órdenes
         </LinkButton>
       </Group>

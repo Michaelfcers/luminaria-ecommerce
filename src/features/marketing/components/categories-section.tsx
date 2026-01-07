@@ -1,4 +1,3 @@
-"use client"
 
 import Link from "next/link"
 import { Button, Container, Title, Text, SimpleGrid, BackgroundImage, Stack, Box, Overlay } from "@mantine/core"

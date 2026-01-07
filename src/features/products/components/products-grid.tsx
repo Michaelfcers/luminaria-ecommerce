@@ -2,7 +2,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { Card, Image, Text, Badge, Button, Group, SimpleGrid, Select, Stack, ActionIcon, Rating, Box, Flex } from "@mantine/core"
-import { LayoutGrid, List } from "lucide-react"
+import { IconLayoutGrid, IconList } from "@tabler/icons-react"
 
 // Define a type for the product prop for better type safety
 type Product = {
@@ -54,7 +54,7 @@ export function ProductsGrid({ products = [] }: { products: Product[] }) {
               radius={0}
               style={{ borderTopLeftRadius: 'var(--mantine-radius-sm)', borderBottomLeftRadius: 'var(--mantine-radius-sm)' }}
             >
-              <LayoutGrid size={16} />
+              <IconLayoutGrid size={16} />
             </ActionIcon>
             <ActionIcon
               variant={viewMode === "list" ? "filled" : "transparent"}
@@ -64,7 +64,7 @@ export function ProductsGrid({ products = [] }: { products: Product[] }) {
               radius={0}
               style={{ borderTopRightRadius: 'var(--mantine-radius-sm)', borderBottomRightRadius: 'var(--mantine-radius-sm)' }}
             >
-              <List size={16} />
+              <IconList size={16} />
             </ActionIcon>
           </Group>
         </Group>

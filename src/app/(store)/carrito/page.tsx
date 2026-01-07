@@ -2,7 +2,7 @@
 
 import { Button, Card, NumberInput, Title, Text, Group, Stack, Image, Box, ActionIcon, Container, Grid, Loader, Divider } from "@mantine/core";
 import { useCart } from "@/hooks/use-cart"
-import { Trash2 } from "lucide-react";
+import { IconTrash } from "@tabler/icons-react"; // Replaced Trash2 with IconTrash
 
 export default function CartPage() {
   const { items, removeItem, updateQuantity, total, isLoading } = useCart()
@@ -63,7 +63,7 @@ export default function CartPage() {
                         size="lg"
                         onClick={() => item.cartItemId && removeItem(item.cartItemId)}
                       >
-                        <Trash2 size={20} />
+                        <IconTrash size={20} />
                       </ActionIcon>
                     </Group>
                   </Group>

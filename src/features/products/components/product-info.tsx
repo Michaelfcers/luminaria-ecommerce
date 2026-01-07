@@ -4,7 +4,7 @@ import { Button, Badge, Card, Divider, Group, Stack, Title, Text, NumberInput, A
 import { useCart } from "@/hooks/use-cart"
 import { useRouter } from "next/navigation"
 import { notifications } from "@mantine/notifications"
-import { Star, ShoppingCart, Heart, Share2, Truck, Shield, RotateCcw, Check } from "lucide-react"
+import { IconStar, IconShoppingCart, IconHeart, IconShare, IconTruck, IconShield, IconRotate2, IconCheck } from "@tabler/icons-react"
 
 interface Product {
   id: string
@@ -57,7 +57,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
       <Group gap="xs">
         <Group gap={2}>
           {[...Array(5)].map((_, i) => (
-            <Star
+            <IconStar
               key={i}
               size={16}
               fill={i < Math.floor(product.rating) ? "var(--mantine-color-yellow-4)" : "none"}
@@ -113,16 +113,16 @@ export function ProductInfo({ product }: ProductInfoProps) {
             style={{ flex: 1 }}
             disabled={!product.inStock || isAdded}
             onClick={handleAddToCart}
-            leftSection={isAdded ? <Check size={18} /> : <ShoppingCart size={18} />}
+            leftSection={isAdded ? <IconCheck size={18} /> : <IconShoppingCart size={18} />}
             color={isAdded ? "green" : "blue"}
           >
             {isAdded ? "Añadido" : "Hacer Pedido"}
           </Button>
           <ActionIcon variant="default" size="xl" radius="md" onClick={() => setIsFavorite(!isFavorite)}>
-            <Heart size={20} fill={isFavorite ? "red" : "none"} color={isFavorite ? "red" : "currentColor"} />
+            <IconHeart size={20} fill={isFavorite ? "red" : "none"} color={isFavorite ? "red" : "currentColor"} />
           </ActionIcon>
           <ActionIcon variant="default" size="xl" radius="md">
-            <Share2 size={20} />
+            <IconShare size={20} />
           </ActionIcon>
         </Group>
       </Stack>
@@ -132,19 +132,19 @@ export function ProductInfo({ product }: ProductInfoProps) {
         <Stack gap="sm">
           <Group gap="sm">
             <ThemeIcon variant="light" color="blue">
-              <Truck size={16} />
+              <IconTruck size={16} />
             </ThemeIcon>
             <Text size="sm">Envío gratuito en pedidos superiores a $100</Text>
           </Group>
           <Group gap="sm">
             <ThemeIcon variant="light" color="blue">
-              <Shield size={16} />
+              <IconShield size={16} />
             </ThemeIcon>
             <Text size="sm">Garantía de 3 años incluida</Text>
           </Group>
           <Group gap="sm">
             <ThemeIcon variant="light" color="blue">
-              <RotateCcw size={16} />
+              <IconRotate2 size={16} />
             </ThemeIcon>
             <Text size="sm">Devolución gratuita en 30 días</Text>
           </Group>

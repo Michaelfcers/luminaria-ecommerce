@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Button } from "@mantine/core"
-import { ShoppingCart, Check } from "lucide-react"
+import { IconShoppingCart, IconCheck } from "@tabler/icons-react"
 import { createClient } from "@/lib/supabase/client"
 import { getOrCreateUserCart, addItemToCart } from "@/lib/cart"
 import { notifications } from "@mantine/notifications"
@@ -77,7 +77,7 @@ export function AddToCartButton({
       size="lg"
       fullWidth
       loading={isAdding}
-      leftSection={!isAdding && (isSuccess ? <Check size={20} /> : <ShoppingCart size={20} />)}
+      leftSection={!isAdding && (isSuccess ? <IconCheck size={20} /> : <IconShoppingCart size={20} />)}
       color={isSuccess ? "green" : "blue"}
     >
       {isSuccess ? "¡Añadido!" : "Añadir al Carrito"}

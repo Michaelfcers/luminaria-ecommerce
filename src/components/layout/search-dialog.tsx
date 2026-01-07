@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
-import { Search } from "lucide-react"
+import { IconSearch } from "@tabler/icons-react"
 import { Modal, TextInput, Stack, Text, UnstyledButton, Group, ScrollArea } from "@mantine/core"
 import { searchProducts, type SearchResult } from "@/lib/actions/search"
 
@@ -65,7 +65,7 @@ export function SearchDialog({ open, onOpenChange }: SearchDialogProps) {
             <Stack gap="md">
                 <TextInput
                     placeholder="Escribe para buscar..."
-                    leftSection={<Search size={16} />}
+                    leftSection={<IconSearch size={16} />}
                     value={query}
                     onChange={(event) => setQuery(event.currentTarget.value)}
                     data-autofocus
@@ -91,7 +91,7 @@ export function SearchDialog({ open, onOpenChange }: SearchDialogProps) {
                                     className="hover:bg-gray-100 dark:hover:bg-gray-800"
                                 >
                                     <Group>
-                                        <Search size={16} className="text-muted-foreground" />
+                                        <IconSearch size={16} className="text-muted-foreground" />
                                         <div className="flex flex-col">
                                             <Text size="sm">{item.title}</Text>
                                             {item.subtitle && (

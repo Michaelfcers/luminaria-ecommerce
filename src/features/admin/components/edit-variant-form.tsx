@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { Button, Card, TextInput, NumberInput, Select, Title, Stack, Group, Divider, Text } from "@mantine/core"
 import { updateVariant } from "@/lib/actions/product-variants"
 import { notifications } from "@mantine/notifications"
-import { Plus } from "lucide-react"
+import { IconPlus } from "@tabler/icons-react"
 
 export function EditVariantForm({ variant }: { variant: any }) {
   const router = useRouter()
@@ -118,7 +118,7 @@ export function EditVariantForm({ variant }: { variant: any }) {
             <Button
               variant="default"
               size="xs"
-              leftSection={<Plus size={14} />}
+              leftSection={<IconPlus size={14} />}
               onClick={handleAddAttribute}
               style={{ alignSelf: 'flex-start' }}
             >

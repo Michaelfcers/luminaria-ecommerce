@@ -1,9 +1,10 @@
+
 import { Card, Table, Button, Title, Text, Group, Stack, Badge, ActionIcon } from "@mantine/core";
 import { LinkButton } from "@/components/link-button";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Eye } from "lucide-react";
+import { IconEye } from "@tabler/icons-react";
 
 export default async function OrdersPage() {
   const supabase = await createClient();
@@ -68,7 +69,7 @@ export default async function OrdersPage() {
                   </td>
                   <td>{new Date(order.created_at).toLocaleDateString()}</td>
                   <td>
-                    <LinkButton href={`/dashboard/orders/${order.id}`} size="xs" variant="light" leftSection={<Eye size={14} />}>
+                    <LinkButton href={`/dashboard/orders/${order.id}`} size="xs" variant="light" leftSection={<IconEye size={14} />}>
                       Ver Detalles
                     </LinkButton>
                   </td>

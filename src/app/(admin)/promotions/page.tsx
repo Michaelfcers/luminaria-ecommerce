@@ -3,11 +3,13 @@ import { Button, Card, Table, Badge, Title, Text, Group, Stack, ActionIcon } fro
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
+import dayjs from "dayjs";
+import "dayjs/locale/es";
 import { TerminatePromotionButton } from "@/features/admin/components/terminate-promotion-button";
-import { Plus, ArrowLeft, Tag, Calendar, FileText } from "lucide-react";
+import { IconPlus, IconArrowLeft, IconTag, IconCalendar, IconFileText } from "@tabler/icons-react";
 import { LinkButton } from "@/components/link-button";
+
+dayjs.locale("es");
 
 export default async function PromotionsPage() {
     const supabase = await createClient()
@@ -49,10 +51,10 @@ export default async function PromotionsPage() {
             <Group justify="space-between">
                 <Title order={1}>Gestión de Promociones</Title>
                 <Group>
-                    <LinkButton href="/products" variant="default" leftSection={<ArrowLeft size={16} />}>
+                    <LinkButton href="/products" variant="default" leftSection={<IconArrowLeft size={16} />}>
                         Volver a Productos
                     </LinkButton>
-                    <LinkButton href="/promotions/create" leftSection={<Plus size={16} />}>
+                    <LinkButton href="/promotions/create" leftSection={<IconPlus size={16} />}>
                         Crear Nueva Promoción
                     </LinkButton>
                 </Group>
@@ -100,8 +102,8 @@ export default async function PromotionsPage() {
                                     </td>
                                     <td>
                                         <Text size="sm" c="dimmed">
-                                            {promo.starts_at && format(new Date(promo.starts_at), "d MMM", { locale: es })} -
-                                            {promo.ends_at && format(new Date(promo.ends_at), "d MMM", { locale: es })}
+                                            {promo.starts_at && dayjs(promo.starts_at).format("D MMM")} -
+                                            {promo.ends_at && dayjs(promo.ends_at).format("D MMM")}
                                         </Text>
                                     </td>
                                     <td style={{ textAlign: 'right' }}>

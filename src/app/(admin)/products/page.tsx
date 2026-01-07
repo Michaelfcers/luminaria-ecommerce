@@ -1,3 +1,4 @@
+
 import { Button, Card, Table, Title, Text, Group, Stack, Badge, ActionIcon, Container, Avatar } from "@mantine/core";
 import { DeleteProductButton } from "@/features/admin/components/delete-product-button";
 import { LinkButton } from "@/components/link-button";
@@ -5,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getLocalProductImage } from "@/lib/local-images";
-import { Package, Plus } from "lucide-react";
+import { IconPackage, IconPlus } from "@tabler/icons-react";
 
 export default async function ProductsPage() {
   const supabase = await createClient()
@@ -100,7 +101,7 @@ export default async function ProductsPage() {
         <Title order={1}>Gestión de Productos</Title>
         <Group>
           <LinkButton href="/dashboard" variant="default">Dashboard</LinkButton>
-          <LinkButton href="/products/create" leftSection={<Plus size={16} />}>Crear Nuevo Producto</LinkButton>
+          <LinkButton href="/products/create" leftSection={<IconPlus size={16} />}>Crear Nuevo Producto</LinkButton>
         </Group>
       </Group>
 
@@ -126,7 +127,7 @@ export default async function ProductsPage() {
                 <tr key={product.id}>
                   <td>
                     <Avatar src={product.imageUrl} alt={product.name} size="md" radius="sm" variant="outline">
-                      <Package size={20} />
+                      <IconPackage size={20} />
                     </Avatar>
                   </td>
                   <td style={{ fontWeight: 500 }}>{product.name}</td>

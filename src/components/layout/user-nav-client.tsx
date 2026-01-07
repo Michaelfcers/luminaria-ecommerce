@@ -1,7 +1,7 @@
 "use client"
 
 import { Avatar, Menu, Button, Text, Stack, UnstyledButton } from "@mantine/core"
-import { LayoutDashboard, Package, User, LogOut } from "lucide-react"
+import { IconLayoutDashboard, IconPackage, IconUser, IconLogout } from "@tabler/icons-react"
 import Link from "next/link"
 import { signOutAction } from "@/actions/auth"
 
@@ -17,7 +17,7 @@ export function UserNavClient({ user, storeName, userDisplayName, userRole }: Us
         return (
             <Link href="/login">
                 <Button variant="subtle" size="compact-md">
-                    <User size={20} />
+                    <IconUser size={20} />
                 </Button>
             </Link>
         )
@@ -42,15 +42,15 @@ export function UserNavClient({ user, storeName, userDisplayName, userRole }: Us
                     </Stack>
                 </Menu.Label>
                 <Menu.Divider />
-                <Menu.Item leftSection={<User size={14} />} component={Link} href="/account">
+                <Menu.Item leftSection={<IconUser size={14} />} component={Link} href="/account">
                     Mi Cuenta
                 </Menu.Item>
                 {userRole !== 'buyer' && (
                     <>
-                        <Menu.Item leftSection={<LayoutDashboard size={14} />} component={Link} href="/dashboard">
+                        <Menu.Item leftSection={<IconLayoutDashboard size={14} />} component={Link} href="/dashboard">
                             Dashboard
                         </Menu.Item>
-                        <Menu.Item leftSection={<Package size={14} />} component={Link} href="/products">
+                        <Menu.Item leftSection={<IconPackage size={14} />} component={Link} href="/products">
                             Products
                         </Menu.Item>
                     </>
@@ -58,7 +58,7 @@ export function UserNavClient({ user, storeName, userDisplayName, userRole }: Us
                 <Menu.Divider />
                 <form action={signOutAction}>
                     <Menu.Item
-                        leftSection={<LogOut size={14} />}
+                        leftSection={<IconLogout size={14} />}
                         component="button"
                         type="submit"
                         color="red"

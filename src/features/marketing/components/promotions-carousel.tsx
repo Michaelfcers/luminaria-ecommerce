@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ChevronLeft, ChevronRight, Play, Pause } from "lucide-react"
+import { IconChevronLeft, IconChevronRight, IconPlayerPlay, IconPlayerPause } from "@tabler/icons-react"
 import { Button, Box, Container, Title, Text, Group, ActionIcon, Badge, Flex } from "@mantine/core"
 
 const promotions = [
@@ -162,13 +162,13 @@ export function PromotionsCarousel() {
           {/* Controls */}
           <Group justify="center" mt="xl" gap="md">
             <ActionIcon variant="light" color="gray" radius="xl" size="lg" onClick={prevSlide}>
-              <ChevronLeft size={20} />
+              <IconChevronLeft size={20} />
             </ActionIcon>
             <ActionIcon variant="light" color="gray" radius="xl" size="lg" onClick={togglePlayPause}>
-              {isPlaying ? <Pause size={20} /> : <Play size={20} />}
+              {isPlaying ? <IconPlayerPause size={20} /> : <IconPlayerPlay size={20} />}
             </ActionIcon>
             <ActionIcon variant="light" color="gray" radius="xl" size="lg" onClick={nextSlide}>
-              <ChevronRight size={20} />
+              <IconChevronRight size={20} />
             </ActionIcon>
           </Group>
 

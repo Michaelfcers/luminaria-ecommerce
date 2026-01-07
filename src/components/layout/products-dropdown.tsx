@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ChevronDownIcon } from "lucide-react"; // Assuming ChevronDownIcon is used for the trigger
+import { IconChevronDown } from "@tabler/icons-react";
 
 type Category = {
   id: string;
@@ -20,7 +20,7 @@ export function ProductsDropdown({ mainCategories }: { mainCategories: Category[
         className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
       >
         Productos
-        <ChevronDownIcon
+        <IconChevronDown
           className="relative top-[1px] ml-1 size-3 transition duration-300 group-hover:rotate-180"
           aria-hidden="true"
         />

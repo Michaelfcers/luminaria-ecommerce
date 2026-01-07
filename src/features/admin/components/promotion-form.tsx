@@ -6,7 +6,7 @@ import { Button, Card, TextInput, Select, NumberInput, Checkbox, Tabs, Badge, Te
 import { DateInput } from "@mantine/dates";
 import { createPromotion, updatePromotion } from "@/lib/actions/promotions"
 import { notifications } from "@mantine/notifications"
-import { Search, Image as ImageIcon, Calendar, Tag, CheckCircle2 } from "lucide-react"
+import { IconSearch, IconPhoto, IconCalendar, IconTag, IconCircleCheck } from "@tabler/icons-react"
 import Image from "next/image"
 
 interface ProductVariant {
@@ -180,7 +180,7 @@ export function PromotionForm({
                                 <TextInput
                                     label="Nombre"
                                     placeholder="Ej. Oferta de Verano"
-                                    leftSection={<Tag size={16} />}
+                                    leftSection={<IconTag size={16} />}
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                     required
@@ -224,7 +224,7 @@ export function PromotionForm({
                                     <DateInput
                                         label="Inicio"
                                         placeholder="Seleccionar fecha"
-                                        leftSection={<Calendar size={16} />}
+                                        leftSection={<IconCalendar size={16} />}
                                         value={formData.starts_at}
                                         onChange={(val) => setFormData({ ...formData, starts_at: val as Date | null })}
                                         className="w-full"
@@ -233,7 +233,7 @@ export function PromotionForm({
                                     <DateInput
                                         label="Fin"
                                         placeholder="Seleccionar fecha"
-                                        leftSection={<Calendar size={16} />}
+                                        leftSection={<IconCalendar size={16} />}
                                         value={formData.ends_at}
                                         onChange={(val) => setFormData({ ...formData, ends_at: val as Date | null })}
                                         className="w-full"
@@ -268,7 +268,7 @@ export function PromotionForm({
                                 <Group>
                                     <TextInput
                                         placeholder="Buscar productos..."
-                                        leftSection={<Search size={16} />}
+                                        leftSection={<IconSearch size={16} />}
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
                                         style={{ flex: 1 }}
@@ -306,6 +306,7 @@ export function PromotionForm({
                                                         onChange={() => { }}
                                                         style={{ pointerEvents: 'none' }}
                                                         mr="xs"
+                                                        readOnly
                                                     />
                                                     <div style={{ width: 48, height: 48, position: 'relative', borderRadius: 6, overflow: 'hidden', backgroundColor: '#f1f1f1' }}>
                                                         {product.product_media?.[0]?.url ? (
@@ -316,13 +317,13 @@ export function PromotionForm({
                                                                 style={{ objectFit: 'cover' }}
                                                             />
                                                         ) : (
-                                                            <Group justify="center" align="center" h="100%"><ImageIcon size={20} color="gray" /></Group>
+                                                            <Group justify="center" align="center" h="100%"><IconPhoto size={20} color="gray" /></Group>
                                                         )}
                                                     </div>
                                                     <Stack gap={0} style={{ flex: 1 }}>
                                                         <Group gap={4}>
                                                             <Text fw={600} size="sm" lineClamp={1} title={product.name}>{product.name}</Text>
-                                                            {isSelected && <CheckCircle2 size={14} color="var(--mantine-color-blue-6)" />}
+                                                            {isSelected && <IconCircleCheck size={14} color="var(--mantine-color-blue-6)" />}
                                                         </Group>
                                                         {product.code && <Badge variant="dot" color="gray" size="xs">{product.code}</Badge>}
                                                     </Stack>
@@ -331,7 +332,7 @@ export function PromotionForm({
                                         })}
                                         {filteredProducts.length === 0 && (
                                             <Stack align="center" py="xl">
-                                                <Search size={32} color="gray" style={{ opacity: 0.3 }} />
+                                                <IconSearch size={32} color="gray" style={{ opacity: 0.3 }} />
                                                 <Text c="dimmed">No se encontraron productos</Text>
                                             </Stack>
                                         )}
@@ -352,7 +353,7 @@ export function PromotionForm({
                                                                 style={{ objectFit: 'cover' }}
                                                             />
                                                         ) : (
-                                                            <Group justify="center" align="center" h="100%"><ImageIcon size={16} color="gray" /></Group>
+                                                            <Group justify="center" align="center" h="100%"><IconPhoto size={16} color="gray" /></Group>
                                                         )}
                                                     </div>
                                                     <div>
@@ -399,7 +400,7 @@ export function PromotionForm({
                                         ))}
                                         {filteredProducts.length === 0 && (
                                             <Stack align="center" py="xl">
-                                                <Search size={32} color="gray" style={{ opacity: 0.3 }} />
+                                                <IconSearch size={32} color="gray" style={{ opacity: 0.3 }} />
                                                 <Text c="dimmed">No se encontraron productos</Text>
                                             </Stack>
                                         )}

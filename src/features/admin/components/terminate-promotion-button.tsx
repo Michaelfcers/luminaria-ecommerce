@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Button, Modal, Group, Text } from "@mantine/core"
-import { Trash2 } from "lucide-react"
+import { IconTrash } from "@tabler/icons-react"
 import { deletePromotion } from "@/lib/actions/promotions"
 import { notifications } from "@mantine/notifications"
 
@@ -51,7 +51,7 @@ export function TerminatePromotionButton({ promotionId }: TerminatePromotionButt
                 size="xs"
                 disabled={isDeleting}
                 onClick={() => setModalOpen(true)}
-                leftSection={<Trash2 size={16} />}
+                leftSection={<IconTrash size={16} />}
             >
                 Terminar
             </Button>

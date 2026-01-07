@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Search } from "lucide-react"
+import { IconSearch } from "@tabler/icons-react"
 // Mantine imports
 import { Container, Group, Button, Drawer, Burger, Box, Text } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
@@ -72,7 +72,7 @@ export function Navigation({ userNav }: NavigationProps) {
           {/* Icons / Actions */}
           <Group gap="xs">
             <Button variant="subtle" color="gray" size="compact-md" onClick={() => setIsSearchOpen(true)} p={8}>
-              <Search size={20} />
+              <IconSearch size={20} />
             </Button>
             <SearchDialog open={isSearchOpen} onOpenChange={setIsSearchOpen} />
 

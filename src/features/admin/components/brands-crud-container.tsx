@@ -7,7 +7,7 @@ import * as z from "zod"
 import { Button, TextInput, Table, Modal, Group, Stack, Text, Title, ActionIcon } from "@mantine/core"
 import { addBrand, updateBrand, deleteBrand } from "./brands-actions"
 import { notifications } from "@mantine/notifications"
-import { Edit, Trash } from "lucide-react"
+import { IconEdit, IconTrash } from "@tabler/icons-react"
 
 const brandFormSchema = z.object({
   name: z.string().min(2, "El nombre debe tener al menos 2 caracteres."),
@@ -151,10 +151,10 @@ export function BrandsCrudContainer({ brands: initialBrands }: BrandsCrudContain
                 <td style={{ textAlign: 'right' }}>
                   <Group justify="flex-end" gap="xs">
                     <ActionIcon variant="subtle" color="blue" onClick={() => handleEdit(brand)}>
-                      <Edit size={16} />
+                      <IconEdit size={16} />
                     </ActionIcon>
                     <ActionIcon variant="subtle" color="red" onClick={() => openDeleteDialog(brand.id)}>
-                      <Trash size={16} />
+                      <IconTrash size={16} />
                     </ActionIcon>
                   </Group>
                 </td>

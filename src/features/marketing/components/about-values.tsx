@@ -1,30 +1,29 @@
-"use client"
 
 import { Card, Text, Title, SimpleGrid, ThemeIcon, Stack, Container } from "@mantine/core"
-import { Lightbulb, Award, Users, Leaf } from "lucide-react"
+import { IconBulb, IconAward, IconUsers, IconLeaf } from "@tabler/icons-react"
 
 export function AboutValues() {
   const values = [
     {
-      icon: Lightbulb,
+      icon: IconBulb,
       title: "Innovación",
       description:
         "Buscamos constantemente las últimas tendencias y tecnologías en iluminación para ofrecer productos vanguardistas.",
     },
     {
-      icon: Award,
+      icon: IconAward,
       title: "Calidad Premium",
       description:
         "Trabajamos exclusivamente con marcas reconocidas mundialmente que garantizan la máxima calidad y durabilidad.",
     },
     {
-      icon: Users,
+      icon: IconUsers,
       title: "Servicio Personalizado",
       description:
         "Nuestro equipo de expertos está siempre disponible para asesorarte y encontrar la solución perfecta para tu proyecto.",
     },
     {
-      icon: Leaf,
+      icon: IconLeaf,
       title: "Sostenibilidad",
       description: "Promovemos el uso de tecnología LED y productos eco-eficientes para reducir el impacto ambiental.",
     },

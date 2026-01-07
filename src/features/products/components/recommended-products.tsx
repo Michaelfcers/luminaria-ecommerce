@@ -2,7 +2,7 @@
 import { useRef } from "react"
 import Link from "next/link"
 import { Card, Button, ActionIcon, Title, Text, Group, Box, Image, SimpleGrid } from "@mantine/core"
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react"
 
 export type RecommendedProduct = {
   id: string
@@ -46,10 +46,10 @@ export function RecommendedProducts({
         <Title order={2}>Productos Recomendados</Title>
         <Group gap="xs">
           <ActionIcon variant="default" size="lg" onClick={() => scroll("left")}>
-            <ChevronLeft size={16} />
+            <IconChevronLeft size={16} />
           </ActionIcon>
           <ActionIcon variant="default" size="lg" onClick={() => scroll("right")}>
-            <ChevronRight size={16} />
+            <IconChevronRight size={16} />
           </ActionIcon>
         </Group>
       </Group>

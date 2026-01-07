@@ -1,4 +1,3 @@
-"use client"
 
 import { Card, Text, Title, SimpleGrid, Avatar, Stack, Container } from "@mantine/core"
 

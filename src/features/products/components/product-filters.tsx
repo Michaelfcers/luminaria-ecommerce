@@ -15,13 +15,14 @@ import {
   Flex,
   ActionIcon
 } from "@mantine/core"
-import { X } from "lucide-react"
+import { IconX } from "@tabler/icons-react"
 
 // Define types for the filter items
 type FilterItem = {
   id: string;
   name: string;
   count: number;
+  // ... any other properties
 };
 
 export function ProductFilters({
@@ -158,7 +159,7 @@ export function ProductFilters({
             size="compact-xs"
             color="red"
             onClick={clearFilters}
-            rightSection={<X size={12} />}
+            rightSection={<IconX size={12} />}
           >
             Borrar
           </Button>

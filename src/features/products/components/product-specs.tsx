@@ -1,6 +1,5 @@
-"use client"
 import { Card, Tabs, Text, List, Group, ThemeIcon, Stack, Button, Box } from "@mantine/core"
-import { Download, FileText } from "lucide-react"
+import { IconDownload, IconFileText } from "@tabler/icons-react"
 
 interface ProductSpecsProps {
   features: string[]
@@ -70,14 +69,14 @@ function DocumentRow({ title, description }: { title: string, description: strin
       <Group justify="space-between">
         <Group>
           <ThemeIcon size="xl" variant="light" color="blue">
-            <FileText size={24} />
+            <IconFileText size={24} />
           </ThemeIcon>
           <Stack gap={0}>
             <Text fw={600}>{title}</Text>
             <Text size="sm" c="dimmed">{description}</Text>
           </Stack>
         </Group>
-        <Button variant="outline" size="sm" leftSection={<Download size={14} />}>
+        <Button variant="outline" size="sm" leftSection={<IconDownload size={14} />}>
           Descargar PDF
         </Button>
       </Group>
