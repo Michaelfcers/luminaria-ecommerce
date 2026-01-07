@@ -3,25 +3,21 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { Search } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import {
-    CommandDialog,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
-} from "@/components/ui/command"
+import { Modal, TextInput, Stack, Text, UnstyledButton, Group, ScrollArea } from "@mantine/core"
 import { searchProducts, type SearchResult } from "@/lib/actions/search"
 
-export function SearchDialog() {
-    const [open, setOpen] = React.useState(false)
+interface SearchDialogProps {
+    open: boolean
+    onOpenChange: (open: boolean) => void
+}
+
+export function SearchDialog({ open, onOpenChange }: SearchDialogProps) {
     const [query, setQuery] = React.useState("")
     const [data, setData] = React.useState<SearchResult[]>([])
     const [isSearching, setIsSearching] = React.useState(false)
     const router = useRouter()
 
-    // Simple debounce implementation if hook doesn't exist
+    // Simple debounce implementation
     React.useEffect(() => {
         const timer = setTimeout(async () => {
             if (query.length >= 2) {
@@ -46,66 +42,71 @@ export function SearchDialog() {
         const down = (e: KeyboardEvent) => {
             if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
                 e.preventDefault()
-                setOpen((open) => !open)
+                onOpenChange(!open)
             }
         }
 
         document.addEventListener("keydown", down)
         return () => document.removeEventListener("keydown", down)
-    }, [])
+    }, [onOpenChange, open])
 
-    const runCommand = React.useCallback((command: () => unknown) => {
-        setOpen(false)
-        command()
-    }, [])
+    const handleSelect = (url: string) => {
+        onOpenChange(false)
+        router.push(url)
+    }
 
     return (
-        <>
-            <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setOpen(true)}
-                className="relative"
-            >
-                <Search className="h-4 w-4" />
-                <span className="sr-only">Search</span>
-            </Button>
-            <CommandDialog open={open} onOpenChange={setOpen}>
-                <CommandInput
-                    placeholder="Buscar productos..."
+        <Modal
+            opened={open}
+            onClose={() => onOpenChange(false)}
+            title="Buscar productos"
+            size="lg"
+        >
+            <Stack gap="md">
+                <TextInput
+                    placeholder="Escribe para buscar..."
+                    leftSection={<Search size={16} />}
                     value={query}
-                    onValueChange={setQuery}
+                    onChange={(event) => setQuery(event.currentTarget.value)}
+                    data-autofocus
                 />
-                <CommandList>
-                    <CommandEmpty>
-                        {isSearching ? "Buscando..." : "No se encontraron resultados."}
-                    </CommandEmpty>
+
+                <ScrollArea.Autosize mah={300}>
+                    {data.length === 0 && query.length >= 2 && !isSearching && (
+                        <Text c="dimmed" size="sm" ta="center" py="md">No se encontraron resultados.</Text>
+                    )}
+                    {isSearching && (
+                        <Text c="dimmed" size="sm" ta="center" py="md">Buscando...</Text>
+                    )}
 
                     {data.length > 0 && (
-                        <CommandGroup heading="Resultados">
+                        <Stack gap={4}>
+                            <Text size="xs" fw={700} c="dimmed" tt="uppercase">Resultados</Text>
                             {data.map((item) => (
-                                <CommandItem
+                                <UnstyledButton
                                     key={`${item.type}-${item.id}`}
-                                    value={`${item.title} ${item.subtitle}`}
-                                    onSelect={() => {
-                                        runCommand(() => router.push(item.url))
-                                    }}
+                                    onClick={() => handleSelect(item.url)}
+                                    p="sm"
+                                    style={{ borderRadius: 'var(--mantine-radius-md)' }}
+                                    className="hover:bg-gray-100 dark:hover:bg-gray-800"
                                 >
-                                    <Search className="mr-2 h-4 w-4" />
-                                    <div className="flex flex-col">
-                                        <span>{item.title}</span>
-                                        {item.subtitle && (
-                                            <span className="text-xs text-muted-foreground">
-                                                {item.subtitle}
-                                            </span>
-                                        )}
-                                    </div>
-                                </CommandItem>
+                                    <Group>
+                                        <Search size={16} className="text-muted-foreground" />
+                                        <div className="flex flex-col">
+                                            <Text size="sm">{item.title}</Text>
+                                            {item.subtitle && (
+                                                <Text size="xs" c="dimmed">
+                                                    {item.subtitle}
+                                                </Text>
+                                            )}
+                                        </div>
+                                    </Group>
+                                </UnstyledButton>
                             ))}
-                        </CommandGroup>
+                        </Stack>
                     )}
-                </CommandList>
-            </CommandDialog>
-        </>
+                </ScrollArea.Autosize>
+            </Stack>
+        </Modal>
     )
 }

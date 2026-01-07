@@ -1,21 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
+import { Button, Modal, Group, Text } from "@mantine/core"
 import { Trash2 } from "lucide-react"
 import { deletePromotion } from "@/lib/actions/promotions"
-import { useToast } from "@/hooks/use-toast"
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
+import { notifications } from "@mantine/notifications"
 
 interface TerminatePromotionButtonProps {
     promotionId: string
@@ -23,57 +12,61 @@ interface TerminatePromotionButtonProps {
 
 export function TerminatePromotionButton({ promotionId }: TerminatePromotionButtonProps) {
     const [isDeleting, setIsDeleting] = useState(false)
-    const { toast } = useToast()
+    const [modalOpen, setModalOpen] = useState(false)
 
     const handleDelete = async () => {
         setIsDeleting(true)
         try {
             const result = await deletePromotion(promotionId)
             if (result.error) {
-                toast({
+                notifications.show({
                     title: "Error",
-                    description: result.error,
-                    variant: "destructive",
+                    message: result.error,
+                    color: "red",
                 })
             } else {
-                toast({
+                notifications.show({
                     title: "Promoción eliminada",
-                    description: "La promoción ha sido terminada y eliminada correctamente.",
+                    message: "La promoción ha sido terminada y eliminada correctamente.",
+                    color: "green",
                 })
             }
         } catch (error) {
-            toast({
+            notifications.show({
                 title: "Error",
-                description: "Ocurrió un error al eliminar la promoción.",
-                variant: "destructive",
+                message: "Ocurrió un error al eliminar la promoción.",
+                color: "red",
             })
         } finally {
             setIsDeleting(false)
+            setModalOpen(false)
         }
     }
 
     return (
-        <AlertDialog>
-            <AlertDialogTrigger asChild>
-                <Button variant="destructive" size="sm" disabled={isDeleting}>
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Terminar
-                </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        Esta acción no se puede deshacer. Esto eliminará permanentemente la promoción y la desvinculará de todos los productos.
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+        <>
+            <Button
+                variant="subtle"
+                color="red"
+                size="xs"
+                disabled={isDeleting}
+                onClick={() => setModalOpen(true)}
+                leftSection={<Trash2 size={16} />}
+            >
+                Terminar
+            </Button>
+
+            <Modal opened={modalOpen} onClose={() => setModalOpen(false)} title="¿Estás seguro?">
+                <Text size="sm">
+                    Esta acción no se puede deshacer. Esto eliminará permanentemente la promoción y la desvinculará de todos los productos.
+                </Text>
+                <Group justify="flex-end" mt="md">
+                    <Button variant="default" onClick={() => setModalOpen(false)}>Cancelar</Button>
+                    <Button color="red" onClick={handleDelete} loading={isDeleting}>
                         {isDeleting ? "Eliminando..." : "Terminar Promoción"}
-                    </AlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
+                    </Button>
+                </Group>
+            </Modal>
+        </>
     )
 }

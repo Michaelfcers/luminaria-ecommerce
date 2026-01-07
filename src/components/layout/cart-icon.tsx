@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { ShoppingBag } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { ActionIcon, Indicator } from "@mantine/core"
 import { useCart } from "@/hooks/use-cart"
 
 export function CartIcon() {
@@ -10,15 +10,12 @@ export function CartIcon() {
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0)
 
   return (
-    <Link href="/carrito">
-      <Button variant="ghost" size="icon" className="relative">
-        <ShoppingBag className="h-4 w-4" />
-        {itemCount > 0 && (
-          <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
-            {itemCount}
-          </span>
-        )}
-      </Button>
+    <Link href="/carrito" passHref>
+      <Indicator label={itemCount} size={16} disabled={itemCount === 0} offset={2} color="blue" withBorder>
+        <ActionIcon variant="subtle" size="lg" color="dark">
+          <ShoppingBag className="h-5 w-5" />
+        </ActionIcon>
+      </Indicator>
     </Link>
   )
 }

@@ -1,26 +1,11 @@
-
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { DeleteProductButton } from "@/features/admin/components/delete-product-button"
-import { createClient } from "@/lib/supabase/server"
-import Link from "next/link"
-import { redirect } from "next/navigation"
-import { getLocalProductImage } from "@/lib/local-images"
-import Image from "next/image"
+import { Button, Card, Table, Title, Text, Group, Stack, Badge, ActionIcon, Container, Avatar } from "@mantine/core";
+import { DeleteProductButton } from "@/features/admin/components/delete-product-button";
+import { LinkButton } from "@/components/link-button";
+import { createClient } from "@/lib/supabase/server";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { getLocalProductImage } from "@/lib/local-images";
+import { Package, Plus } from "lucide-react";
 
 export default async function ProductsPage() {
   const supabase = await createClient()
@@ -31,8 +16,6 @@ export default async function ProductsPage() {
   if (!user) {
     redirect("/login")
   }
-
-  console.log("Logged in user ID:", user.id)
 
   // Fetch the user's store_id from the store_members table
   const { data: storeMembers, error: storeMemberError } = await supabase
@@ -111,88 +94,73 @@ export default async function ProductsPage() {
     }
   }))
 
-  console.log("Fetched products:", products)
-
   return (
-    <div className="flex flex-col gap-8 p-4 md:p-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Gestión de Productos</h1>
-        <div className="flex gap-2">
-          <Button asChild>
-            <Link href="/dashboard">Dashboard</Link>
-          </Button>
-          <Button asChild>
-            <Link href="/products/create">Crear Nuevo Producto</Link>
-          </Button>
-        </div>
-      </div>
+    <Stack gap="lg" p="md">
+      <Group justify="space-between">
+        <Title order={1}>Gestión de Productos</Title>
+        <Group>
+          <LinkButton href="/dashboard" variant="default">Dashboard</LinkButton>
+          <LinkButton href="/products/create" leftSection={<Plus size={16} />}>Crear Nuevo Producto</LinkButton>
+        </Group>
+      </Group>
 
-      <Card className="rounded-3xl elegant-shadow bg-white">
-        <CardHeader>
-          <CardTitle>Listado de Productos</CardTitle>
-          <CardDescription>
-            Administra los productos de tu tienda.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Imagen</TableHead>
-                <TableHead>Nombre</TableHead>
-                <TableHead>Marca</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead>Stock</TableHead>
-                <TableHead className="text-right">Acciones</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+      <Card withBorder radius="lg" padding="lg">
+        <Stack gap="md">
+          <div>
+            <Title order={3}>Listado de Productos</Title>
+            <Text c="dimmed" size="sm">Administra los productos de tu tienda.</Text>
+          </div>
+          <Table highlightOnHover>
+            <thead>
+              <tr>
+                <th>Imagen</th>
+                <th>Nombre</th>
+                <th>Marca</th>
+                <th>Estado</th>
+                <th>Stock</th>
+                <th style={{ textAlign: 'right' }}>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
               {products.map((product) => (
-                <TableRow key={product.id}>
-                  <TableCell>
-                    <div className="relative h-12 w-12 rounded-md overflow-hidden border">
-                      <Image
-                        src={product.imageUrl}
-                        alt={product.name}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                  </TableCell>
-                  <TableCell className="font-medium">{product.name}</TableCell>
-                  <TableCell>
+                <tr key={product.id}>
+                  <td>
+                    <Avatar src={product.imageUrl} alt={product.name} size="md" radius="sm" variant="outline">
+                      <Package size={20} />
+                    </Avatar>
+                  </td>
+                  <td style={{ fontWeight: 500 }}>{product.name}</td>
+                  <td>
                     {/* @ts-ignore */}
                     {product.brands?.name || "N/A"}
-                  </TableCell>
-                  <TableCell>
-                    {/* @ts-ignore */}
-                    {product.promotion_products?.some((pp: any) => pp.promotions?.status === 'active') && (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-pink-100 text-pink-800 mr-2">
-                        Oferta
-                      </span>
-                    )}
-                    {product.status}
-                  </TableCell>
-                  <TableCell>{product.stock}</TableCell>
-                  <TableCell className="text-right">
-                    <Button asChild variant="outline" size="sm" className="mr-2">
-                      <Link href={`/products/${product.id}/edit`}>
+                  </td>
+                  <td>
+                    <Group gap="xs">
+                      {/* @ts-ignore */}
+                      {product.promotion_products?.some((pp: any) => pp.promotions?.status === 'active') && (
+                        <Badge color="pink" variant="light">Oferta</Badge>
+                      )}
+                      <Badge color={product.status === 'active' ? 'green' : 'gray'}>{product.status}</Badge>
+                    </Group>
+                  </td>
+                  <td>{product.stock}</td>
+                  <td style={{ textAlign: 'right' }}>
+                    <Group justify="flex-end" gap="xs">
+                      <LinkButton href={`/products/${product.id}/edit`} size="xs" variant="default">
                         Editar
-                      </Link>
-                    </Button>
-                    <Button asChild variant="outline" size="sm" className="mr-2">
-                      <Link href={`/products/${product.id}/versions`}>
-                        Editar Versiones
-                      </Link>
-                    </Button>
-                    <DeleteProductButton productId={product.id} />
-                  </TableCell>
-                </TableRow>
+                      </LinkButton>
+                      <LinkButton href={`/products/${product.id}/versions`} size="xs" variant="default">
+                        Versiones
+                      </LinkButton>
+                      <DeleteProductButton productId={product.id} />
+                    </Group>
+                  </td>
+                </tr>
               ))}
-            </TableBody>
+            </tbody>
           </Table>
-        </CardContent>
+        </Stack>
       </Card>
-    </div>
+    </Stack>
   )
 }

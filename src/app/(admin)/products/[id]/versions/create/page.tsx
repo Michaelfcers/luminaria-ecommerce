@@ -2,6 +2,7 @@
 import { notFound, redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { CreateVariantForm } from "@/features/admin/components/create-variant-form"
+import { Container, Title, Stack, Text } from "@mantine/core"
 
 export default async function CreateProductVersionPage({
     params,
@@ -31,13 +32,15 @@ export default async function CreateProductVersionPage({
     }
 
     return (
-        <div className="flex flex-col gap-8 p-4 md:p-8">
-            <div>
-                <h1 className="text-3xl font-bold">Crear Nueva Versión</h1>
-                <p className="text-xl text-muted-foreground">Para: {product.name}</p>
-            </div>
+        <Container size="md" py="lg">
+            <Stack gap="lg">
+                <div>
+                    <Title order={2}>Crear Nueva Versión</Title>
+                    <Text c="dimmed">Para: {product.name}</Text>
+                </div>
 
-            <CreateVariantForm productId={product.id} />
-        </div>
+                <CreateVariantForm productId={product.id} />
+            </Stack>
+        </Container>
     )
 }

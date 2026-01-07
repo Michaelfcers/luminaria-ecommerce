@@ -1,15 +1,9 @@
-
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { BrandsCrudContainer } from "@/features/admin/components/brands-crud-container"
-import { createClient } from "@/lib/supabase/server"
-import Link from "next/link"
+import { Button, Card, Title, Text, Group, Stack } from "@mantine/core";
+import { LinkButton } from "@/components/link-button";
+import { BrandsCrudContainer } from "@/features/admin/components/brands-crud-container";
+import { createClient } from "@/lib/supabase/server";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 export default async function BrandsPage() {
   const supabase = await createClient()
@@ -25,25 +19,23 @@ export default async function BrandsPage() {
   }
 
   return (
-    <div className="flex flex-col gap-8 p-4 md:p-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Gestión de Marcas</h1>
-        <Button asChild>
-          <Link href="/dashboard">Volver al Dashboard</Link>
-        </Button>
-      </div>
+    <Stack gap="lg" p="md">
+      <Group justify="space-between">
+        <Title order={1}>Gestión de Marcas</Title>
+        <LinkButton href="/dashboard" variant="outline" leftSection={<ArrowLeft size={16} />}>
+          Volver al Dashboard
+        </LinkButton>
+      </Group>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Marcas</CardTitle>
-          <CardDescription>
-            Añade, edita y elimina las marcas de productos.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+      <Card withBorder radius="lg" padding="lg">
+        <Stack gap="md">
+          <div>
+            <Title order={3}>Marcas</Title>
+            <Text c="dimmed" size="sm">Añade, edita y elimina las marcas de productos.</Text>
+          </div>
           <BrandsCrudContainer brands={brands || []} />
-        </CardContent>
+        </Stack>
       </Card>
-    </div>
+    </Stack>
   )
 }

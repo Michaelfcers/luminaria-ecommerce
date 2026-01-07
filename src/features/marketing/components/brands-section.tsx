@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { Container, Title, Text, SimpleGrid, Card, Image, Box, Badge, Center, Grid } from "@mantine/core"
 import philipsLogo from "@/assets/brands/philips-logo.webp"
 
 export function BrandsSection() {
@@ -23,74 +24,90 @@ export function BrandsSection() {
   }, [brands.length])
 
   return (
-    <section className="py-24 bg-gradient-to-r from-primary/5 via-background to-primary/10 relative overflow-hidden">
-      <div className="absolute inset-0 bg-grid-pattern opacity-5" />
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-primary/5 rounded-full blur-3xl animate-pulse delay-1000" />
+    <Box py={{ base: 60, md: 100 }} bg="gray.0" style={{ position: 'relative', overflow: 'hidden' }}>
+      {/* Background decorations - optional or simplified */}
+      <Box
+        pos="absolute" top={0} left={0} w="100%" h="100%"
+        style={{ opacity: 0.03, background: 'radial-gradient(circle, var(--mantine-color-blue-9) 0%, transparent 70%)' }}
+      />
 
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="text-center mb-20 fade-in-up">
-          <div className="inline-flex items-center gap-2 bg-white text-primary px-4 py-2 rounded-full text-sm font-medium mb-6 shadow-sm border border-primary/20">
-            <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-            Marcas de Confianza
-          </div>
-          <h2 className="text-5xl font-bold text-foreground mb-6">Marcas Aliadas</h2>
-          <p className="text-muted-foreground max-w-3xl mx-auto text-xl leading-relaxed">
+      <Container size="xl" pos="relative">
+        <Box ta="center" mb={60}>
+          <Center mb="md">
+            <Badge variant="light" size="lg" color="blue" tt="uppercase" opacity={0.8}>
+              Marcas de Confianza
+            </Badge>
+          </Center>
+          <Title order={2} size="h1" fw={800} mb="sm" c="dark.8">Marcas Aliadas</Title>
+          <Text size="xl" c="dimmed" maw={700} mx="auto">
             Colaboramos con las marcas más prestigiosas y reconocidas mundialmente en el sector de la iluminación
             premium
-          </p>
-        </div>
+          </Text>
+        </Box>
 
-        <div className="text-center mb-16 fade-in-up stagger-2">
-          <div className="inline-block p-8 bg-background rounded-2xl elegant-shadow-lg border border-primary/20">
-            <div className="text-sm text-primary font-medium mb-4">Marca Destacada</div>
-            <img
-              src={brands[currentIndex].logo || "/placeholder.svg"}
+        <Center mb={60}>
+          <Card padding="xl" radius="lg" withBorder shadow="sm" miw={300}>
+            <Text size="sm" fw={700} c="blue" ta="center" mb="md" tt="uppercase">Marca Destacada</Text>
+            <Image
+              src={brands[currentIndex].logo}
               alt={`Logo de ${brands[currentIndex].name}`}
-              className="h-16 w-auto mx-auto transition-all duration-500 transform hover:scale-110"
+              h={64}
+              fit="contain"
+              mb="md"
             />
-            <div className="text-lg font-bold text-foreground mt-4">{brands[currentIndex].name}</div>
-          </div>
-        </div>
+            <Text size="xl" fw={700} ta="center">{brands[currentIndex].name}</Text>
+          </Card>
+        </Center>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+        <SimpleGrid cols={{ base: 2, sm: 3, md: 6 }} spacing="lg">
           {brands.map((brand, index) => (
-            <div
+            <Card
               key={brand.name}
-              className={`group relative p-8 bg-background/80 backdrop-blur-sm rounded-xl elegant-shadow hover:shadow-2xl transition-all duration-500 elegant-hover fade-in-up stagger-${Math.min(index + 1, 4)} border border-transparent hover:border-primary/30`}
+              padding="lg"
+              radius="md"
+              withBorder={false}
+              bg="white"
+              style={{
+                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                cursor: 'default',
+                boxShadow: index === currentIndex ? '0 0 0 2px var(--mantine-color-blue-5)' : 'none'
+              }}
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-xl" />
-
-              <div className="relative z-10 flex items-center justify-center">
-                <img
-                  src={brand.logo || "/placeholder.svg"}
+              <Center h={60}>
+                <Image
+                  src={brand.logo}
                   alt={`Logo de ${brand.name}`}
-                  className="h-12 w-auto max-w-full object-contain opacity-70 group-hover:opacity-100 transition-all duration-500 filter grayscale group-hover:grayscale-0 transform group-hover:scale-110"
+                  h={40}
+                  w="auto"
+                  fit="contain"
+                  style={{ filter: index === currentIndex ? 'none' : 'grayscale(100%)', opacity: index === currentIndex ? 1 : 0.6, transition: 'filter 0.3s' }}
                 />
-              </div>
-
-              {index === currentIndex && (
-                <div className="absolute -top-2 -right-2 w-4 h-4 bg-primary rounded-full animate-ping" />
-              )}
-            </div>
+              </Center>
+            </Card>
           ))}
-        </div>
+        </SimpleGrid>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20 fade-in-up stagger-4">
-          <div className="text-center p-6 bg-background/50 rounded-xl elegant-shadow">
-            <div className="text-3xl font-bold text-primary mb-2">25+</div>
-            <div className="text-muted-foreground">Años de Experiencia</div>
-          </div>
-          <div className="text-center p-6 bg-background/50 rounded-xl elegant-shadow">
-            <div className="text-3xl font-bold text-primary mb-2">500+</div>
-            <div className="text-muted-foreground">Productos Premium</div>
-          </div>
-          <div className="text-center p-6 bg-background/50 rounded-xl elegant-shadow">
-            <div className="text-3xl font-bold text-primary mb-2">10K+</div>
-            <div className="text-muted-foreground">Clientes Satisfechos</div>
-          </div>
-        </div>
-      </div>
-    </section>
+        <Grid mt={80} gutter={40}>
+          <Grid.Col span={{ base: 12, md: 4 }}>
+            <Box ta="center" p="xl" bg="white" style={{ borderRadius: 16 }}>
+              <Text size="3rem" fw={900} c="blue" lh={1}>25+</Text>
+              <Text size="lg" c="dimmed" mt="xs">Años de Experiencia</Text>
+            </Box>
+          </Grid.Col>
+          <Grid.Col span={{ base: 12, md: 4 }}>
+            <Box ta="center" p="xl" bg="white" style={{ borderRadius: 16 }}>
+              <Text size="3rem" fw={900} c="blue" lh={1}>500+</Text>
+              <Text size="lg" c="dimmed" mt="xs">Productos Premium</Text>
+            </Box>
+          </Grid.Col>
+          <Grid.Col span={{ base: 12, md: 4 }}>
+            <Box ta="center" p="xl" bg="white" style={{ borderRadius: 16 }}>
+              <Text size="3rem" fw={900} c="blue" lh={1}>10K+</Text>
+              <Text size="lg" c="dimmed" mt="xs">Clientes Satisfechos</Text>
+            </Box>
+          </Grid.Col>
+        </Grid>
+      </Container>
+    </Box>
   )
 }

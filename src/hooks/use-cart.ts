@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState, useCallback } from "react"
-import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/features/auth/components/auth-provider"
 import {
   getOrCreateUserCart,
@@ -11,6 +10,7 @@ import {
   clearCart as dbClearCart,
 } from "@/lib/cart"
 import { getCartItemsAction } from "@/lib/actions/cart"
+import { notifications } from "@mantine/notifications"
 
 export interface Cart {
   id: string
@@ -35,7 +35,6 @@ export function useCart() {
   const [cart, setCart] = useState<Cart | null>(null)
   const [items, setItems] = useState<CartItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const { toast } = useToast()
 
   const loadCart = useCallback(async () => {
     if (user) {
@@ -53,7 +52,7 @@ export function useCart() {
         }
       } catch (error) {
         console.error(error)
-        toast({ title: "Error", description: "No se pudo cargar el carrito." })
+        notifications.show({ title: "Error", message: "No se pudo cargar el carrito.", color: "red" })
       } finally {
         setIsLoading(false)
       }
@@ -63,7 +62,7 @@ export function useCart() {
       setItems([])
       setIsLoading(false)
     }
-  }, [user, isAuthLoading, toast, cart])
+  }, [user, isAuthLoading, cart])
 
   useEffect(() => {
     loadCart()
@@ -79,7 +78,7 @@ export function useCart() {
     } else {
       await dbAddItem(cart.id, item.id, quantity, item.price)
     }
-    toast({ title: "Añadido al carrito", description: `${item.name} (${quantity})` })
+    notifications.show({ title: "Añadido al carrito", message: `${item.name} (${quantity})`, color: "green" })
     loadCart() // Reload cart from DB to ensure consistency
   }
 

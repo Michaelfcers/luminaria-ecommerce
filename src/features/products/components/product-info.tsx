@@ -1,14 +1,9 @@
 "use client"
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
+import { Button, Badge, Card, Divider, Group, Stack, Title, Text, NumberInput, ActionIcon, SimpleGrid, ThemeIcon } from "@mantine/core"
 import { useCart } from "@/hooks/use-cart"
-import { useToast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
-import Link from "next/link"
-import { ToastAction } from "@/components/ui/toast"
+import { notifications } from "@mantine/notifications"
 import { Star, ShoppingCart, Heart, Share2, Truck, Shield, RotateCcw, Check } from "lucide-react"
 
 interface Product {
@@ -33,7 +28,6 @@ export function ProductInfo({ product }: ProductInfoProps) {
   const [isFavorite, setIsFavorite] = useState(false)
   const [isAdded, setIsAdded] = useState(false)
   const { addItem } = useCart()
-  const { toast } = useToast()
   const router = useRouter()
 
   const discount = product.originalPrice
@@ -49,125 +43,113 @@ export function ProductInfo({ product }: ProductInfoProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <Stack gap="lg">
       {/* Product Title and Brand */}
-      <div>
-        <Badge variant="outline" className="mb-2">
+      <Stack gap="xs">
+        <Badge variant="outline" size="lg" w="fit-content">
           {product.brand}
         </Badge>
-        <h1 className="text-3xl font-bold text-foreground mb-2">{product.name}</h1>
-        <p className="text-muted-foreground">{product.category}</p>
-      </div>
+        <Title order={1}>{product.name}</Title>
+        <Text c="dimmed">{product.category}</Text>
+      </Stack>
 
       {/* Rating and Reviews */}
-      <div className="flex items-center gap-4">
-        <div className="flex items-center">
+      <Group gap="xs">
+        <Group gap={2}>
           {[...Array(5)].map((_, i) => (
             <Star
               key={i}
-              className={`h-4 w-4 ${i < Math.floor(product.rating) ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground"
-                }`}
+              size={16}
+              fill={i < Math.floor(product.rating) ? "var(--mantine-color-yellow-4)" : "none"}
+              color={i < Math.floor(product.rating) ? "var(--mantine-color-yellow-4)" : "var(--mantine-color-gray-5)"}
             />
           ))}
-          <span className="ml-2 text-sm font-medium">{product.rating}</span>
-        </div>
-        <span className="text-sm text-muted-foreground">({product.reviews} reseñas)</span>
-      </div>
+          <Text span fw={500} ml={4}>{product.rating}</Text>
+        </Group>
+        <Text size="sm" c="dimmed">({product.reviews} reseñas)</Text>
+      </Group>
 
       {/* Price */}
-      <div className="flex items-center gap-4">
-        <span className="text-3xl font-bold text-primary">${product.price}</span>
+      <Group align="center" gap="md">
+        <Text size="xl" fw={700} fz={32} c="blue">${product.price}</Text>
         {product.originalPrice && (
           <>
-            <span className="text-xl text-muted-foreground line-through">${product.originalPrice}</span>
-            <Badge variant="destructive">-{discount}%</Badge>
+            <Text size="xl" c="dimmed" td="line-through">${product.originalPrice}</Text>
+            <Badge color="red" size="lg">-{discount}%</Badge>
           </>
         )}
-      </div>
+      </Group>
 
       {/* Stock Status */}
-      <div className="flex items-center gap-2">
-        <div className={`h-2 w-2 rounded-full ${product.inStock ? "bg-green-500" : "bg-red-500"}`} />
-        <span className={`text-sm font-medium ${product.inStock ? "text-green-600" : "text-red-600"}`}>
+      <Group gap="xs">
+        <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: product.inStock ? 'var(--mantine-color-green-5)' : 'var(--mantine-color-red-5)' }} />
+        <Text size="sm" fw={500} c={product.inStock ? "green" : "red"}>
           {product.inStock ? "En stock" : "Agotado"}
-        </span>
-      </div>
+        </Text>
+      </Group>
 
       {/* Description */}
-      <div>
-        <h3 className="font-semibold mb-2">Descripción</h3>
-        <p className="text-muted-foreground leading-relaxed">{product.description}</p>
-      </div>
+      <Stack gap="xs">
+        <Text fw={600}>Descripción</Text>
+        <Text c="dimmed" lh="md">{product.description}</Text>
+      </Stack>
 
-      <Separator />
+      <Divider />
 
       {/* Quantity and Add to Cart */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-4">
-          <label className="text-sm font-medium">Cantidad:</label>
-          <div className="flex items-center border rounded-md">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setQuantity(Math.max(1, quantity - 1))}
-              disabled={quantity <= 1}
-            >
-              -
-            </Button>
-            <span className="px-4 py-2 text-sm font-medium">{quantity}</span>
-            <Button variant="ghost" size="sm" onClick={() => setQuantity(quantity + 1)}>
-              +
-            </Button>
-          </div>
-        </div>
+      <Stack gap="md">
+        <Group>
+          <Text size="sm" fw={500}>Cantidad:</Text>
+          <Group gap={0} style={{ border: '1px solid var(--mantine-color-gray-3)', borderRadius: 'var(--mantine-radius-md)' }}>
+            <ActionIcon variant="transparent" c="dark" onClick={() => setQuantity(Math.max(1, quantity - 1))} disabled={quantity <= 1}>-</ActionIcon>
+            <Text px="md" size="sm" fw={500}>{quantity}</Text>
+            <ActionIcon variant="transparent" c="dark" onClick={() => setQuantity(quantity + 1)}>+</ActionIcon>
+          </Group>
+        </Group>
 
-        <div className="flex gap-3">
+        <Group>
           <Button
             size="lg"
-            className="flex-1"
+            style={{ flex: 1 }}
             disabled={!product.inStock || isAdded}
             onClick={handleAddToCart}
+            leftSection={isAdded ? <Check size={18} /> : <ShoppingCart size={18} />}
+            color={isAdded ? "green" : "blue"}
           >
-            {isAdded ? (
-              <>
-                <Check className="h-4 w-4 mr-2" />
-                Añadido
-              </>
-            ) : (
-              <>
-                <ShoppingCart className="h-4 w-4 mr-2" />
-                Hacer Pedido
-              </>
-            )}
+            {isAdded ? "Añadido" : "Hacer Pedido"}
           </Button>
-          <Button variant="outline" size="lg" onClick={() => setIsFavorite(!isFavorite)}>
-            <Heart className={`h-4 w-4 ${isFavorite ? "fill-red-500 text-red-500" : ""}`} />
-          </Button>
-          <Button variant="outline" size="lg">
-            <Share2 className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
+          <ActionIcon variant="default" size="xl" radius="md" onClick={() => setIsFavorite(!isFavorite)}>
+            <Heart size={20} fill={isFavorite ? "red" : "none"} color={isFavorite ? "red" : "currentColor"} />
+          </ActionIcon>
+          <ActionIcon variant="default" size="xl" radius="md">
+            <Share2 size={20} />
+          </ActionIcon>
+        </Group>
+      </Stack>
 
       {/* Benefits */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="grid gap-3">
-            <div className="flex items-center gap-3">
-              <Truck className="h-5 w-5 text-primary" />
-              <span className="text-sm">Envío gratuito en pedidos superiores a $100</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <Shield className="h-5 w-5 text-primary" />
-              <span className="text-sm">Garantía de 3 años incluida</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <RotateCcw className="h-5 w-5 text-primary" />
-              <span className="text-sm">Devolución gratuita en 30 días</span>
-            </div>
-          </div>
-        </CardContent>
+      <Card withBorder padding="md" radius="md">
+        <Stack gap="sm">
+          <Group gap="sm">
+            <ThemeIcon variant="light" color="blue">
+              <Truck size={16} />
+            </ThemeIcon>
+            <Text size="sm">Envío gratuito en pedidos superiores a $100</Text>
+          </Group>
+          <Group gap="sm">
+            <ThemeIcon variant="light" color="blue">
+              <Shield size={16} />
+            </ThemeIcon>
+            <Text size="sm">Garantía de 3 años incluida</Text>
+          </Group>
+          <Group gap="sm">
+            <ThemeIcon variant="light" color="blue">
+              <RotateCcw size={16} />
+            </ThemeIcon>
+            <Text size="sm">Devolución gratuita en 30 días</Text>
+          </Group>
+        </Stack>
       </Card>
-    </div>
+    </Stack>
   )
 }

@@ -1,10 +1,9 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
+import { Card, Table, Button, Title, Text, Group, Stack, Badge, ActionIcon } from "@mantine/core";
+import { LinkButton } from "@/components/link-button";
 import { createClient } from "@/lib/supabase/server";
-
 import { redirect } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { Eye } from "lucide-react";
 
 export default async function OrdersPage() {
   const supabase = await createClient();
@@ -37,48 +36,48 @@ export default async function OrdersPage() {
   }
 
   return (
-    <div className="flex flex-col gap-8 p-4 md:p-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Órdenes de Compra</h1>
-      </div>
+    <Stack gap="lg" p="md">
+      <Group justify="space-between">
+        <Title order={1}>Órdenes de Compra</Title>
+      </Group>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Todas las Órdenes</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>ID Pedido</TableHead>
-                <TableHead>Cliente</TableHead>
-                <TableHead>Monto</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead>Fecha</TableHead>
-                <TableHead>Acciones</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+      <Card withBorder radius="lg" padding="lg">
+        <Stack gap="md">
+          <Title order={3}>Todas las Órdenes</Title>
+          <Table highlightOnHover>
+            <thead>
+              <tr>
+                <th>ID Pedido</th>
+                <th>Cliente</th>
+                <th>Monto</th>
+                <th>Estado</th>
+                <th>Fecha</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
               {orders?.map((order) => (
-                <TableRow key={order.id}>
-                  <TableCell>{order.code || `#${order.id.substring(0, 5)}`}</TableCell>
-                  <TableCell>{(order.profiles as any)?.display_name || 'N/A'}</TableCell>
-                  <TableCell>${order.total?.toLocaleString()}</TableCell>
-                  <TableCell>{order.status}</TableCell>
-                  <TableCell>{new Date(order.created_at).toLocaleDateString()}</TableCell>
-                  <TableCell>
-                    <Button asChild>
-                      <Link href={`/dashboard/orders/${order.id}`}>
-                        Ver Detalles
-                      </Link>
-                    </Button>
-                  </TableCell>
-                </TableRow>
+                <tr key={order.id}>
+                  <td>{order.code || `#${order.id.substring(0, 5)}`}</td>
+                  <td>{(order.profiles as any)?.display_name || 'N/A'}</td>
+                  <td>${order.total?.toLocaleString()}</td>
+                  <td>
+                    <Badge color={order.status === 'completed' ? 'green' : order.status === 'pending' ? 'yellow' : 'gray'}>
+                      {order.status}
+                    </Badge>
+                  </td>
+                  <td>{new Date(order.created_at).toLocaleDateString()}</td>
+                  <td>
+                    <LinkButton href={`/dashboard/orders/${order.id}`} size="xs" variant="light" leftSection={<Eye size={14} />}>
+                      Ver Detalles
+                    </LinkButton>
+                  </td>
+                </tr>
               ))}
-            </TableBody>
+            </tbody>
           </Table>
-        </CardContent>
+        </Stack>
       </Card>
-    </div>
+    </Stack>
   );
 }

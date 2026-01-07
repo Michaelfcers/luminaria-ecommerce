@@ -2,6 +2,7 @@
 import { notFound, redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { EditVariantForm } from "@/features/admin/components/edit-variant-form"
+import { Container, Title, Stack, Text } from "@mantine/core"
 
 export default async function EditProductVersionPage({
   params,
@@ -18,6 +19,7 @@ export default async function EditProductVersionPage({
     redirect("/login")
   }
 
+  // Verify product and variant
   const { data: variant, error } = await supabase
     .from("product_variants")
     .select("*")
@@ -26,15 +28,20 @@ export default async function EditProductVersionPage({
     .single()
 
   if (error || !variant) {
-    console.error("Error fetching product variant:", error)
+    console.error("Error fetching variant:", error)
     notFound()
   }
 
   return (
-    <div className="flex flex-col gap-8 p-4 md:p-8">
-      <h1 className="text-3xl font-bold">Editar Versión de Producto</h1>
+    <Container size="md" py="lg">
+      <Stack gap="lg">
+        <div>
+          <Title order={2}>Editar Versión</Title>
+          <Text c="dimmed">{variant.name}</Text>
+        </div>
 
-      <EditVariantForm variant={variant} />
-    </div>
+        <EditVariantForm variant={variant} />
+      </Stack>
+    </Container>
   )
 }

@@ -1,12 +1,7 @@
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
+"use client"
+import { Menu, Button, ActionIcon } from "@mantine/core";
 import { MoreHorizontal } from "lucide-react";
-import { updateMemberRole } from "@/app/(admin)/dashboard/members/page"; // Import the server action
+import { updateMemberRoleAction } from "@/actions/members";
 
 interface RoleUpdateFormProps {
   storeId: string;
@@ -22,31 +17,29 @@ export function RoleUpdateForm({ storeId, memberId, currentRole }: RoleUpdateFor
   ];
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="h-8 w-8 p-0">
-          <span className="sr-only">Abrir menú</span>
-          <MoreHorizontal className="h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+    <Menu shadow="md" width={200} position="bottom-end">
+      <Menu.Target>
+        <ActionIcon variant="subtle" color="gray">
+          <MoreHorizontal size={16} />
+        </ActionIcon>
+      </Menu.Target>
+
+      <Menu.Dropdown>
         {roles.map((role) => (
-          <form key={role.value} action={updateMemberRole}>
+          <form key={role.value} action={updateMemberRoleAction}>
             <input type="hidden" name="storeId" value={storeId} />
             <input type="hidden" name="memberId" value={memberId} />
             <input type="hidden" name="newRole" value={role.value} />
-            <DropdownMenuItem asChild>
-              <button
-                type="submit"
-                className="w-full text-left"
-                disabled={currentRole === role.value} // Disable if already this role
-              >
-                Hacer {role.name}
-              </button>
-            </DropdownMenuItem>
+            <Menu.Item
+              component="button"
+              type="submit"
+              disabled={currentRole === role.value}
+            >
+              Hacer {role.name}
+            </Menu.Item>
           </form>
         ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+      </Menu.Dropdown>
+    </Menu>
   );
 }

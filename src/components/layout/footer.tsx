@@ -1,65 +1,109 @@
+"use client"
+
 import Link from "next/link"
+import { Facebook, Instagram, Twitter, Mail, MapPin, Phone } from "lucide-react"
+import { Container, Grid, Stack, Text, Title, Group, ActionIcon, Box } from "@mantine/core"
 
 export function Footer() {
   return (
-    <footer className="bg-foreground text-background py-16">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Logo and description */}
-          <div className="col-span-1 md:col-span-2">
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="h-8 w-8 rounded-full bg-primary"></div>
-              <span className="text-xl font-bold">Luminaria</span>
-            </div>
-            <p className="text-background/80 max-w-md">
-              Especialistas en iluminación de lujo. Transformamos espacios con diseño minimalista y calidad excepcional
-              desde 1995.
-            </p>
-          </div>
+    <Box component="footer" bg="#111827" c="gray.4" py="xl" mt="auto">
+      <Container size="xl">
+        <Grid gutter={50}>
+          {/* Brand Column */}
+          <Grid.Col span={{ base: 12, md: 4 }}>
+            <Stack gap="md">
+              <Link href="/">
+                <Text size="xl" fw={700} c="white">
+                  LUMINARIA
+                </Text>
+              </Link>
+              <Text size="sm" style={{ maxWidth: 300 }}>
+                Iluminando espacios con diseño y elegancia. Tu destino premium para luminarias y accesorios eléctricos.
+              </Text>
+              <Group gap="sm">
+                <ActionIcon component={Link} href="#" variant="subtle" color="gray" size="lg">
+                  <Facebook size={20} />
+                </ActionIcon>
+                <ActionIcon component={Link} href="#" variant="subtle" color="gray" size="lg">
+                  <Instagram size={20} />
+                </ActionIcon>
+                <ActionIcon component={Link} href="#" variant="subtle" color="gray" size="lg">
+                  <Twitter size={20} />
+                </ActionIcon>
+              </Group>
+            </Stack>
+          </Grid.Col>
 
-          {/* Quick links */}
-          <div>
-            <h3 className="font-semibold mb-4">Enlaces Rápidos</h3>
-            <ul className="space-y-2 text-background/80">
-              <li>
-                <Link href="/productos" className="hover:text-primary transition-colors">
+          {/* Quick Links */}
+          <Grid.Col span={{ base: 6, sm: 6, md: 2 }}>
+            <Stack gap="md">
+              <Title order={4} c="white" size="h5">Enlaces</Title>
+              <Stack gap="xs">
+                <Text component={Link} href="/productos" size="sm" c="dimmed" style={{ textDecoration: 'none' }} className="hover:text-white transition-colors">
                   Productos
-                </Link>
-              </li>
-              <li>
-                <Link href="/sobre-nosotros" className="hover:text-primary transition-colors">
-                  Sobre Nosotros
-                </Link>
-              </li>
-              <li>
-                <Link href="/contacto" className="hover:text-primary transition-colors">
-                  Contacto
-                </Link>
-              </li>
-              <li>
-                <Link href="/garantia" className="hover:text-primary transition-colors">
-                  Garantía
-                </Link>
-              </li>
-            </ul>
-          </div>
+                </Text>
+                <Text component={Link} href="/ofertas" size="sm" c="dimmed" style={{ textDecoration: 'none' }} className="hover:text-white transition-colors">
+                  Ofertas
+                </Text>
+                <Text component={Link} href="/sobre-nosotros" size="sm" c="dimmed" style={{ textDecoration: 'none' }} className="hover:text-white transition-colors">
+                  Nosotros
+                </Text>
+                <Text component={Link} href="/blog" size="sm" c="dimmed" style={{ textDecoration: 'none' }} className="hover:text-white transition-colors">
+                  Blog
+                </Text>
+              </Stack>
+            </Stack>
+          </Grid.Col>
 
-          {/* Contact info */}
-          <div>
-            <h3 className="font-semibold mb-4">Contacto</h3>
-            <ul className="space-y-2 text-background/80">
-              <li>+34 900 123 456</li>
-              <li>info@luminaria.es</li>
-              <li>Lun - Vie: 9:00 - 18:00</li>
-              <li>Sáb: 10:00 - 14:00</li>
-            </ul>
-          </div>
-        </div>
+          {/* Categories */}
+          <Grid.Col span={{ base: 6, sm: 6, md: 2 }}>
+            <Stack gap="md">
+              <Title order={4} c="white" size="h5">Categorías</Title>
+              <Stack gap="xs">
+                <Text component={Link} href="/productos?category=interior" size="sm" c="dimmed" style={{ textDecoration: 'none' }} className="hover:text-white transition-colors">
+                  Interior
+                </Text>
+                <Text component={Link} href="/productos?category=exterior" size="sm" c="dimmed" style={{ textDecoration: 'none' }} className="hover:text-white transition-colors">
+                  Exterior
+                </Text>
+                <Text component={Link} href="/productos?category=smart" size="sm" c="dimmed" style={{ textDecoration: 'none' }} className="hover:text-white transition-colors">
+                  Smart Home
+                </Text>
+                <Text component={Link} href="/productos?category=industrial" size="sm" c="dimmed" style={{ textDecoration: 'none' }} className="hover:text-white transition-colors">
+                  Industrial
+                </Text>
+              </Stack>
+            </Stack>
+          </Grid.Col>
 
-        <div className="border-t border-background/20 mt-12 pt-8 text-center text-background/60">
-          <p>&copy; 2024 Luminaria. Todos los derechos reservados.</p>
-        </div>
-      </div>
-    </footer>
+          {/* Contact */}
+          <Grid.Col span={{ base: 12, md: 4 }}>
+            <Stack gap="md">
+              <Title order={4} c="white" size="h5">Contacto</Title>
+              <Stack gap="sm">
+                <Group wrap="nowrap" align="flex-start">
+                  <MapPin size={18} style={{ marginTop: 4 }} />
+                  <Text size="sm">Av. Principal 123, Ciudad de México, CP 12345</Text>
+                </Group>
+                <Group wrap="nowrap">
+                  <Phone size={18} />
+                  <Text size="sm">+52 (55) 1234-5678</Text>
+                </Group>
+                <Group wrap="nowrap">
+                  <Mail size={18} />
+                  <Text size="sm">contacto@luminaria.com</Text>
+                </Group>
+              </Stack>
+            </Stack>
+          </Grid.Col>
+        </Grid>
+
+        <Box mt={40} pt="md" style={{ borderTop: '1px solid #374151' }}>
+          <Text ta="center" size="sm" c="dimmed">
+            © {new Date().getFullYear()} Luminaria. Todos los derechos reservados.
+          </Text>
+        </Box>
+      </Container>
+    </Box>
   )
 }

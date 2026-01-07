@@ -1,9 +1,7 @@
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
+import { Button, Card, Table, Badge, Title, Text, Group, Stack, ActionIcon, SimpleGrid } from "@mantine/core";
 import Link from "next/link";
+import { LinkButton } from "@/components/link-button"
 import { createClient } from "@/lib/supabase/server";
-
 import { redirect } from "next/navigation";
 
 export default async function DashboardPage() {
@@ -44,113 +42,86 @@ export default async function DashboardPage() {
   ]);
 
   return (
-    <div className="flex flex-col gap-8 p-4 md:p-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Dashboard de Administrador</h1>
-        <div className="flex gap-2">
-          <Button asChild>
-            <Link href="/products">
-              Gestionar Productos
-            </Link>
-          </Button>
-          <Button asChild>
-            <Link href="/brands">
-              Gestionar Marcas
-            </Link>
-          </Button>
-          <Button asChild>
-            <Link href="/categories">
-              Gestionar Categorías
-            </Link>
-          </Button>
-          <Button asChild>
-            <Link href="/dashboard/orders">
-              Ver Órdenes
-            </Link>
-          </Button>
+    <Stack gap="lg" p="md">
+      <Group justify="space-between" align="center">
+        <Title order={1}>Dashboard de Administrador</Title>
+        <Group>
+          <LinkButton href="/products">
+            Gestionar Productos
+          </LinkButton>
+          <LinkButton href="/brands">
+            Gestionar Marcas
+          </LinkButton>
+          <LinkButton href="/categories">
+            Gestionar Categorías
+          </LinkButton>
+          <LinkButton href="/dashboard/orders">
+            Ver Órdenes
+          </LinkButton>
           {isStoreOwner && (
-            <Button asChild>
-              <Link href={`/dashboard/members?store_id=${storeId}`}>
-                Gestionar Miembros
-              </Link>
-            </Button>
+            <LinkButton href={`/ dashboard / members ? store_id = ${storeId} `}>
+              Gestionar Miembros
+            </LinkButton>
           )}
-          <Button asChild>
-            <Link href="/promotions">
-              Gestionar Promociones
-            </Link>
-          </Button>
-        </div>
-      </div>
+          <LinkButton href="/promotions">
+            Gestionar Promociones
+          </LinkButton>
+        </Group>
+      </Group>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="rounded-3xl elegant-shadow bg-white">
-          <CardHeader>
-            <CardTitle>Total de Categorías</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-4xl font-bold">{totalCategories}</p>
-          </CardContent>
-        </Card>
-        <Card className="rounded-3xl elegant-shadow bg-white">
-          <CardHeader>
-            <CardTitle>Total de Productos</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-4xl font-bold">{totalProducts}</p>
-          </CardContent>
-        </Card>
-        <Card className="rounded-3xl elegant-shadow bg-white">
-          <CardHeader>
-            <CardTitle>Total de Variantes</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-4xl font-bold">{totalVariants}</p>
-          </CardContent>
-        </Card>
-        <Card className="rounded-3xl elegant-shadow bg-white">
-          <CardHeader>
-            <CardTitle>Total de Órdenes</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-4xl font-bold">{totalOrders}</p>
-          </CardContent>
-        </Card>
-      </div>
+      <SimpleGrid cols={{ base: 1, md: 2, lg: 4 }} spacing="lg">
+        <StatsCard title="Total de Categorías" value={totalCategories} />
+        <StatsCard title="Total de Productos" value={totalProducts} />
+        <StatsCard title="Total de Variantes" value={totalVariants} />
+        <StatsCard title="Total de Órdenes" value={totalOrders} />
+      </SimpleGrid>
 
-      <div>
-        <h2 className="text-2xl font-bold mb-4">Pedidos Recientes</h2>
-        <Card className="rounded-3xl elegant-shadow bg-white">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>ID Pedido</TableHead>
-                <TableHead>Cliente</TableHead>
-                <TableHead>Monto</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead>Fecha</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow>
-                <TableCell>#00125</TableCell>
-                <TableCell>Juan Pérez</TableCell>
-                <TableCell>$150.00</TableCell>
-                <TableCell>Enviado</TableCell>
-                <TableCell>2023-10-26</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>#00124</TableCell>
-                <TableCell>Ana Gómez</TableCell>
-                <TableCell>$85.50</TableCell>
-                <TableCell>Procesando</TableCell>
-                <TableCell>2023-10-25</TableCell>
-              </TableRow>
+      <Stack gap="md">
+        <Title order={2}>Pedidos Recientes</Title>
+        <Card withBorder radius="lg" shadow="sm">
+          <Table highlightOnHover>
+            <thead>
+              <tr>
+                <th>ID Pedido</th>
+                <th>Cliente</th>
+                <th>Monto</th>
+                <th>Estado</th>
+                <th>Fecha</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>#00125</td>
+                <td>Juan Pérez</td>
+                <td>$150.00</td>
+                <td>Enviado</td>
+                <td>2023-10-26</td>
+              </tr>
+              <tr>
+                <td>#00124</td>
+                <td>Ana Gómez</td>
+                <td>$85.50</td>
+                <td>Procesando</td>
+                <td>2023-10-25</td>
+              </tr>
               {/* Más filas de pedidos */}
-            </TableBody>
+            </tbody>
           </Table>
         </Card>
-      </div>
-    </div>
+      </Stack>
+    </Stack>
   );
+}
+
+function StatsCard({ title, value }: { title: string, value: number | null }) {
+  return (
+    <Card withBorder padding="lg" radius="lg" shadow="sm">
+      <Text size="sm" c="dimmed" fw={500} tt="uppercase">
+        {title}
+      </Text>
+      <Text fw={700} size="xl" mt="xs">
+        {value}
+      </Text>
+    </Card>
+  )
 }

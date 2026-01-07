@@ -1,10 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
-
 import { redirect } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button, Card, TextInput, Title, Text, Stack, Container } from "@mantine/core"
 import { updateProfile } from "@/lib/actions/profile"
 
 export default async function AccountPage() {
@@ -23,56 +19,46 @@ export default async function AccountPage() {
         .single()
 
     return (
-        <div className="container mx-auto py-10">
-            <Card className="max-w-2xl mx-auto">
-                <CardHeader>
-                    <CardTitle>Mi Cuenta</CardTitle>
-                    <CardDescription>
+        <Container size="sm" py="xl">
+            <Card withBorder radius="md" padding="xl">
+                <Stack gap="md" mb="lg">
+                    <Title order={3}>Mi Cuenta</Title>
+                    <Text c="dimmed" size="sm">
                         Administra tu información personal.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <form action={async (formData) => {
-                        "use server"
-                        await updateProfile(formData)
-                    }} className="space-y-6">
-                        <div className="space-y-2">
-                            <Label htmlFor="email">Correo Electrónico</Label>
-                            <Input
-                                id="email"
-                                value={user.email}
-                                disabled
-                                className="bg-muted"
-                            />
-                            <p className="text-sm text-muted-foreground">
-                                El correo electrónico no se puede cambiar.
-                            </p>
-                        </div>
+                    </Text>
+                </Stack>
 
-                        <div className="space-y-2">
-                            <Label htmlFor="display_name">Nombre Completo</Label>
-                            <Input
-                                id="display_name"
-                                name="display_name"
-                                defaultValue={profile?.display_name || ""}
-                                placeholder="Tu nombre"
-                            />
-                        </div>
+                <form action={async (formData) => {
+                    "use server"
+                    await updateProfile(formData)
+                }}>
+                    <Stack gap="md">
+                        <TextInput
+                            label="Correo Electrónico"
+                            defaultValue={user.email}
+                            disabled
+                            description="El correo electrónico no se puede cambiar."
+                            variant="filled"
+                        />
 
-                        <div className="space-y-2">
-                            <Label htmlFor="phone">Teléfono</Label>
-                            <Input
-                                id="phone"
-                                name="phone"
-                                defaultValue={profile?.phone || ""}
-                                placeholder="Tu número de teléfono"
-                            />
-                        </div>
+                        <TextInput
+                            label="Nombre Completo"
+                            name="display_name"
+                            defaultValue={profile?.display_name || ""}
+                            placeholder="Tu nombre"
+                        />
+
+                        <TextInput
+                            label="Teléfono"
+                            name="phone"
+                            defaultValue={profile?.phone || ""}
+                            placeholder="Tu número de teléfono"
+                        />
 
                         <Button type="submit">Guardar Cambios</Button>
-                    </form>
-                </CardContent>
+                    </Stack>
+                </form>
             </Card>
-        </div>
+        </Container>
     )
 }

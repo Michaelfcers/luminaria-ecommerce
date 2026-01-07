@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { PromotionForm } from "@/features/admin/components/promotion-form"
 import { getLocalProductImage } from "@/lib/local-images"
+import { Container, Title, Stack, Text } from "@mantine/core"
 
 export default async function CreatePromotionPage() {
     const supabase = await createClient()
@@ -59,12 +60,17 @@ export default async function CreatePromotionPage() {
     }))
 
     return (
-        <div className="flex flex-col gap-8 p-4 md:p-8">
-            <h1 className="text-3xl font-bold">Crear Nueva Promoción</h1>
-            <PromotionForm
-                storeId={storeMembers.store_id}
-                products={enrichedProducts}
-            />
-        </div>
+        <Container size="xl" py="lg">
+            <Stack gap="lg">
+                <div>
+                    <Title order={2}>Crear Nueva Promoción</Title>
+                    <Text c="dimmed">Configura una nueva promoción para tu tienda</Text>
+                </div>
+                <PromotionForm
+                    storeId={storeMembers.store_id}
+                    products={enrichedProducts}
+                />
+            </Stack>
+        </Container>
     )
 }

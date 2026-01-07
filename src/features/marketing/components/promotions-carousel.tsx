@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { ChevronLeft, ChevronRight, Play, Pause } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Button, Box, Container, Title, Text, Group, ActionIcon, Badge, Flex } from "@mantine/core"
 
 const promotions = [
   {
@@ -11,8 +11,8 @@ const promotions = [
     subtitle: "Controla tu hogar con un toque",
     description: "Lámparas LED que se adaptan a tu estilo de vida.",
     buttonText: "Comprar ahora",
-    backgroundColor: "bg-blue-800", // usando color sólido en lugar de gradiente
-    textColor: "text-white",
+    backgroundColor: "blue.9",
+    textColor: "white",
     placeholderType: "smart",
   },
   {
@@ -21,8 +21,8 @@ const promotions = [
     subtitle: "Elegancia en cada detalle",
     description: "Luminarias que transforman cualquier espacio.",
     buttonText: "Ver colección",
-    backgroundColor: "bg-slate-900", // usando color sólido en lugar de gradiente
-    textColor: "text-white",
+    backgroundColor: "dark.8",
+    textColor: "white",
     placeholderType: "minimal",
   },
   {
@@ -31,8 +31,8 @@ const promotions = [
     subtitle: "Tecnología LED avanzada",
     description: "Hasta 80% menos consumo de energía.",
     buttonText: "Descubrir más",
-    backgroundColor: "bg-emerald-800", // usando color sólido en lugar de gradiente
-    textColor: "text-white",
+    backgroundColor: "teal.9",
+    textColor: "white",
     placeholderType: "eco",
   },
   {
@@ -41,8 +41,8 @@ const promotions = [
     subtitle: "Descuentos hasta 40% OFF",
     description: "En toda nuestra línea de lámparas premium.",
     buttonText: "Ver ofertas",
-    backgroundColor: "bg-orange-700", // usando color sólido en lugar de gradiente
-    textColor: "text-white",
+    backgroundColor: "orange.8",
+    textColor: "white",
     placeholderType: "promo",
   },
   {
@@ -51,8 +51,8 @@ const promotions = [
     subtitle: "Tendencias 2024",
     description: "Diseños exclusivos que marcan la diferencia.",
     buttonText: "Explorar",
-    backgroundColor: "bg-purple-800", // usando color sólido en lugar de gradiente
-    textColor: "text-white",
+    backgroundColor: "violet.9",
+    textColor: "white",
     placeholderType: "new",
   },
   {
@@ -61,99 +61,21 @@ const promotions = [
     subtitle: "Jardines y terrazas",
     description: "Resistentes al agua con garantía extendida.",
     buttonText: "Ver modelos",
-    backgroundColor: "bg-teal-800", // usando color sólido en lugar de gradiente
-    textColor: "text-white",
+    backgroundColor: "cyan.9",
+    textColor: "white",
     placeholderType: "outdoor",
   },
 ]
 
 const renderPlaceholder = (type: string) => {
-  switch (type) {
-    case "smart":
-      return (
-        <div className="w-56 h-40 relative">
-          <div className="absolute inset-0 bg-white/20 rounded-2xl backdrop-blur-sm border border-white/30">
-            <div className="absolute top-4 left-4 w-8 h-8 bg-white/40 rounded-lg"></div>
-            <div className="absolute top-4 right-4 w-6 h-6 bg-white/30 rounded-full"></div>
-            <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 w-32 h-20 bg-white/30 rounded-xl flex items-center justify-center">
-              <div className="w-16 h-16 bg-white/50 rounded-full flex items-center justify-center">
-                <div className="w-8 h-8 bg-white/70 rounded-full"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )
-    case "minimal":
-      return (
-        <div className="w-56 h-40 relative">
-          <div className="absolute inset-0 bg-white/15 rounded-2xl backdrop-blur-sm border border-white/20">
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-              <div className="w-24 h-32 bg-white/30 rounded-lg"></div>
-              <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-16 h-4 bg-white/20 rounded-full"></div>
-            </div>
-          </div>
-        </div>
-      )
-    case "eco":
-      return (
-        <div className="w-56 h-40 relative">
-          <div className="absolute inset-0 bg-white/20 rounded-2xl backdrop-blur-sm border border-white/30">
-            <div className="absolute top-6 left-1/2 transform -translate-x-1/2 w-20 h-20 bg-white/40 rounded-full flex items-center justify-center">
-              <div className="w-12 h-12 bg-white/60 rounded-full"></div>
-            </div>
-            <div className="absolute bottom-6 left-4 w-4 h-8 bg-white/30 rounded-full"></div>
-            <div className="absolute bottom-6 right-4 w-4 h-12 bg-white/40 rounded-full"></div>
-            <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 w-4 h-6 bg-white/35 rounded-full"></div>
-          </div>
-        </div>
-      )
-    case "promo":
-      return (
-        <div className="w-56 h-40 relative">
-          <div className="absolute inset-0 bg-white/25 rounded-2xl backdrop-blur-sm border border-white/40">
-            <div className="absolute top-3 right-3 w-12 h-6 bg-white/60 rounded-full flex items-center justify-center">
-              <span className="text-xs font-bold text-orange-800">40%</span>
-            </div>
-            <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 w-28 h-16 bg-white/40 rounded-xl"></div>
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-20 h-3 bg-white/30 rounded-full"></div>
-          </div>
-        </div>
-      )
-    case "new":
-      return (
-        <div className="w-56 h-40 relative">
-          <div className="absolute inset-0 bg-white/20 rounded-2xl backdrop-blur-sm border border-white/30">
-            <div className="absolute top-4 left-4 w-6 h-6 bg-white/50 rounded-full"></div>
-            <div className="absolute top-4 right-4 w-8 h-4 bg-white/40 rounded-full"></div>
-            <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 w-32 h-20 bg-white/35 rounded-2xl">
-              <div className="absolute top-2 left-2 w-6 h-6 bg-white/50 rounded-lg"></div>
-              <div className="absolute top-2 right-2 w-6 h-6 bg-white/50 rounded-lg"></div>
-              <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-16 h-4 bg-white/40 rounded-lg"></div>
-            </div>
-          </div>
-        </div>
-      )
-    case "outdoor":
-      return (
-        <div className="w-56 h-40 relative">
-          <div className="absolute inset-0 bg-white/20 rounded-2xl backdrop-blur-sm border border-white/30">
-            <div className="absolute top-6 left-6 w-16 h-24 bg-white/40 rounded-lg"></div>
-            <div className="absolute top-12 right-8 w-12 h-16 bg-white/35 rounded-lg"></div>
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-24 h-2 bg-white/30 rounded-full"></div>
-            <div className="absolute bottom-6 left-4 w-2 h-2 bg-white/50 rounded-full"></div>
-            <div className="absolute bottom-6 right-4 w-2 h-2 bg-white/50 rounded-full"></div>
-          </div>
-        </div>
-      )
-    default:
-      return (
-        <div className="w-56 h-40 bg-white/20 rounded-2xl backdrop-blur-sm border border-white/30 flex items-center justify-center">
-          <div className="w-24 h-24 bg-white/30 rounded-lg flex items-center justify-center">
-            <div className="w-12 h-12 bg-white/50 rounded-full"></div>
-          </div>
-        </div>
-      )
-  }
+  // Simplified placeholders for Mantine version
+  return (
+    <Box w={220} h={160} style={{ position: 'relative', overflow: 'hidden', borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.2)' }}>
+      {/* Abstract shapes */}
+      <Box style={{ position: 'absolute', top: 20, left: 20, width: 40, height: 40, borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.3)' }} />
+      <Box style={{ position: 'absolute', bottom: 20, right: 20, width: 80, height: 80, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.1)' }} />
+    </Box>
+  )
 }
 
 export function PromotionsCarousel() {
@@ -183,96 +105,88 @@ export function PromotionsCarousel() {
   }
 
   return (
-    <section className="py-16 bg-background">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-foreground mb-4">OFERTAS ESPECIALES</h2>
-          <p className="text-xl text-muted-foreground">Descubre nuestras promociones exclusivas</p>
-        </div>
+    <Box py={80} bg="gray.0">
+      <Container size="xl">
+        <Box ta="center" mb={60}>
+          <Title order={2} size="h1" fw={900} mb="sm">OFERTAS ESPECIALES</Title>
+          <Text size="xl" c="dimmed">Descubre nuestras promociones exclusivas</Text>
+        </Box>
 
-        <div className="relative overflow-hidden">
-          <div
-            className="flex transition-transform duration-500 ease-in-out gap-6"
+        <Box style={{ position: 'relative', overflow: 'hidden' }}>
+          <Flex
+            gap="md"
             style={{
-              transform: `translateX(calc(-${currentSlide * 50}% - ${currentSlide * 12}px))`,
+              transition: 'transform 500ms ease-in-out',
+              transform: `translateX(calc(-${currentSlide * 50}% - ${currentSlide * 16}px))`, // 16px is gap-"md" approx
               paddingLeft: "10%",
               paddingRight: "10%",
             }}
           >
             {[...promotions, ...promotions].map((promo, index) => (
-              <div
+              <Box
                 key={`${promo.id}-${index}`}
-                className={`w-[45%] flex-shrink-0 relative h-80 ${promo.backgroundColor} rounded-2xl flex items-center justify-between px-8 py-6 shadow-2xl overflow-hidden`}
+                style={{
+                  width: '45%',
+                  flexShrink: 0,
+                  position: 'relative',
+                  height: 340,
+                  borderRadius: 24,
+                  overflow: 'hidden',
+                }}
+                bg={promo.backgroundColor}
+                p="xl"
               >
-                {/* Content */}
-                <div className="flex-1 space-y-4 z-10 relative">
-                  <div className="space-y-2">
-                    <h3 className={`text-3xl font-bold ${promo.textColor} tracking-tight`}>{promo.title}</h3>
-                    <p className={`text-lg ${promo.textColor} opacity-90 font-medium`}>{promo.subtitle}</p>
-                    <p className={`text-base ${promo.textColor} opacity-80 max-w-sm leading-relaxed`}>
+                <Flex justify="space-between" align="center" h="100%" style={{ position: 'relative', zIndex: 10 }}>
+                  <Box style={{ flex: 1 }}>
+                    <Title order={3} c="white" size="h2" fw={800} lh={1.1} mb="xs">{promo.title}</Title>
+                    <Text c="white" size="lg" fw={500} mb="xs" style={{ opacity: 0.9 }}>{promo.subtitle}</Text>
+                    <Text c="white" size="sm" mb="lg" style={{ opacity: 0.8 }} maw={300}>
                       {promo.description}
-                    </p>
-                  </div>
-                  <Button
-                    size="lg"
-                    className="bg-white text-slate-900 hover:bg-slate-100 font-semibold px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-                  >
-                    {promo.buttonText}
-                  </Button>
-                </div>
+                    </Text>
+                    <Button size="md" variant="white" color="dark" radius="xl">
+                      {promo.buttonText}
+                    </Button>
+                  </Box>
+                  <Box ml="xl">
+                    {renderPlaceholder(promo.placeholderType)}
+                  </Box>
+                </Flex>
 
-                <div className="flex-shrink-0 ml-6 z-10 relative">{renderPlaceholder(promo.placeholderType)}</div>
-
-                <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
-                <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full blur-xl"></div>
-                <div className="absolute top-1/2 right-4 w-16 h-16 bg-white/5 rounded-full blur-lg"></div>
-              </div>
+                {/* Decorative background blobs */}
+                <Box pos="absolute" top={0} right={0} w={200} h={200} bg="white" style={{ opacity: 0.05, filter: 'blur(50px)', borderRadius: '50%' }} />
+                <Box pos="absolute" bottom={0} left={0} w={150} h={150} bg="white" style={{ opacity: 0.05, filter: 'blur(40px)', borderRadius: '50%' }} />
+              </Box>
             ))}
-          </div>
+          </Flex>
 
-          {/* Navigation Controls */}
-          <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex items-center space-x-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={prevSlide}
-              className="bg-black/30 hover:bg-black/50 text-white border-white/20 rounded-full p-3 backdrop-blur-sm"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </Button>
+          {/* Controls */}
+          <Group justify="center" mt="xl" gap="md">
+            <ActionIcon variant="light" color="gray" radius="xl" size="lg" onClick={prevSlide}>
+              <ChevronLeft size={20} />
+            </ActionIcon>
+            <ActionIcon variant="light" color="gray" radius="xl" size="lg" onClick={togglePlayPause}>
+              {isPlaying ? <Pause size={20} /> : <Play size={20} />}
+            </ActionIcon>
+            <ActionIcon variant="light" color="gray" radius="xl" size="lg" onClick={nextSlide}>
+              <ChevronRight size={20} />
+            </ActionIcon>
+          </Group>
 
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={togglePlayPause}
-              className="bg-black/30 hover:bg-black/50 text-white border-white/20 rounded-full p-3 backdrop-blur-sm"
-            >
-              {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
-            </Button>
-
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={nextSlide}
-              className="bg-black/30 hover:bg-black/50 text-white border-white/20 rounded-full p-3 backdrop-blur-sm"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </Button>
-          </div>
-
-          <div className="absolute bottom-6 right-6 flex space-x-2">
+          {/* Dots */}
+          <Group justify="center" mt="md" gap="xs">
             {promotions.map((_, index) => (
-              <button
+              <Box
                 key={index}
                 onClick={() => setCurrentSlide(index)}
-                className={`h-2 rounded-full transition-all duration-300 ${
-                  index === currentSlide ? "bg-white w-8" : "bg-white/50 w-2"
-                }`}
+                w={index === currentSlide ? 24 : 8}
+                h={8}
+                bg={index === currentSlide ? "blue" : "gray.3"}
+                style={{ borderRadius: 4, cursor: 'pointer', transition: 'width 0.3s' }}
               />
             ))}
-          </div>
-        </div>
-      </div>
-    </section>
+          </Group>
+        </Box>
+      </Container>
+    </Box>
   )
 }

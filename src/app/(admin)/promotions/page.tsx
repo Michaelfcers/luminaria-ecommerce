@@ -1,26 +1,13 @@
 
-import { Button } from "@/components/ui/button"
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
-import { createClient } from "@/lib/supabase/server"
-import Link from "next/link"
-import { redirect } from "next/navigation"
-import { format } from "date-fns"
-import { es } from "date-fns/locale"
-import { TerminatePromotionButton } from "@/features/admin/components/terminate-promotion-button"
+import { Button, Card, Table, Badge, Title, Text, Group, Stack, ActionIcon } from "@mantine/core";
+import { createClient } from "@/lib/supabase/server";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
+import { TerminatePromotionButton } from "@/features/admin/components/terminate-promotion-button";
+import { Plus, ArrowLeft, Tag, Calendar, FileText } from "lucide-react";
+import { LinkButton } from "@/components/link-button";
 
 export default async function PromotionsPage() {
     const supabase = await createClient()
@@ -58,85 +45,88 @@ export default async function PromotionsPage() {
     }
 
     return (
-        <div className="flex flex-col gap-8 p-4 md:p-8">
-            <div className="flex items-center justify-between">
-                <h1 className="text-3xl font-bold">Gestión de Promociones</h1>
-                <div className="flex gap-2">
-                    <Button asChild variant="outline">
-                        <Link href="/products">Volver a Productos</Link>
-                    </Button>
-                    <Button asChild>
-                        <Link href="/promotions/create">Crear Nueva Promoción</Link>
-                    </Button>
-                </div>
-            </div>
+        <Stack gap="lg" p="md">
+            <Group justify="space-between">
+                <Title order={1}>Gestión de Promociones</Title>
+                <Group>
+                    <LinkButton href="/products" variant="default" leftSection={<ArrowLeft size={16} />}>
+                        Volver a Productos
+                    </LinkButton>
+                    <LinkButton href="/promotions/create" leftSection={<Plus size={16} />}>
+                        Crear Nueva Promoción
+                    </LinkButton>
+                </Group>
+            </Group>
 
-            <Card className="rounded-3xl elegant-shadow bg-white">
-                <CardHeader>
-                    <CardTitle>Listado de Promociones</CardTitle>
-                    <CardDescription>
-                        Administra las ofertas y descuentos de tu tienda.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Nombre</TableHead>
-                                <TableHead>Tipo</TableHead>
-                                <TableHead>Valor</TableHead>
-                                <TableHead>Estado</TableHead>
-                                <TableHead>Vigencia</TableHead>
-                                <TableHead className="text-right">Acciones</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
+            <Card withBorder radius="lg" padding="lg">
+                <Stack gap="md">
+                    <div>
+                        <Title order={3}>Listado de Promociones</Title>
+                        <Text c="dimmed" size="sm">
+                            Administra las ofertas y descuentos de tu tienda.
+                        </Text>
+                    </div>
+                    <Table highlightOnHover>
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Tipo</th>
+                                <th>Valor</th>
+                                <th>Estado</th>
+                                <th>Vigencia</th>
+                                <th style={{ textAlign: 'right' }}>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
                             {promotions.map((promo) => (
-                                <TableRow key={promo.id}>
-                                    <TableCell className="font-medium">{promo.name}</TableCell>
-                                    <TableCell className="capitalize">
+                                <tr key={promo.id}>
+                                    <td style={{ fontWeight: 500 }}>{promo.name}</td>
+                                    <td style={{ textTransform: 'capitalize' }}>
                                         {promo.type === "percentage" ? "Porcentaje" :
                                             promo.type === "amount" ? "Monto Fijo" : "Bundle"}
-                                    </TableCell>
-                                    <TableCell>
-                                        {promo.type === "percentage" ? `${promo.value}%` : `$${promo.value}`}
-                                    </TableCell>
-                                    <TableCell>
-                                        <span className={`px-2 py-1 rounded-full text-xs ${promo.status === 'active' ? 'bg-green-100 text-green-800' :
-                                            promo.status === 'scheduled' ? 'bg-blue-100 text-blue-800' :
-                                                'bg-gray-100 text-gray-800'
-                                            }`}>
+                                    </td>
+                                    <td>
+                                        {promo.type === "percentage" ? `${promo.value}% ` : `$${promo.value} `}
+                                    </td>
+                                    <td>
+                                        <Badge
+                                            color={promo.status === 'active' ? 'green' :
+                                                promo.status === 'scheduled' ? 'blue' : 'gray'}
+                                            variant="light"
+                                        >
                                             {promo.status === 'active' ? 'Activa' :
                                                 promo.status === 'scheduled' ? 'Programada' : 'Expirada'}
-                                        </span>
-                                    </TableCell>
-                                    <TableCell>
-                                        <div className="text-sm text-muted-foreground">
+                                        </Badge>
+                                    </td>
+                                    <td>
+                                        <Text size="sm" c="dimmed">
                                             {promo.starts_at && format(new Date(promo.starts_at), "d MMM", { locale: es })} -
                                             {promo.ends_at && format(new Date(promo.ends_at), "d MMM", { locale: es })}
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        <Button asChild variant="outline" size="sm" className="mr-2">
-                                            <Link href={`/promotions/${promo.id}/edit`}>
+                                        </Text>
+                                    </td>
+                                    <td style={{ textAlign: 'right' }}>
+                                        <Group justify="flex-end" gap="xs">
+                                            <LinkButton href={`/promotions/${promo.id}/edit`} size="xs" variant="default">
                                                 Editar
-                                            </Link>
-                                        </Button>
-                                        <TerminatePromotionButton promotionId={promo.id} />
-                                    </TableCell>
-                                </TableRow>
+                                            </LinkButton>
+                                            <TerminatePromotionButton promotionId={promo.id} />
+                                        </Group>
+                                    </td>
+                                </tr>
                             ))}
-                            {promotions.length === 0 && (
-                                <TableRow>
-                                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                                        No hay promociones creadas.
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </CardContent>
-            </Card>
-        </div>
+                            {
+                                promotions.length === 0 && (
+                                    <tr>
+                                        <td colSpan={6} style={{ textAlign: 'center', padding: '2rem' }}>
+                                            <Text c="dimmed">No hay promociones creadas.</Text>
+                                        </td>
+                                    </tr>
+                                )
+                            }
+                        </tbody >
+                    </Table >
+                </Stack >
+            </Card >
+        </Stack >
     )
 }

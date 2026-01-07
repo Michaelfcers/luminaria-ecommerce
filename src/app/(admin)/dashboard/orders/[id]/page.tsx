@@ -1,11 +1,9 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
+import { Card, Table, Button, Title, Text, Group, Stack, Badge, Grid } from "@mantine/core";
+import { LinkButton } from "@/components/link-button";
 import { createClient } from "@/lib/supabase/server";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
-import { notFound } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 export default async function OrderDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params
@@ -46,52 +44,57 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
   }
 
   return (
-    <div className="flex flex-col gap-8 p-4 md:p-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Detalles del Pedido</h1>
-        <Button asChild>
-          <Link href="/dashboard/orders">
-            Volver a Órdenes
-          </Link>
-        </Button>
-      </div>
+    <Stack gap="lg" p="md">
+      <Group justify="space-between" align="center">
+        <Title order={1}>Detalles del Pedido</Title>
+        <LinkButton href="/dashboard/orders" variant="outline" leftSection={<ArrowLeft size={16} />}>
+          Volver a Órdenes
+        </LinkButton>
+      </Group>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Pedido {order.code || `#${order.id.substring(0, 5)}`}</CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-4">
-          <div>
-            <p><strong>Cliente:</strong> {(order.profiles as any)?.display_name || 'N/A'}</p>
-            <p><strong>Estado:</strong> {order.status}</p>
-            <p><strong>Total:</strong> ${order.total?.toLocaleString()}</p>
-            <p><strong>Fecha:</strong> {new Date(order.created_at).toLocaleDateString()}</p>
-          </div>
-          <div>
-            <h2 className="text-xl font-bold mb-2">Artículos del Pedido</h2>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Producto</TableHead>
-                  <TableHead>Precio Unitario</TableHead>
-                  <TableHead>Cantidad</TableHead>
-                  <TableHead>Subtotal</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+      <Card withBorder radius="lg" padding="lg">
+        <Stack gap="lg">
+          <Title order={2}>Pedido {order.code || `#${order.id.substring(0, 5)}`}</Title>
+
+          <Grid>
+            <Grid.Col span={{ base: 12, md: 6 }}>
+              <Stack gap="xs">
+                <Text><strong>Cliente:</strong> {(order.profiles as any)?.display_name || 'N/A'}</Text>
+                <Group gap="xs">
+                  <Text fw={700}>Estado:</Text>
+                  <Badge color={order.status === 'completed' ? 'green' : 'blue'}>{order.status}</Badge>
+                </Group>
+                <Text><strong>Total:</strong> ${order.total?.toLocaleString()}</Text>
+                <Text><strong>Fecha:</strong> {new Date(order.created_at).toLocaleDateString()}</Text>
+              </Stack>
+            </Grid.Col>
+          </Grid>
+
+          <Stack gap="md">
+            <Title order={3}>Artículos del Pedido</Title>
+            <Table withTableBorder withColumnBorders>
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Precio Unitario</th>
+                  <th>Cantidad</th>
+                  <th>Subtotal</th>
+                </tr>
+              </thead>
+              <tbody>
                 {order.order_items.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell>{item.name_snapshot}</TableCell>
-                    <TableCell>${item.unit_price?.toLocaleString()}</TableCell>
-                    <TableCell>{item.quantity}</TableCell>
-                    <TableCell>${(item.unit_price! * item.quantity).toLocaleString()}</TableCell>
-                  </TableRow>
+                  <tr key={item.id}>
+                    <td>{item.name_snapshot}</td>
+                    <td>${item.unit_price?.toLocaleString()}</td>
+                    <td>{item.quantity}</td>
+                    <td>${(item.unit_price! * item.quantity).toLocaleString()}</td>
+                  </tr>
                 ))}
-              </TableBody>
+              </tbody>
             </Table>
-          </div>
-        </CardContent>
+          </Stack>
+        </Stack>
       </Card>
-    </div>
+    </Stack>
   );
 }

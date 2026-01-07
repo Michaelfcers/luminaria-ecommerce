@@ -1,83 +1,114 @@
-import Link from "next/link"
+"use client"
 
-import { LayoutDashboard, Package, ShoppingBag } from "lucide-react"
-import { createClient } from "@/lib/supabase/server"
-import { Button } from "@/components/ui/button"
-import { UserNav } from "./user-nav"
+import { useState } from "react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { Search } from "lucide-react"
+// Mantine imports
+import { Container, Group, Button, Drawer, Burger, Box, Text } from "@mantine/core"
+import { useDisclosure } from "@mantine/hooks"
+
 import { CartIcon } from "./cart-icon"
-import { ProductsDropdown } from "./products-dropdown" // Import the new component
 import { SearchDialog } from "./search-dialog"
 
-type Category = {
-  id: string
-  name: string
-  slug: string
-  parent_id: string | null
+interface NavigationProps {
+  userNav: React.ReactNode;
 }
 
-export async function Navigation() {
-  const supabase = await createClient()
+const routes = [
+  {
+    href: "/",
+    label: "Inicio",
+  },
+  {
+    href: "/productos",
+    label: "Productos",
+  },
 
-  const { data: categoriesData, error } = await supabase
-    .from("categories")
-    .select("id, name, slug, parent_id")
-    .is("deleted_at", null)
+  {
+    href: "/ofertas",
+    label: "Ofertas",
+  },
+  {
+    href: "/sobre-nosotros",
+    label: "Sobre Nosotros",
+  },
+]
 
-  if (error) {
-    console.error("Error fetching categories:", error)
-  }
-
-  const allCategories = (categoriesData as Category[]) || []
-
-  const mainCategories = allCategories.filter((cat) => cat.parent_id === null)
+export function Navigation({ userNav }: NavigationProps) {
+  const pathname = usePathname()
+  const [opened, { toggle, close }] = useDisclosure(false)
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
+    <Box component="header" style={{ position: 'sticky', top: 0, zIndex: 50, width: '100%', borderBottom: '1px solid var(--mantine-color-gray-3)', backgroundColor: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(10px)' }}>
+      <Container size="xl" h={64}>
+        <Group justify="space-between" h="100%" wrap="nowrap">
+          {/* Mobile Menu Trigger */}
+          <Burger opened={opened} onClick={toggle} hiddenFrom="md" size="sm" />
+
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="h-8 w-8 rounded-full bg-primary"></div>
-            <span className="text-xl font-bold tracking-tight">Luminaria</span>
+          <Link href="/" onClick={close} style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ width: 32, height: 32, borderRadius: '50%', backgroundColor: 'var(--mantine-color-blue-9)' }}></div>
+            <Text fw={700} size="xl" lh={1}>LUMINARIA</Text>
           </Link>
 
-          {/* Navigation Menu */}
-          <nav className="hidden md:flex">
-            <ul className="flex flex-1 list-none items-center justify-center gap-1">
-              <li>
-                <Link href="/" className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50">
-                  Inicio
-                </Link>
-              </li>
+          {/* Desktop Navigation */}
+          <Group gap="sm" visibleFrom="md">
+            {routes.map((route) => (
+              <Button
+                key={route.href}
+                component={Link}
+                href={route.href}
+                variant={pathname === route.href ? "light" : "subtle"}
+                color={pathname === route.href ? "blue" : "gray"}
+                fw={500}
+              >
+                {route.label}
+              </Button>
+            ))}
+          </Group>
 
-              <li>
-                <ProductsDropdown mainCategories={mainCategories} />
-              </li>
+          {/* Icons / Actions */}
+          <Group gap="xs">
+            <Button variant="subtle" color="gray" size="compact-md" onClick={() => setIsSearchOpen(true)} p={8}>
+              <Search size={20} />
+            </Button>
+            <SearchDialog open={isSearchOpen} onOpenChange={setIsSearchOpen} />
 
-              <li>
-                <Link href="/sobre-nosotros" className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50">
-                  Sobre Nosotros
-                </Link>
-              </li>
-
-              <li>
-                <Link href="/ofertas" className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50">
-                  Ofertas
-                </Link>
-              </li>
-
-
-            </ul>
-          </nav>
-
-          {/* Actions */}
-          <div className="flex items-center space-x-2">
-            <SearchDialog />
-            <UserNav />
             <CartIcon />
-          </div>
-        </div>
-      </div>
-    </header>
+            {userNav}
+          </Group>
+        </Group>
+      </Container>
+
+
+      {/* Mobile Drawer */}
+      <Drawer
+        opened={opened}
+        onClose={close}
+        title={<Text fw={700} size="lg">Menú</Text>}
+        padding="md"
+        size="75%"
+      >
+        <Group align="stretch" style={{ flexDirection: 'column' }} gap="md" mt="md">
+          {routes.map((route) => (
+            <Button
+              key={route.href}
+              component={Link}
+              href={route.href}
+              variant={pathname === route.href ? "light" : "subtle"}
+              color="gray"
+              fullWidth
+              justify="flex-start"
+              onClick={close}
+              size="lg"
+            >
+              {route.label}
+            </Button>
+          ))}
+        </Group>
+      </Drawer>
+    </Box>
   )
 }

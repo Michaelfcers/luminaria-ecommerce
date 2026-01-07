@@ -1,5 +1,7 @@
+"use client"
+
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
+import { Button, Container, Title, Text, SimpleGrid, BackgroundImage, Stack, Box, Overlay } from "@mantine/core"
 
 export function CategoriesSection() {
   const categories = [
@@ -28,43 +30,58 @@ export function CategoriesSection() {
 
   return (
     <section className="py-20 bg-gradient-to-b from-background to-muted/30">
-      <div className="container mx-auto px-4">
+      <Container size="xl">
         <div className="text-center mb-16 fade-in-up">
-          <h2 className="text-4xl font-bold text-foreground mb-4">Nuestras Categorías</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
+          <Title order={2} mb="md" style={{ fontSize: '2.5rem' }}>Nuestras Categorías</Title>
+          <Text c="dimmed" size="lg" maw={600} mx="auto">
             Explora nuestra amplia gama de productos de iluminación premium
-          </p>
+          </Text>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }} spacing="lg">
           {categories.map((category, index) => (
-            <div
+            <Box
               key={category.name}
-              className={`group relative overflow-hidden rounded-2xl elegant-shadow hover-lift fade-in-up stagger-${index + 1} h-80 cursor-pointer`}
+              className={`group relative overflow-hidden rounded-2xl elegant-shadow hover-lift fade-in-up stagger-${index + 1}`}
+              style={{ height: 320, cursor: 'pointer', position: 'relative' }}
             >
-              <div
-                className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                style={{ backgroundImage: `url(${category.image})` }}
+              <BackgroundImage
+                src={category.image}
+                h="100%"
+                w="100%"
+                className="transition-transform duration-700 group-hover:scale-110"
               />
 
-              <div className="absolute inset-0 bg-black/50 group-hover:bg-black/40 transition-colors duration-300" />
+              <Overlay color="#000" opacity={0.5} zIndex={1} className="group-hover:opacity-40 transition-opacity" />
 
-              <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                <p className="text-xs font-medium mb-1 text-white/90 drop-shadow-lg">{category.count}</p>
-                <h3 className="text-2xl font-bold mb-2 drop-shadow-lg">{category.name}</h3>
-                <p className="text-white/95 mb-4 text-sm leading-relaxed drop-shadow">{category.description}</p>
-                <Button
-                  asChild
-                  size="sm"
-                  className="bg-white text-black hover:bg-white/90 transition-all duration-300 font-medium"
-                >
-                  <Link href={category.href}>Ver Productos</Link>
-                </Button>
-              </div>
-            </div>
+              <Stack
+                justify="flex-end"
+                p="xl"
+                h="100%"
+                style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 2 }}
+                gap="xs"
+              >
+                <Text size="xs" fw={500} c="white" style={{ opacity: 0.9 }}>{category.count}</Text>
+                <Title order={3} c="white">{category.name}</Title>
+                <Text size="sm" c="gray.2" mb="sm">{category.description}</Text>
+                <div>
+                  <Button
+                    component={Link}
+                    href={category.href}
+                    size="sm"
+                    variant="white"
+                    color="dark"
+                  >
+                    Ver Productos
+                  </Button>
+                </div>
+              </Stack>
+            </Box>
           ))}
-        </div>
-      </div>
+        </SimpleGrid>
+      </Container>
     </section>
   )
 }
+
+

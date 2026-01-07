@@ -1,88 +1,101 @@
 "use client"
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { Button, Card, NumberInput, Title, Text, Group, Stack, Image, Box, ActionIcon, Container, Grid, Loader, Divider } from "@mantine/core";
 import { useCart } from "@/hooks/use-cart"
-import { Loader2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 
 export default function CartPage() {
   const { items, removeItem, updateQuantity, total, isLoading } = useCart()
 
   if (isLoading) {
     return (
-      <div className="container mx-auto py-8 px-4 md:px-6 flex justify-center items-center">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
+      <Container size="xl" py="xl" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+        <Loader size="xl" />
+      </Container>
     )
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 md:px-6">
-      <h1 className="text-3xl font-bold mb-6">Tu Carrito</h1>
+    <Container size="xl" py="xl">
+      <Title order={1} mb="xl">Tu Carrito</Title>
 
       {items.length === 0 ? (
-        <div className="p-8 text-center text-muted-foreground">Tu carrito está vacío.</div>
+        <Box p="xl" style={{ textAlign: 'center' }}>
+          <Text size="lg" c="dimmed">Tu carrito está vacío.</Text>
+        </Box>
       ) : (
-        <div className="grid md:grid-cols-[2fr_1fr] gap-8">
-          <div className="space-y-6">
-            {items.map((item) => (
-              <Card key={item.cartItemId} className="rounded-3xl elegant-shadow bg-white">
-                <CardContent className="p-6 flex items-center gap-6">
-                  <img src={item.image || "/placeholder.svg"} alt={item.name} width={100} height={100} className="rounded-md" />
-                  <div className="flex-1">
-                    <h3 className="font-semibold">{item.name}</h3>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <Input
-                      type="number"
-                      value={String(item.quantity)}
-                      min={1}
-                      className="w-20"
-                      onChange={(e) => item.cartItemId && updateQuantity(item.cartItemId, Math.max(1, Number(e.target.value) || 1))}
+        <Grid gutter="xl">
+          <Grid.Col span={{ base: 12, md: 8 }}>
+            <Stack gap="lg">
+              {items.map((item) => (
+                <Card key={item.cartItemId} padding="md" radius="lg" withBorder shadow="sm">
+                  <Group wrap="nowrap" align="center">
+                    <Image
+                      src={item.image || "/placeholder.svg"}
+                      alt={item.name}
+                      w={100}
+                      h={100}
+                      radius="md"
+                      fit="cover"
                     />
-                    <div className="flex flex-col items-end">
-                      <span className="font-semibold text-lg">${item.price.toFixed(2)}</span>
-                      {item.originalPrice && (
-                        <span className="text-sm text-muted-foreground line-through">
-                          ${item.originalPrice.toFixed(2)}
-                        </span>
-                      )}
-                    </div>
-                    <Button variant="ghost" size="icon" onClick={() => item.cartItemId && removeItem(item.cartItemId)}>
-                      <Trash2Icon className="h-5 w-5" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                    <Stack gap={4} style={{ flex: 1 }}>
+                      <Text fw={600} size="md" lineClamp={2}>{item.name}</Text>
+                    </Stack>
 
-          <div className="space-y-6">
-            <Card className="rounded-3xl elegant-shadow bg-white">
-              <CardHeader>
-                <CardTitle>Resumen del Pedido</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex justify-between">
-                  <span>Subtotal</span>
-                  <span>${total.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Envío</span>
-                  <span>$0.00</span>
-                </div>
-                <div className="flex justify-between font-bold text-lg">
-                  <span>Total</span>
-                  <span>${total.toFixed(2)}</span>
-                </div>
-                <Button className="w-full">Proceder al Pago</Button>
-              </CardContent>
+                    <Group gap="md" align="center">
+                      <Stack gap={0} align="flex-end" visibleFrom="xs">
+                        <Text fw={700} size="lg">${item.price.toFixed(2)}</Text>
+                        {item.originalPrice && (
+                          <Text size="sm" c="dimmed" td="line-through">${item.originalPrice.toFixed(2)}</Text>
+                        )}
+                      </Stack>
+
+                      <NumberInput
+                        value={item.quantity}
+                        min={1}
+                        w={80}
+                        onChange={(val) => item.cartItemId && updateQuantity(item.cartItemId, Number(val))}
+                      />
+
+                      <ActionIcon
+                        variant="subtle"
+                        color="red"
+                        size="lg"
+                        onClick={() => item.cartItemId && removeItem(item.cartItemId)}
+                      >
+                        <Trash2 size={20} />
+                      </ActionIcon>
+                    </Group>
+                  </Group>
+                </Card>
+              ))}
+            </Stack>
+          </Grid.Col>
+
+          <Grid.Col span={{ base: 12, md: 4 }}>
+            <Card padding="xl" radius="lg" withBorder shadow="sm" pos="sticky" top={96}>
+              <Title order={3} mb="lg">Resumen del Pedido</Title>
+              <Stack gap="md">
+                <Group justify="space-between">
+                  <Text>Subtotal</Text>
+                  <Text fw={500}>${total.toFixed(2)}</Text>
+                </Group>
+                <Group justify="space-between">
+                  <Text>Envío</Text>
+                  <Text fw={500}>$0.00</Text>
+                </Group>
+                <Divider />
+                <Group justify="space-between">
+                  <Text size="xl" fw={700}>Total</Text>
+                  <Text size="xl" fw={700}>${total.toFixed(2)}</Text>
+                </Group>
+                <Button fullWidth size="lg">Proceder al Pago</Button>
+              </Stack>
             </Card>
-          </div>
-        </div>
+          </Grid.Col>
+        </Grid>
       )}
-    </div>
+    </Container>
   );
 }
 

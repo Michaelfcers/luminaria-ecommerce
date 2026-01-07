@@ -1,8 +1,7 @@
 "use client"
 import { useRef } from "react"
 import Link from "next/link"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { Card, Button, ActionIcon, Title, Text, Group, Box, Image, SimpleGrid } from "@mantine/core"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
 export type RecommendedProduct = {
@@ -42,18 +41,18 @@ export function RecommendedProducts({
   }
 
   return (
-    <section className="p-8 rounded-lg">
-      <div className="flex items-center justify-between mb-8">
-        <h2 className="text-2xl font-bold text-foreground">Productos Recomendados</h2>
-        <div className="flex gap-2">
-          <Button variant="outline" size="icon" onClick={() => scroll("left")}>
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <Button variant="outline" size="icon" onClick={() => scroll("right")}>
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
+    <Box p="lg" component="section">
+      <Group justify="space-between" mb="lg">
+        <Title order={2}>Productos Recomendados</Title>
+        <Group gap="xs">
+          <ActionIcon variant="default" size="lg" onClick={() => scroll("left")}>
+            <ChevronLeft size={16} />
+          </ActionIcon>
+          <ActionIcon variant="default" size="lg" onClick={() => scroll("right")}>
+            <ChevronRight size={16} />
+          </ActionIcon>
+        </Group>
+      </Group>
 
       <div
         ref={scrollRef}
@@ -63,29 +62,40 @@ export function RecommendedProducts({
         {products.map((product) => (
           <Card
             key={product.id}
-            className="flex-shrink-0 w-80 group overflow-hidden bg-white rounded-2xl elegant-shadow hover-lift"
+            padding="sm"
+            radius="md"
+            withBorder
+            className="flex-shrink-0 w-80"
           >
-            <div className="relative overflow-hidden">
-              <img
+            <Card.Section>
+              <Image
                 src={product.image || "/placeholder.svg"}
                 alt={product.name}
-                className="h-48 w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                h={200}
+                w="100%"
+                fit="cover"
               />
-            </div>
-            <CardContent className="p-4">
-              <h3 className="font-semibold text-sm mb-2 line-clamp-2 h-10">{product.name}</h3>
-              <div className="flex items-center justify-between">
-                {product.price && (
-                  <span className="text-lg font-bold text-primary">${product.price}</span>
-                )}
-                <Button asChild size="sm">
-                  <Link href={`/producto/${product.id}`}>Ver</Link>
-                </Button>
-              </div>
-            </CardContent>
+            </Card.Section>
+
+            <Box mt="md" mb="xs">
+              <Text fw={600} size="sm" lineClamp={2} h={40}>
+                {product.name}
+              </Text>
+            </Box>
+
+            <Group justify="space-between" mt="md" align="center">
+              {product.price && (
+                <Text fw={700} size="lg" c="blue">
+                  ${product.price}
+                </Text>
+              )}
+              <Button component={Link} href={`/producto/${product.id}`} size="sm" variant="light">
+                Ver
+              </Button>
+            </Group>
           </Card>
         ))}
       </div>
-    </section>
+    </Box>
   )
 }

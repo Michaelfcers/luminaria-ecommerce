@@ -1,20 +1,9 @@
 "use client"
 
 import { useState, useTransition } from "react"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-import { Button } from "@/components/ui/button"
+import { Button, Modal, Group, Text } from "@mantine/core"
 import { deleteProduct } from "./products-actions"
-import { toast } from "sonner"
+import { notifications } from "@mantine/notifications"
 
 interface DeleteProductButtonProps {
   productId: string
@@ -28,36 +17,41 @@ export function DeleteProductButton({ productId }: DeleteProductButtonProps) {
     startTransition(async () => {
       const result = await deleteProduct(productId)
       if (result?.error) {
-        toast.error(`Error: ${result.error}`)
+        notifications.show({
+          title: "Error",
+          message: result.error,
+          color: "red",
+        })
       } else {
-        toast.success("Producto eliminado con éxito.")
+        notifications.show({
+          title: "Éxito",
+          message: "Producto eliminado con éxito.",
+          color: "green",
+        })
         setIsOpen(false)
       }
     })
   }
 
   return (
-    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
-      <AlertDialogTrigger asChild>
-        <Button variant="destructive" size="sm">
-          Eliminar
-        </Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
-          <AlertDialogDescription>
-            Esta acción no se puede deshacer. El producto será marcado como
-            eliminado.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel disabled={isPending}>Cancelar</AlertDialogCancel>
-          <AlertDialogAction onClick={handleClick} disabled={isPending}>
-            {isPending ? "Eliminando..." : "Confirmar"}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+    <>
+      <Button variant="filled" color="red" size="sm" onClick={() => setIsOpen(true)}>
+        Eliminar
+      </Button>
+      <Modal opened={isOpen} onClose={() => setIsOpen(false)} title="¿Estás seguro?">
+        <Text size="sm">
+          Esta acción no se puede deshacer. El producto será marcado como
+          eliminado.
+        </Text>
+        <Group justify="flex-end" mt="md">
+          <Button variant="default" onClick={() => setIsOpen(false)} disabled={isPending}>
+            Cancelar
+          </Button>
+          <Button color="red" onClick={handleClick} loading={isPending}>
+            Confirmar
+          </Button>
+        </Group>
+      </Modal>
+    </>
   )
 }

@@ -1,12 +1,12 @@
 "use client"
 
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
+import { Button } from "@mantine/core"
 import { ShoppingCart, Check } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { getOrCreateUserCart, addItemToCart } from "@/lib/cart"
-import { useToast } from "@/components/ui/use-toast"
-import { Product, ProductVariant } from "../types"
+import { notifications } from "@mantine/notifications"
+import { Product, ProductVariant } from "@/features/products/types"
 
 export function AddToCartButton({
   variant,
@@ -18,14 +18,13 @@ export function AddToCartButton({
   const [isAdding, setIsAdding] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const supabase = createClient()
-  const { toast } = useToast()
 
   const handleAddToCart = async () => {
     if (!variant) {
-      toast({
+      notifications.show({
         title: "Error",
-        description: "Por favor, selecciona una versión del producto.",
-        variant: "destructive",
+        message: "Por favor, selecciona una versión del producto.",
+        color: "red",
       })
       return
     }
@@ -36,10 +35,10 @@ export function AddToCartButton({
     } = await supabase.auth.getUser()
 
     if (!user) {
-      toast({
+      notifications.show({
         title: "Error",
-        description: "Debes iniciar sesión para añadir productos al carrito.",
-        variant: "destructive",
+        message: "Debes iniciar sesión para añadir productos al carrito.",
+        color: "red",
       })
       setIsAdding(false)
       return
@@ -48,11 +47,12 @@ export function AddToCartButton({
     try {
       const cart = await getOrCreateUserCart(user.id)
       await addItemToCart(cart.id, variant.id, 1, variant.list_price_usd)
-      
+
       setIsSuccess(true)
-      toast({
+      notifications.show({
         title: "¡Añadido!",
-        description: `${product.name} (${variant.name || ''}) se ha añadido a tu carrito.`,
+        message: `${product.name} (${variant.name || ''}) se ha añadido a tu carrito.`,
+        color: "green",
       })
 
       setTimeout(() => {
@@ -60,10 +60,10 @@ export function AddToCartButton({
       }, 2000)
 
     } catch (error) {
-      toast({
+      notifications.show({
         title: "Error",
-        description: "Hubo un problema al añadir el producto al carrito.",
-        variant: "destructive",
+        message: "Hubo un problema al añadir el producto al carrito.",
+        color: "red",
       })
     } finally {
       setIsAdding(false)
@@ -71,25 +71,16 @@ export function AddToCartButton({
   }
 
   return (
-    <Button 
-      onClick={handleAddToCart} 
-      disabled={isAdding || isSuccess || !variant} 
-      size="lg" 
-      className="w-full transition-all duration-300"
+    <Button
+      onClick={handleAddToCart}
+      disabled={isAdding || isSuccess || !variant}
+      size="lg"
+      fullWidth
+      loading={isAdding}
+      leftSection={!isAdding && (isSuccess ? <Check size={20} /> : <ShoppingCart size={20} />)}
+      color={isSuccess ? "green" : "blue"}
     >
-      {isAdding ? (
-        "Añadiendo..."
-      ) : isSuccess ? (
-        <>
-          <Check className="mr-2 h-4 w-4" />
-          ¡Añadido!
-        </>
-      ) : (
-        <>
-          <ShoppingCart className="mr-2 h-4 w-4" />
-          Añadir al Carrito
-        </>
-      )}
+      {isSuccess ? "¡Añadido!" : "Añadir al Carrito"}
     </Button>
   )
 }

@@ -1,23 +1,25 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import Image from "next/image"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import {
   Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
+  Card,
+  Badge,
+  Button,
+  Divider,
+  Tooltip,
+  Text,
+  Title,
+  Image,
+  Stack,
+  Group,
+  SimpleGrid,
+  Box,
+  Flex
+} from "@mantine/core"
 import { FileText } from "lucide-react"
-
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 import { AddToCartButton } from "../../cart/components/add-to-cart-button"
 import { Product, ProductVariant } from "../types"
@@ -52,9 +54,6 @@ export function ProductDetailClient({
       : null
   })
 
-  // Update effect to handle URL changes if needed, or just initial load
-  // But usually initial state is enough if we link to a fresh page load. 
-  // If we navigate client side, we might need useEffect.
   useEffect(() => {
     const variantIdParam = searchParams.get("variant")
     if (variantIdParam && product.product_variants) {
@@ -62,33 +61,23 @@ export function ProductDetailClient({
       if (variant && variant.id !== selectedVariant?.id) {
         setSelectedVariant(variant)
         if (variant.localImage) {
-          setCurrentImage(variant.localImage) // Assuming localImage exists on variant based on previous code
-        } else {
-          // Handle image update if no local image?
-          // Existing HandleVariantChange logic:
-          // if (newVariant.localImage) setCurrentImage(newVariant.localImage)
-          // It doesn't handle fallback. Ideally we should.
+          setCurrentImage(variant.localImage)
         }
       }
     }
-  }, [searchParams, product.product_variants]) // Add dependencies
+  }, [searchParams, product.product_variants])
 
   const [currentImage, setCurrentImage] = useState(initialImage)
 
-  // Sync image with selected variant on mount if logic requires
+  // Sync image with selected variant if needed
   useEffect(() => {
-    // If we initialized with a specific variant from URL, we should probably set the image too if it has one.
-    // But `initialImage` is passed from server.
     if (selectedVariant && selectedVariant.localImage) {
       setCurrentImage(selectedVariant.localImage)
     }
-  }, []) // Run once on mount to override server image if variant selected? 
-  // Actually, handleVariantChange updates image.
-  // URL param only sets state. We should also update image.
+  }, [selectedVariant])
 
 
   const getActivePromotion = (variant: any) => {
-    // ... (existing code)
     // 1. Check for variant-specific promotion
     const variantPromo = variant?.promotion_variants?.find((pv: any) => {
       const promo = pv.promotions
@@ -128,12 +117,8 @@ export function ProductDetailClient({
     )
     if (newVariant) {
       setSelectedVariant(newVariant)
-      // Update image if variant has a local image
-      // @ts-ignore
-      if (newVariant.localImage) {
-        // @ts-ignore
-        setCurrentImage(newVariant.localImage)
-      }
+      // Note: updating existing search param logic usually handled via router push in parent or here?
+      // For now just update state.
     }
   }
 
@@ -142,196 +127,155 @@ export function ProductDetailClient({
   const activePromo = selectedVariant ? getActivePromotion(selectedVariant) : null
 
   return (
-    <div className="space-y-8">
+    <Stack gap="xl">
       {/* Main Product "Group" Header */}
-      <div className="pb-4 border-b">
-        <h1 className="text-4xl font-bold tracking-tight text-foreground">
-          {product.name}
-        </h1>
+      <Box style={{ borderBottom: '1px solid var(--mantine-color-gray-3)' }} pb="md">
+        <Title order={1} size="h1" fw={900}>{product.name}</Title>
         {product.description && (
-          <p className="mt-2 text-lg text-muted-foreground">
+          <Text size="lg" c="dimmed" mt="xs">
             {product.description}
-          </p>
+          </Text>
         )}
-      </div>
+      </Box>
 
-      <div className="grid lg:grid-cols-2 gap-12">
+      <SimpleGrid cols={{ base: 1, lg: 2 }} spacing={48}>
         {/* Left side: Image & Attributes */}
-        <div className="space-y-6">
-          <Card className="overflow-hidden w-full rounded-3xl elegant-shadow bg-white">
-            <CardContent className="p-0">
-              <Image
-                src={currentImage}
-                alt={product.name}
-                width={800}
-                height={800}
-                className="object-cover w-full h-full"
-                priority
-              />
-            </CardContent>
+        <Stack gap="lg">
+          <Card padding="0" radius="xl" withBorder shadow="sm" style={{ overflow: 'hidden' }}>
+            <Image
+              src={currentImage}
+              alt={product.name}
+              w="100%"
+              h="auto" // Image component usually handles aspect ratio or we set h={500}
+              fit="cover"
+            />
           </Card>
 
           {product.attributes && Object.keys(product.attributes).length > 0 && (
-            <Card className="rounded-3xl elegant-shadow bg-white">
-              <CardHeader>
-                <CardTitle>Atributos Generales</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
+            <Card padding="lg" radius="xl" withBorder shadow="sm">
+              <Text fw={700} size="lg" mb="md">Atributos Generales</Text>
+              <Stack gap="xs">
                 {Object.entries(product.attributes).map(([key, value]) => (
-                  <div key={key} className="flex justify-between text-sm">
-                    <span className="font-medium text-muted-foreground">{key}:</span>
-                    <span>{String(value)}</span>
-                  </div>
+                  <Group key={key} justify="space-between">
+                    <Text fw={500} c="dimmed">{key}:</Text>
+                    <Text>{String(value)}</Text>
+                  </Group>
                 ))}
-              </CardContent>
+              </Stack>
             </Card>
           )}
-        </div>
+        </Stack>
 
         {/* Right side: Variant Selection and Details */}
-        <div className="space-y-6">
+        <Stack gap="lg">
           {selectedVariant && (
-            <h2 className="text-3xl font-bold">{selectedVariant.name || formatAttributes(selectedVariant.attributes)}</h2>
+            <Title order={2} size="h2">{selectedVariant.name || formatAttributes(selectedVariant.attributes)}</Title>
           )}
 
-          <Card className="rounded-3xl elegant-shadow bg-white">
-            <CardHeader>
-              <CardTitle>Selecciona una Versión</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          <Card padding="lg" radius="xl" withBorder shadow="sm">
+            <Text fw={700} size="lg" mb="md">Selecciona una Versión</Text>
+            <Stack gap="md">
               <Select
-                onValueChange={handleVariantChange}
-                defaultValue={selectedVariant?.id}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Elige una versión..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {product.product_variants?.map((variant) => {
-                    const variantPromo = getActivePromotion(variant)
-                    return (
-                      <SelectItem key={variant.id} value={variant.id}>
-                        <div className="flex items-center gap-2">
-                          <span>{variant.name || formatAttributes(variant.attributes)}</span>
-                          {variantPromo && (
-                            <Badge variant="destructive" className="h-5 px-1.5 text-[10px]">
-                              {variantPromo.type === 'percentage' ? `-${variantPromo.value}%` : `-$${variantPromo.value}`}
-                            </Badge>
-                          )}
-                        </div>
-                      </SelectItem>
-                    )
-                  })}
-                </SelectContent>
-              </Select>
+                value={selectedVariant?.id}
+                onChange={(val) => val && handleVariantChange(val)}
+                placeholder="Elige una versión..."
+                data={product.product_variants?.map((variant) => {
+                  const variantPromo = getActivePromotion(variant)
+                  return {
+                    value: variant.id,
+                    label: `${variant.name || formatAttributes(variant.attributes)} ${variantPromo ? (variantPromo.type === 'percentage' ? `(-${variantPromo.value}%)` : `(-$${variantPromo.value})`) : ''}`
+                  }
+                })}
+              />
+
               {variantTechnicalSheet ? (
-                <Button asChild className="w-full" size="lg" variant="default">
-                  <Link href={variantTechnicalSheet} target="_blank" rel="noopener noreferrer">
-                    <FileText className="mr-2 h-4 w-4" />
-                    Descargar ficha tecnica
-                  </Link>
+                <Button component={Link} href={variantTechnicalSheet} target="_blank" rel="noopener noreferrer" size="lg" fullWidth leftSection={<FileText size={18} />}>
+                  Descargar ficha tecnica
                 </Button>
               ) : (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <span tabIndex={0} className="w-full inline-block">
-                        <Button className="w-full" size="lg" disabled variant="default">
-                          <FileText className="mr-2 h-4 w-4" />
-                          Descargar ficha tecnica
-                        </Button>
-                      </span>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Ficha técnica no disponible para esta versión</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                <Tooltip label="Ficha técnica no disponible para esta versión">
+                  <Button size="lg" fullWidth disabled leftSection={<FileText size={18} />}>
+                    Descargar ficha tecnica
+                  </Button>
+                </Tooltip>
               )}
               <AddToCartButton variant={selectedVariant} product={product} />
-            </CardContent>
+            </Stack>
           </Card>
 
           {selectedVariant && (
-            <Card className="rounded-3xl elegant-shadow bg-white">
-              <CardHeader>
-                <CardTitle>Detalles</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="pb-2">
-                  <h3 className="font-semibold">Precio:</h3>
-                  {selectedVariant && (
-                    <div className="flex items-center gap-2">
-                      {calculateDiscountedPrice(selectedVariant.list_price_usd, selectedVariant) ? (
-                        <>
-                          <p className="text-3xl font-bold text-primary">
-                            ${calculateDiscountedPrice(selectedVariant.list_price_usd, selectedVariant)?.toFixed(2)}
-                          </p>
-                          <p className="text-xl text-muted-foreground line-through">
-                            ${selectedVariant.list_price_usd}
-                          </p>
-                          <Badge variant="destructive">
-                            {activePromo?.type === 'percentage' ? `-${activePromo.value}%` : `-$${activePromo?.value}`}
-                          </Badge>
-                        </>
-                      ) : (
-                        <p className="text-3xl font-bold text-primary">
-                          ${selectedVariant.list_price_usd}
-                        </p>
-                      )}
-                    </div>
-                  )}
-                </div>
+            <Card padding="lg" radius="xl" withBorder shadow="sm">
+              <Text fw={700} size="lg" mb="md">Detalles</Text>
+              <Stack gap="md">
+                <Box>
+                  <Text fw={600} mb={4}>Precio:</Text>
+                  <Group align="center">
+                    {calculateDiscountedPrice(selectedVariant.list_price_usd, selectedVariant) ? (
+                      <>
+                        <Text size="xl" fw={800} c="blue">${calculateDiscountedPrice(selectedVariant.list_price_usd, selectedVariant)?.toFixed(2)}</Text>
+                        <Text size="lg" c="dimmed" td="line-through">${selectedVariant.list_price_usd}</Text>
+                        <Badge color="red" variant="filled">
+                          {activePromo?.type === 'percentage' ? `-${activePromo.value}%` : `-$${activePromo?.value}`}
+                        </Badge>
+                      </>
+                    ) : (
+                      <Text size="xl" fw={800} c="blue">${selectedVariant.list_price_usd}</Text>
+                    )}
+                  </Group>
+                </Box>
 
-                <Separator />
-                <div>
-                  <h3 className="font-semibold">Horas de vida:</h3>
-                  <p>{selectedVariant.life_hours}</p>
-                </div>
+                <Divider />
 
-                <Separator />
-                <div>
-                  <h3 className="font-semibold">Lúmenes:</h3>
-                  <p>{selectedVariant.lumens}</p>
-                </div>
+                <Box>
+                  <Text fw={600}>Horas de vida:</Text>
+                  <Text>{selectedVariant.life_hours}</Text>
+                </Box>
 
-                <Separator />
-                <div>
-                  <h3 className="font-semibold">Piezas por caja:</h3>
-                  <p>{selectedVariant.pieces_per_box}</p>
-                </div>
+                <Divider />
 
-                <Separator />
-                <div>
-                  <h3 className="font-semibold">Atributos:</h3>
-                  <div className="flex flex-wrap gap-2 mt-2">
+                <Box>
+                  <Text fw={600}>Lúmenes:</Text>
+                  <Text>{selectedVariant.lumens}</Text>
+                </Box>
+
+                <Divider />
+
+                <Box>
+                  <Text fw={600}>Piezas por caja:</Text>
+                  <Text>{selectedVariant.pieces_per_box}</Text>
+                </Box>
+
+                <Divider />
+
+                <Box>
+                  <Text fw={600} mb={8}>Atributos:</Text>
+                  <Group gap="xs">
                     {Object.entries(selectedVariant.attributes).map(
                       ([key, value]) => (
-                        <Badge key={key} variant="outline">
-                          <span className="font-normal mr-1">{key}:</span> {String(value)}
+                        <Badge key={key} variant="outline" color="gray" size="lg" fw={500} style={{ textTransform: 'none' }}>
+                          <span style={{ fontWeight: 400, marginRight: 4 }}>{key}:</span> {String(value)}
                         </Badge>
                       )
                     )}
-                  </div>
-                </div>
-                <Separator />
-                <div>
-                  <h3 className="font-semibold">Disponibilidad:</h3>
+                  </Group>
+                </Box>
+
+                <Divider />
+
+                <Box>
+                  <Text fw={600} mb={4}>Disponibilidad:</Text>
                   <Badge
-                    variant={
-                      selectedVariant.sourcing_status === "active"
-                        ? "default"
-                        : "destructive"
-                    }
+                    color={selectedVariant.sourcing_status === "active" ? "green" : "red"}
+                    size="lg"
                   >
                     {selectedVariant.sourcing_status}
                   </Badge>
-                </div>
-              </CardContent>
+                </Box>
+              </Stack>
             </Card>
           )}
-        </div>
-      </div>
-    </div>
+        </Stack>
+      </SimpleGrid>
+    </Stack>
   )
 }

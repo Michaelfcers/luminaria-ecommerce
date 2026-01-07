@@ -1,19 +1,21 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Slider } from "@/components/ui/slider"
-import { Button } from "@/components/ui/button"
 import { useRouter, useSearchParams } from "next/navigation"
 import {
   Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
-import { ScrollArea } from "@/components/ui/scroll-area"
+  Checkbox,
+  Button,
+  ScrollArea,
+  Badge,
+  Text,
+  Group,
+  Stack,
+  Box,
+  Flex,
+  ActionIcon
+} from "@mantine/core"
 import { X } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
 
 // Define types for the filter items
 type FilterItem = {
@@ -147,175 +149,140 @@ export function ProductFilters({
     selectedGroups.length > 0
 
   return (
-    <div className="bg-white rounded-3xl elegant-shadow p-6 sticky top-24">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold tracking-tight">Filtros</h2>
+    <Box className="bg-white rounded-xl shadow-sm p-6" style={{ position: 'sticky', top: 96 }}>
+      <Flex justify="space-between" align="center" mb="md">
+        <Text fw={700} size="lg">Filtros</Text>
         {hasActiveFilters && (
           <Button
-            variant="ghost"
-            size="sm"
+            variant="subtle"
+            size="compact-xs"
+            color="red"
             onClick={clearFilters}
-            className="h-8 px-2 text-muted-foreground hover:text-destructive transition-colors"
+            rightSection={<X size={12} />}
           >
-            <span className="text-xs mr-1">Borrar</span>
-            <X className="h-3 w-3" />
+            Borrar
           </Button>
         )}
-      </div>
+      </Flex>
 
-      <div className="space-y-4">
-        <h3 className="font-medium text-sm text-muted-foreground uppercase tracking-wider mb-2">General</h3>
+      <Stack gap="md">
+        <Text size="xs" fw={700} tt="uppercase" c="dimmed">General</Text>
         <Accordion
-          type="multiple"
+          multiple
           defaultValue={["categories", "brands"]}
-          className="w-full space-y-4"
+          variant="separated"
+          radius="md"
         >
           {/* Categories Filter */}
-          <AccordionItem value="categories" className="border-none">
-            <AccordionTrigger className="py-2 hover:no-underline">
-              <span className="font-semibold text-base">Categorías</span>
-            </AccordionTrigger>
-            <AccordionContent>
-              <ScrollArea className="h-[200px] pr-4">
-                <div className="space-y-3 pt-1">
+          <Accordion.Item value="categories" bg="transparent" style={{ border: 'none' }}>
+            <Accordion.Control ><Text fw={600}>Categorías</Text></Accordion.Control>
+            <Accordion.Panel>
+              <ScrollArea h={200} type="always" offsetScrollbars>
+                <Stack gap="sm" pt="xs">
                   {categories.map((category) => (
-                    <div key={category.id} className="flex items-center space-x-3 group">
-                      <Checkbox
-                        id={`category-${category.id}`}
-                        checked={selectedCategories.includes(category.id)}
-                        onCheckedChange={(checked) => handleCategoryChange(category.id, checked as boolean)}
-                        className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                      />
-                      <label
-                        htmlFor={`category-${category.id}`}
-                        className="text-sm text-muted-foreground group-hover:text-foreground transition-colors flex-1 cursor-pointer flex justify-between items-center"
-                      >
-                        <span>{category.name}</span>
-                      </label>
-                    </div>
+                    <Checkbox
+                      key={category.id}
+                      label={category.name}
+                      checked={selectedCategories.includes(String(category.id))}
+                      onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleCategoryChange(String(category.id), event.currentTarget.checked)}
+                      styles={{ label: { cursor: 'pointer' } }}
+                    />
                   ))}
-                </div>
+                </Stack>
               </ScrollArea>
-            </AccordionContent>
-          </AccordionItem>
+            </Accordion.Panel>
+          </Accordion.Item>
 
           {/* Brands Filter */}
-          <AccordionItem value="brands" className="border-none">
-            <AccordionTrigger className="py-2 hover:no-underline">
-              <span className="font-semibold text-base">Marcas</span>
-            </AccordionTrigger>
-            <AccordionContent>
-              <ScrollArea className="h-[200px] pr-4">
-                <div className="space-y-3 pt-1">
+          <Accordion.Item value="brands" bg="transparent" style={{ border: 'none' }}>
+            <Accordion.Control><Text fw={600}>Marcas</Text></Accordion.Control>
+            <Accordion.Panel>
+              <ScrollArea h={200} type="always" offsetScrollbars>
+                <Stack gap="sm" pt="xs">
                   {brands.map((brand) => (
-                    <div key={brand.id} className="flex items-center space-x-3 group">
-                      <Checkbox
-                        id={`brand-${brand.id}`}
-                        checked={selectedBrands.includes(brand.id)}
-                        onCheckedChange={(checked) => handleBrandChange(brand.id, checked as boolean)}
-                        className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                      />
-                      <label
-                        htmlFor={`brand-${brand.id}`}
-                        className="text-sm text-muted-foreground group-hover:text-foreground transition-colors flex-1 cursor-pointer flex justify-between items-center"
-                      >
-                        <span>{brand.name}</span>
-                      </label>
-                    </div>
+                    <Checkbox
+                      key={brand.id}
+                      label={brand.name}
+                      checked={selectedBrands.includes(String(brand.id))}
+                      onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleBrandChange(String(brand.id), event.currentTarget.checked)}
+                      styles={{ label: { cursor: 'pointer' } }}
+                    />
                   ))}
-                </div>
+                </Stack>
               </ScrollArea>
-            </AccordionContent>
-          </AccordionItem>
+            </Accordion.Panel>
+          </Accordion.Item>
         </Accordion>
-      </div>
+      </Stack>
 
       {(families.length > 0 || groups.length > 0) && (
-        <div className="space-y-4 pt-4 border-t">
-          <h3 className="font-medium text-sm text-muted-foreground uppercase tracking-wider mb-2">Producto</h3>
+        <Stack gap="md" mt="md" pt="md" style={{ borderTop: '1px solid var(--mantine-color-gray-2)' }}>
+          <Text size="xs" fw={700} tt="uppercase" c="dimmed">Producto</Text>
           <Accordion
-            type="multiple"
+            multiple
             defaultValue={["families", "groups"]}
-            className="w-full space-y-4"
+            variant="separated"
           >
             {/* Families Filter */}
             {families.length > 0 && (
-              <AccordionItem value="families" className="border-none">
-                <AccordionTrigger className="py-2 hover:no-underline">
-                  <span className="font-semibold text-base">Familias</span>
-                </AccordionTrigger>
-                <AccordionContent>
-                  <ScrollArea className="h-[200px] pr-4">
-                    <div className="space-y-3 pt-1">
+              <Accordion.Item value="families" bg="transparent" style={{ border: 'none' }}>
+                <Accordion.Control><Text fw={600}>Familias</Text></Accordion.Control>
+                <Accordion.Panel>
+                  <ScrollArea h={200} type="always" offsetScrollbars>
+                    <Stack gap="sm" pt="xs">
                       {families.map((family) => (
-                        <div key={family.id} className="flex items-center space-x-3 group">
-                          <Checkbox
-                            id={`family-${family.id}`}
-                            checked={selectedFamilies.includes(family.id)}
-                            onCheckedChange={(checked) =>
-                              handleFamilyChange(family.id, checked as boolean)
-                            }
-                            className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                          />
-                          <label
-                            htmlFor={`family-${family.id}`}
-                            className="text-sm text-muted-foreground group-hover:text-foreground transition-colors flex-1 cursor-pointer flex justify-between items-center"
-                          >
-                            <span>{family.name}</span>
-                            {family.count > 0 && (
-                              <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded-full">
-                                {family.count}
-                              </span>
-                            )}
-                          </label>
-                        </div>
+                        <Checkbox
+                          key={family.id}
+                          label={
+                            <Group gap={4} wrap="nowrap">
+                              <Text size="sm">{family.name}</Text>
+                              {family.count > 0 && (
+                                <Badge size="xs" color="gray" variant="light">{family.count}</Badge>
+                              )}
+                            </Group>
+                          }
+                          checked={selectedFamilies.includes(String(family.id))}
+                          onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleFamilyChange(String(family.id), event.currentTarget.checked)}
+                          styles={{ label: { cursor: 'pointer', width: '100%' } }}
+                        />
                       ))}
-                    </div>
+                    </Stack>
                   </ScrollArea>
-                </AccordionContent>
-              </AccordionItem>
+                </Accordion.Panel>
+              </Accordion.Item>
             )}
 
             {/* Groups Filter */}
             {groups.length > 0 && (
-              <AccordionItem value="groups" className="border-none">
-                <AccordionTrigger className="py-2 hover:no-underline">
-                  <span className="font-semibold text-base">Grupos</span>
-                </AccordionTrigger>
-                <AccordionContent>
-                  <ScrollArea className="h-[200px] pr-4">
-                    <div className="space-y-3 pt-1">
+              <Accordion.Item value="groups" bg="transparent" style={{ border: 'none' }}>
+                <Accordion.Control><Text fw={600}>Grupos</Text></Accordion.Control>
+                <Accordion.Panel>
+                  <ScrollArea h={200} type="always" offsetScrollbars>
+                    <Stack gap="sm" pt="xs">
                       {groups.map((group) => (
-                        <div key={group.id} className="flex items-center space-x-3 group">
-                          <Checkbox
-                            id={`group-${group.id}`}
-                            checked={selectedGroups.includes(group.id)}
-                            onCheckedChange={(checked) =>
-                              handleGroupChange(group.id, checked as boolean)
-                            }
-                            className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                          />
-                          <label
-                            htmlFor={`group-${group.id}`}
-                            className="text-sm text-muted-foreground group-hover:text-foreground transition-colors flex-1 cursor-pointer flex justify-between items-center"
-                          >
-                            <span>{group.name}</span>
-                            {group.count > 0 && (
-                              <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded-full">
-                                {group.count}
-                              </span>
-                            )}
-                          </label>
-                        </div>
+                        <Checkbox
+                          key={group.id}
+                          label={
+                            <Group gap={4} wrap="nowrap">
+                              <Text size="sm">{group.name}</Text>
+                              {group.count > 0 && (
+                                <Badge size="xs" color="gray" variant="light">{group.count}</Badge>
+                              )}
+                            </Group>
+                          }
+                          checked={selectedGroups.includes(String(group.id))}
+                          onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleGroupChange(String(group.id), event.currentTarget.checked)}
+                          styles={{ label: { cursor: 'pointer', width: '100%' } }}
+                        />
                       ))}
-                    </div>
+                    </Stack>
                   </ScrollArea>
-                </AccordionContent>
-              </AccordionItem>
+                </Accordion.Panel>
+              </Accordion.Item>
             )}
           </Accordion>
-        </div>
+        </Stack>
       )}
-    </div>
+    </Box>
   )
 }

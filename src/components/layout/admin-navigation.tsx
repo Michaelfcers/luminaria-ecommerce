@@ -1,9 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
+import { Button, Group, Paper } from "@mantine/core"
 import { usePathname } from "next/navigation"
-import { cn } from "@/lib/utils"
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard" },
@@ -16,21 +15,19 @@ export function AdminNavigation() {
   const pathname = usePathname()
 
   return (
-    <nav className="flex items-center space-x-4 lg:space-x-6 p-4 border-b bg-background">
-      {navItems.map((item) => (
-        <Link
-          key={item.href}
-          href={item.href}
-          className={cn(
-            "text-sm font-medium transition-colors hover:text-primary",
-            pathname === item.href
-              ? "text-primary"
-              : "text-muted-foreground"
-          )}
-        >
-          {item.label}
-        </Link>
-      ))}
-    </nav>
+    <Paper shadow="xs" p="md" withBorder mb="lg">
+      <Group>
+        {navItems.map((item) => (
+          <Button
+            key={item.href}
+            component={Link}
+            href={item.href}
+            variant={pathname === item.href ? "filled" : "subtle"}
+          >
+            {item.label}
+          </Button>
+        ))}
+      </Group>
+    </Paper>
   )
 }

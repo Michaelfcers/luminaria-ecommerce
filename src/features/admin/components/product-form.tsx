@@ -1,37 +1,12 @@
 "use client"
 
-import { useForm } from "react-hook-form"
+import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Checkbox } from "@/components/ui/checkbox"
+import { Button, Card, TextInput, Textarea, Select, NumberInput, Checkbox, Stack, Grid, Title, Text, Group } from "@mantine/core"
 import { addProduct, updateProduct } from "./products-actions"
 import { useRouter } from "next/navigation"
-import { toast } from "sonner"
+import { notifications } from "@mantine/notifications"
 
 const productFormSchema = z.object({
   name: z.string().min(2, "El nombre debe tener al menos 2 caracteres."),
@@ -95,8 +70,8 @@ export function ProductForm({
       code: product?.code ?? "",
       store_id: product?.store_id ?? store_id,
       brand_id: product?.brand_id ?? "",
-      status: product?.status ?? "draft",
-      sourcing_status: product?.sourcing_status ?? "active",
+      status: product?.status as any ?? "draft",
+      sourcing_status: product?.sourcing_status as any ?? "active",
       life_hours: product?.life_hours ?? undefined,
       lumens: product?.lumens ?? undefined,
       pieces_per_box: product?.pieces_per_box ?? undefined,
@@ -117,322 +92,270 @@ export function ProductForm({
       : await addProduct(values)
 
     if (result?.error) {
-      toast.error(`Error: ${result.error}`)
+      notifications.show({
+        title: 'Error',
+        message: result.error,
+        color: 'red',
+      })
     } else {
-      toast.success(
-        `Producto ${product?.id ? "actualizado" : "creado"} con éxito.`
-      )
+      notifications.show({
+        title: 'Éxito',
+        message: `Producto ${product?.id ? "actualizado" : "creado"} con éxito.`,
+        color: 'green',
+      })
       router.push("/products")
     }
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Nombre del Producto</FormLabel>
-              <FormControl>
-                <Input placeholder="Lámpara de Techo" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+    <form onSubmit={form.handleSubmit(onSubmit)}>
+      <Stack gap="xl">
+        <TextInput
+          label="Nombre del Producto"
+          placeholder="Lámpara de Techo"
+          {...form.register("name")}
+          error={form.formState.errors.name?.message}
         />
 
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Descripción</FormLabel>
-              <FormControl>
-                <Textarea placeholder="Descripción del producto..." {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+        <Textarea
+          label="Descripción"
+          placeholder="Descripción del producto..."
+          {...form.register("description")}
+          error={form.formState.errors.description?.message}
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <FormField
-            control={form.control}
-            name="code"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Código</FormLabel>
-                <FormControl>
-                  <Input placeholder="SKU12345" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+        <Grid gutter="lg">
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <TextInput
+              label="Código"
+              placeholder="SKU12345"
+              {...form.register("code")}
+              error={form.formState.errors.code?.message}
+            />
+          </Grid.Col>
+        </Grid>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <FormField
-            control={form.control}
-            name="brand_id"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Marca</FormLabel>
+        <Grid gutter="lg">
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <Controller
+              control={form.control}
+              name="brand_id"
+              render={({ field }) => (
                 <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecciona una marca" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {brands.map((brand) => (
-                      <SelectItem key={brand.id} value={String(brand.id)}>
-                        {brand.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+                  label="Marca"
+                  placeholder="Selecciona una marca"
+                  data={brands.map(b => ({ value: String(b.id), label: b.name }))}
+                  value={field.value}
+                  onChange={field.onChange}
+                  error={form.formState.errors.brand_id?.message}
+                />
+              )}
+            />
+          </Grid.Col>
+        </Grid>
 
-        <Card className="rounded-3xl elegant-shadow bg-white">
-          <CardHeader>
-            <CardTitle>Disponibilidad y Estado</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Estado de Publicación</FormLabel>
+        <Card withBorder radius="lg" padding="lg">
+          <Stack gap="md">
+            <Title order={3}>Disponibilidad y Estado</Title>
+            <Grid gutter="lg">
+              <Grid.Col span={{ base: 12, md: 6 }}>
+                <Controller
+                  control={form.control}
+                  name="status"
+                  render={({ field }) => (
                     <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecciona un estado" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="draft">Borrador</SelectItem>
-                        <SelectItem value="active">Activo</SelectItem>
-                        <SelectItem value="inactive">Inactivo</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="sourcing_status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Estado de Abastecimiento</FormLabel>
+                      label="Estado de Publicación"
+                      placeholder="Selecciona un estado"
+                      data={[
+                        { value: "draft", label: "Borrador" },
+                        { value: "active", label: "Activo" },
+                        { value: "inactive", label: "Inactivo" },
+                      ]}
+                      value={field.value}
+                      onChange={field.onChange}
+                      error={form.formState.errors.status?.message}
+                    />
+                  )}
+                />
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, md: 6 }}>
+                <Controller
+                  control={form.control}
+                  name="sourcing_status"
+                  render={({ field }) => (
                     <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecciona un estado" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="active">Activo</SelectItem>
-                        <SelectItem value="backorder">Pedido Pendiente</SelectItem>
-                        <SelectItem value="discontinued">Descontinuado</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-               <FormField
-                control={form.control}
-                name="stock"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Stock</FormLabel>
-                    <FormControl>
-                      <Input type="number" placeholder="100" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-               <FormField
-                control={form.control}
-                name="pieces_per_box"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Piezas por Caja</FormLabel>
-                    <FormControl>
-                      <Input type="number" placeholder="12" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          </CardContent>
+                      label="Estado de Abastecimiento"
+                      placeholder="Selecciona un estado"
+                      data={[
+                        { value: "active", label: "Activo" },
+                        { value: "backorder", label: "Pedido Pendiente" },
+                        { value: "discontinued", label: "Descontinuado" },
+                      ]}
+                      value={field.value}
+                      onChange={field.onChange}
+                      error={form.formState.errors.sourcing_status?.message}
+                    />
+                  )}
+                />
+              </Grid.Col>
+            </Grid>
+            <Grid gutter="lg">
+              <Grid.Col span={{ base: 12, md: 6 }}>
+                <Controller
+                  control={form.control}
+                  name="stock"
+                  render={({ field }) => (
+                    <NumberInput
+                      label="Stock"
+                      placeholder="100"
+                      value={field.value}
+                      min={0}
+                      onChange={(val) => field.onChange(val)}
+                      error={form.formState.errors.stock?.message}
+                    />
+                  )}
+                />
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, md: 6 }}>
+                <Controller
+                  control={form.control}
+                  name="pieces_per_box"
+                  render={({ field }) => (
+                    <NumberInput
+                      label="Piezas por Caja"
+                      placeholder="12"
+                      value={field.value}
+                      min={1}
+                      onChange={(val) => field.onChange(val)}
+                      error={form.formState.errors.pieces_per_box?.message}
+                    />
+                  )}
+                />
+              </Grid.Col>
+            </Grid>
+          </Stack>
         </Card>
 
-        <Card className="rounded-3xl elegant-shadow bg-white">
-          <CardHeader>
-            <CardTitle>Precios</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <FormField
-                control={form.control}
-                name="list_price_usd"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Precio de Lista (USD)</FormLabel>
-                    <FormControl>
-                      <Input type="number" placeholder="99.99" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="currency"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Moneda</FormLabel>
-                    <FormControl>
-                      <Input placeholder="USD" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          </CardContent>
+        <Card withBorder radius="lg" padding="lg">
+          <Stack gap="md">
+            <Title order={3}>Precios</Title>
+            <Grid gutter="lg">
+              <Grid.Col span={{ base: 12, md: 6 }}>
+                <Controller
+                  control={form.control}
+                  name="list_price_usd"
+                  render={({ field }) => (
+                    <NumberInput
+                      label="Precio de Lista (USD)"
+                      placeholder="99.99"
+                      decimalScale={2}
+                      fixedDecimalScale
+                      prefix="$"
+                      min={0}
+                      value={field.value}
+                      onChange={(val) => field.onChange(val)}
+                      error={form.formState.errors.list_price_usd?.message}
+                    />
+                  )}
+                />
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, md: 6 }}>
+                <TextInput
+                  label="Moneda"
+                  placeholder="USD"
+                  {...form.register("currency")}
+                  error={form.formState.errors.currency?.message}
+                />
+              </Grid.Col>
+            </Grid>
+          </Stack>
         </Card>
 
-        <Card className="rounded-3xl elegant-shadow bg-white">
-          <CardHeader>
-            <CardTitle>Especificaciones Técnicas</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <FormField
-                control={form.control}
-                name="life_hours"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Horas de Vida</FormLabel>
-                    <FormControl>
-                      <Input type="number" placeholder="50000" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="lumens"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Lúmenes</FormLabel>
-                    <FormControl>
-                      <Input type="number" placeholder="800" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-             <FormField
-                control={form.control}
-                name="attributes"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Atributos Adicionales</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder='{ "color": "blanco", "voltaje": "110-220V" }'
-                        {...field}
-                        rows={5}
-                      />
-                    </FormControl>
-                     <FormDescription>
-                      Introduce un objeto JSON válido con atributos adicionales.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-          </CardContent>
+        <Card withBorder radius="lg" padding="lg">
+          <Stack gap="md">
+            <Title order={3}>Especificaciones Técnicas</Title>
+            <Grid gutter="lg">
+              <Grid.Col span={{ base: 12, md: 6 }}>
+                <Controller
+                  control={form.control}
+                  name="life_hours"
+                  render={({ field }) => (
+                    <NumberInput
+                      label="Horas de Vida"
+                      placeholder="50000"
+                      min={0}
+                      value={field.value}
+                      onChange={(val) => field.onChange(val)}
+                      error={form.formState.errors.life_hours?.message}
+                    />
+                  )}
+                />
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, md: 6 }}>
+                <Controller
+                  control={form.control}
+                  name="lumens"
+                  render={({ field }) => (
+                    <NumberInput
+                      label="Lúmenes"
+                      placeholder="800"
+                      min={0}
+                      value={field.value}
+                      onChange={(val) => field.onChange(val)}
+                      error={form.formState.errors.lumens?.message}
+                    />
+                  )}
+                />
+              </Grid.Col>
+            </Grid>
+            <Textarea
+              label="Atributos Adicionales (JSON)"
+              placeholder='{ "color": "blanco", "voltaje": "110-220V" }'
+              rows={5}
+              {...form.register("attributes")}
+              error={form.formState.errors.attributes?.message}
+            />
+            <Text c="dimmed" size="xs">Introduce un objeto JSON válido con atributos adicionales.</Text>
+          </Stack>
         </Card>
 
-        <FormField
-          control={form.control}
-          name="category_ids"
-          render={({ field }) => (
-            <FormItem>
-              <div className="mb-4">
-                <FormLabel className="text-base">Categorías</FormLabel>
-                <FormDescription>
-                  Selecciona las categorías a las que pertenece el producto.
-                </FormDescription>
-              </div>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {categories.map((category) => (
-                  <FormItem
-                    key={category.id}
-                    className="flex flex-row items-start space-x-3 space-y-0"
-                  >
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value?.includes(category.id)}
-                        onCheckedChange={(checked) => {
-                          return checked
-                            ? field.onChange([...(field.value ?? []), category.id])
-                            : field.onChange(
-                                field.value?.filter(
-                                  (value) => value !== category.id
-                                )
-                              )
-                        }}
-                      />
-                    </FormControl>
-                    <FormLabel className="font-normal">
-                      {category.name}
-                    </FormLabel>
-                  </FormItem>
-                ))}
-              </div>
-              <FormMessage />
-            </FormItem>
+        <Stack gap="xs">
+          <Text fw={500}>Categorías</Text>
+          <Text c="dimmed" size="sm">Selecciona las categorías a las que pertenece el producto.</Text>
+          <Grid gutter="sm">
+            {categories.map((category) => (
+              <Grid.Col span={{ base: 6, md: 4, lg: 3 }} key={category.id}>
+                <Controller
+                  control={form.control}
+                  name="category_ids"
+                  render={({ field }) => (
+                    <Checkbox
+                      label={category.name}
+                      checked={field.value?.includes(category.id)}
+                      onChange={(event) => {
+                        const checked = event.currentTarget.checked;
+                        const current = field.value || [];
+                        if (checked) {
+                          field.onChange([...current, category.id]);
+                        } else {
+                          field.onChange(current.filter((id) => id !== category.id));
+                        }
+                      }}
+                    />
+                  )}
+                />
+              </Grid.Col>
+            ))}
+          </Grid>
+          {form.formState.errors.category_ids && (
+            <Text c="red" size="sm">{form.formState.errors.category_ids.message}</Text>
           )}
-        />
+        </Stack>
 
-        <Button type="submit" disabled={form.formState.isSubmitting}>
-          {form.formState.isSubmitting
-            ? "Guardando..."
-            : product?.id
-            ? "Guardar Cambios"
-            : "Crear Producto"}
+        <Button type="submit" loading={form.formState.isSubmitting}>
+          {product?.id ? "Guardar Cambios" : "Crear Producto"}
         </Button>
-      </form>
-    </Form>
+      </Stack>
+    </form>
   )
 }

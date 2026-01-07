@@ -1,4 +1,6 @@
-import { Card, CardContent } from "@/components/ui/card"
+"use client"
+
+import { Card, Text, Title, SimpleGrid, Avatar, Stack, Container } from "@mantine/core"
 
 export function AboutTeam() {
   const team = [
@@ -30,33 +32,36 @@ export function AboutTeam() {
 
   return (
     <section className="py-20 bg-background">
-      <div className="container mx-auto px-4">
+      <Container size="xl">
         <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold text-foreground mb-4">Nuestro Equipo</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
+          <Title order={2} mb="md">Nuestro Equipo</Title>
+          <Text c="dimmed" size="lg" maw={600} mx="auto">
             Profesionales apasionados por la iluminación, comprometidos con tu satisfacción
-          </p>
+          </Text>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <SimpleGrid cols={{ base: 1, md: 2, lg: 4 }} spacing="lg">
           {team.map((member, index) => (
-            <Card key={index} className="text-center border-0 elegant-shadow hover-lift">
-              <CardContent className="p-6">
-                <div className="mb-4">
-                  <img
-                    src={member.image}
-                    alt={member.name}
-                    className="w-24 h-24 rounded-full mx-auto object-cover mb-4"
-                  />
-                  <h3 className="font-semibold text-lg text-foreground">{member.name}</h3>
-                  <p className="text-primary font-medium text-sm mb-3">{member.role}</p>
+            <Card key={index} padding="lg" radius="md" withBorder className="text-center elegant-shadow hover-lift">
+              <Stack align="center" gap="sm">
+                <Avatar
+                  src={member.image}
+                  alt={member.name}
+                  size={100}
+                  radius="xl"
+                />
+                <div>
+                  <Text fw={600} size="lg">{member.name}</Text>
+                  <Text c="blue" fw={500} size="sm">{member.role}</Text>
                 </div>
-                <p className="text-muted-foreground text-sm leading-relaxed">{member.description}</p>
-              </CardContent>
+                <Text size="sm" c="dimmed" lh={1.6}>{member.description}</Text>
+              </Stack>
             </Card>
           ))}
-        </div>
-      </div>
+        </SimpleGrid>
+      </Container>
     </section>
   )
 }
+
+

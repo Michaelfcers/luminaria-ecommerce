@@ -1,7 +1,7 @@
 "use client"
 import { useState } from "react"
 import { ChevronLeft, ChevronRight, ZoomIn } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { ActionIcon, Image, Box, Grid, AspectRatio } from "@mantine/core"
 
 interface ProductGalleryProps {
   images: string[]
@@ -21,75 +21,95 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
   }
 
   return (
-    <div className="space-y-4">
+    <Box>
       {/* Main Image */}
-      <div className="relative group">
-        <div className="aspect-square overflow-hidden rounded-lg bg-muted elegant-shadow">
-          <img
+      <Box pos="relative" mb="md">
+        <AspectRatio ratio={1} bg="gray.1" style={{ borderRadius: 'var(--mantine-radius-md)', overflow: 'hidden' }}>
+          <Image
             src={images[currentImage] || "/placeholder.svg"}
             alt={`${productName} - Imagen ${currentImage + 1}`}
-            className={`h-full w-full object-cover transition-transform duration-500 ${
-              isZoomed ? "scale-150 cursor-zoom-out" : "cursor-zoom-in"
-            }`}
+            style={{
+              objectFit: 'cover',
+              width: '100%',
+              height: '100%',
+              transform: isZoomed ? "scale(1.5)" : "scale(1)",
+              transition: "transform 0.5s ease",
+              cursor: isZoomed ? "zoom-out" : "zoom-in"
+            }}
             onClick={() => setIsZoomed(!isZoomed)}
           />
-        </div>
+        </AspectRatio>
 
         {/* Navigation Arrows */}
         {images.length > 1 && (
           <>
-            <Button
-              variant="secondary"
-              size="icon"
-              className="absolute left-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
+            <ActionIcon
+              variant="default"
+              size="lg"
+              pos="absolute"
+              left={10}
+              top="50%"
+              style={{ transform: 'translateY(-50%)', opacity: 0.8 }}
               onClick={prevImage}
             >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="secondary"
-              size="icon"
-              className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
+              <ChevronLeft size={18} />
+            </ActionIcon>
+            <ActionIcon
+              variant="default"
+              size="lg"
+              pos="absolute"
+              right={10}
+              top="50%"
+              style={{ transform: 'translateY(-50%)', opacity: 0.8 }}
               onClick={nextImage}
             >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
+              <ChevronRight size={18} />
+            </ActionIcon>
           </>
         )}
 
         {/* Zoom Icon */}
-        <Button
-          variant="secondary"
-          size="icon"
-          className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity"
+        <ActionIcon
+          variant="light"
+          size="md"
+          pos="absolute"
+          top={10}
+          right={10}
           onClick={() => setIsZoomed(!isZoomed)}
         >
-          <ZoomIn className="h-4 w-4" />
-        </Button>
-      </div>
+          <ZoomIn size={16} />
+        </ActionIcon>
+      </Box>
 
       {/* Thumbnail Images */}
       {images.length > 1 && (
-        <div className="grid grid-cols-4 gap-2">
+        <Grid gutter="xs">
           {images.map((image, index) => (
-            <button
-              key={index}
-              className={`aspect-square overflow-hidden rounded-md border-2 transition-all ${
-                currentImage === index
-                  ? "border-primary ring-2 ring-primary/20"
-                  : "border-transparent hover:border-muted-foreground/50"
-              }`}
-              onClick={() => setCurrentImage(index)}
-            >
-              <img
-                src={image || "/placeholder.svg"}
-                alt={`${productName} - Miniatura ${index + 1}`}
-                className="h-full w-full object-cover"
-              />
-            </button>
+            <Grid.Col span={3} key={index}>
+              <Box
+                component="button"
+                onClick={() => setCurrentImage(index)}
+                style={{
+                  width: '100%',
+                  border: currentImage === index ? '2px solid var(--mantine-color-blue-6)' : '2px solid transparent',
+                  borderRadius: 'var(--mantine-radius-md)',
+                  overflow: 'hidden',
+                  cursor: 'pointer',
+                  padding: 0
+                }}
+              >
+                <AspectRatio ratio={1}>
+                  <Image
+                    src={image || "/placeholder.svg"}
+                    alt={`${productName} - Miniatura ${index + 1}`}
+                    fit="cover"
+                  />
+                </AspectRatio>
+              </Box>
+            </Grid.Col>
           ))}
-        </div>
+        </Grid>
       )}
-    </div>
+    </Box>
   )
 }

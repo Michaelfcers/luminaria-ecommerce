@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server"
 import { redirect, notFound } from "next/navigation"
 import { PromotionForm } from "@/features/admin/components/promotion-form"
 import { getLocalProductImage } from "@/lib/local-images"
+import { Container, Title, Stack, Text } from "@mantine/core"
 
 export default async function EditPromotionPage({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = await params
@@ -90,16 +91,21 @@ export default async function EditPromotionPage({ params }: { params: Promise<{ 
     }))
 
     return (
-        <div className="flex flex-col gap-8 p-4 md:p-8">
-            <h1 className="text-3xl font-bold">Editar Promoción</h1>
-            <PromotionForm
-                storeId={storeMembers.store_id}
-                products={enrichedProducts}
-                initialData={promotion}
-                initialProductIds={initialProductIds}
-                initialVariantIds={initialVariantIds}
-                isEditing={true}
-            />
-        </div>
+        <Container size="xl" py="lg">
+            <Stack gap="lg">
+                <div>
+                    <Title order={2}>Editar Promoción</Title>
+                    <Text c="dimmed">Modifica los detalles de la promoción</Text>
+                </div>
+                <PromotionForm
+                    storeId={storeMembers.store_id}
+                    products={enrichedProducts}
+                    initialData={promotion}
+                    initialProductIds={initialProductIds}
+                    initialVariantIds={initialVariantIds}
+                    isEditing={true}
+                />
+            </Stack>
+        </Container>
     )
 }

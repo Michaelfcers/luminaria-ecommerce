@@ -1,0 +1,656 @@
+﻿
+> my-v0-project@0.1.0 build C:\Users\micha\OneDrive\Documentos\Proyectos\luminaria-ecommerce
+> next build
+
+   Γû▓ Next.js 16.0.7 (Turbopack)
+   - Environments: .env
+
+node.exe :  ΓÜá The 
+"middleware" file 
+convention is 
+deprecated. Please 
+use "proxy" instead. 
+Learn more: https://ne
+xtjs.org/docs/messages
+/middleware-to-proxy
+At C:\Program Files\no
+dejs\pnpm.ps1:16 
+char:5
++     & 
+"$basedir/node$exe"  "
+$basedir/node_modules/
+corepack/dist/pnpm. 
+...
++     ~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
+~~~~~
+    + CategoryInfo    
+          : NotSpeci  
+  fied: ( ΓÜá The "   
+ middl...leware-to    
+-proxy:String) []    
+, RemoteException
+    + FullyQualifiedE 
+   rrorId : NativeCo  
+  mmandError
+ 
+   Creating an optimized production build ...
+
+> Build error occurred
+Error: Turbopack 
+build failed with 5 
+errors:
+./src/app/(admin)/dash
+board/members/page.tsx
+:39:3
+Ecmascript file had 
+an error
+[0m [90m 37 |[39m 
+[90m */[39m
+ [90m 38 |[39m 
+[36mexport[39m 
+[36masync[39m 
+[36mfunction[39m upd
+ateMemberRole(formData
+[33m:[39m [33mFormD
+ata[39m)[33m:[39m 
+[33mPromise[39m[33m<
+[39m[36mvoid[39m[3
+3m>[39m {
+[31m[1m>[22m[39m[
+90m 39 |[39m   
+[32m"use server"[39m
+[33m;[39m
+ [90m    |[39m   [3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m
+ [90m 40 |[39m
+ [90m 41 |[39m   
+[36mconst[39m 
+storeId [33m=[39m fo
+rmData[33m.[39m[36m
+get[39m([32m"storeId
+"[39m) [36mas[39m 
+string [33m|[39m [3
+6mnull[39m[33m;[39m
+ [90m 42 |[39m   
+[36mconst[39m 
+memberId [33m=[39m f
+ormData[33m.[39m[36
+mget[39m([32m"member
+Id"[39m) 
+[36mas[39m string 
+[33m|[39m [36mnull
+[39m[33m;[39m[0m
+
+It is not allowed to 
+define inline "use 
+server" annotated 
+Server Actions in 
+Client Components.
+To use Server Actions 
+in a Client 
+Component, you can 
+either export them 
+from a separate file 
+with "use server" at 
+the top, or pass them 
+down through props 
+from a Server 
+Component.
+
+Read more: https://nex
+tjs.org/docs/app/api-r
+eference/directives/us
+e-server#using-server-
+functions-in-a-client-
+component
+
+
+Import traces:
+  Client Component 
+Browser:
+    ./src/app/(admin)/
+dashboard/members/page
+.tsx [Client 
+Component Browser]
+    ./src/components/r
+ole-update-form.tsx 
+[Client Component 
+Browser]
+    ./src/components/r
+ole-update-form.tsx 
+[Server Component]
+    ./src/app/(admin)/
+dashboard/members/page
+.tsx [Server 
+Component]
+
+  Client Component 
+SSR:
+    ./src/app/(admin)/
+dashboard/members/page
+.tsx [Client 
+Component SSR]
+    ./src/components/r
+ole-update-form.tsx 
+[Client Component SSR]
+    ./src/components/r
+ole-update-form.tsx 
+[Server Component]
+    ./src/app/(admin)/
+dashboard/members/page
+.tsx [Server 
+Component]
+
+
+./src/app/(admin)/dash
+board/members/page.tsx
+:1:1
+Ecmascript file had 
+an error
+[0m[31m[1m>[22m[3
+9m[90m 1 |[39m 
+[36mimport[39m { 
+cookies } 
+[36mfrom[39m [32m"n
+ext/headers"[39m[33m
+;[39m
+ [90m   |[39m [31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m
+ [90m 2 |[39m 
+[36mimport[39m { 
+redirect } 
+[36mfrom[39m [32m"n
+ext/navigation"[39m[
+33m;[39m
+ [90m 3 |[39m 
+[36mimport[39m { 
+revalidatePath } 
+[36mfrom[39m [32m"n
+ext/cache"[39m[33m;
+[39m
+ [90m 4 |[39m 
+[36mimport[39m { 
+createClient } 
+[36mfrom[39m [32m"@
+/lib/supabase/server"
+[39m[33m;[39m[0m
+
+You're importing a 
+component that needs 
+"next/headers". That 
+only works in a 
+Server Component but 
+one of its parents is 
+marked with "use 
+client", so it's a 
+Client Component.
+Learn more: https://ne
+xtjs.org/docs/app/buil
+ding-your-application/
+rendering
+
+
+
+Import traces:
+  Client Component 
+Browser:
+    ./src/app/(admin)/
+dashboard/members/page
+.tsx [Client 
+Component Browser]
+    ./src/components/r
+ole-update-form.tsx 
+[Client Component 
+Browser]
+    ./src/components/r
+ole-update-form.tsx 
+[Server Component]
+    ./src/app/(admin)/
+dashboard/members/page
+.tsx [Server 
+Component]
+
+  Client Component 
+SSR:
+    ./src/app/(admin)/
+dashboard/members/page
+.tsx [Client 
+Component SSR]
+    ./src/components/r
+ole-update-form.tsx 
+[Client Component SSR]
+    ./src/components/r
+ole-update-form.tsx 
+[Server Component]
+    ./src/app/(admin)/
+dashboard/members/page
+.tsx [Server 
+Component]
+
+
+./src/app/(admin)/dash
+board/members/page.tsx
+:3:10
+Ecmascript file had 
+an error
+[0m [90m 1 |[39m 
+[36mimport[39m { 
+cookies } 
+[36mfrom[39m [32m"n
+ext/headers"[39m[33m
+;[39m
+ [90m 2 |[39m 
+[36mimport[39m { 
+redirect } 
+[36mfrom[39m [32m"n
+ext/navigation"[39m[
+33m;[39m
+[31m[1m>[22m[39m[
+90m 3 |[39m 
+[36mimport[39m { 
+revalidatePath } 
+[36mfrom[39m [32m"n
+ext/cache"[39m[33m;
+[39m
+ [90m   |[39m       
+   [31m[1m^[22m[39
+m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m
+[31m[1m^[22m[39m
+ [90m 4 |[39m 
+[36mimport[39m { 
+createClient } 
+[36mfrom[39m [32m"@
+/lib/supabase/server"
+[39m[33m;[39m
+ [90m 5 |[39m 
+[36mimport[39m { [3
+3mCard[39m[33m,[39m
+ [33mTable[39m[33m,
+[39m [33mButton[39m
+[33m,[39m [33mTitle
+[39m[33m,[39m [33m
+Text[39m[33m,[39m 
+[33mGroup[39m[33m,[
+39m [33mStack[39m[3
+3m,[39m [33mBadge[3
+9m[33m,[39m [33mAct
+ionIcon[39m[33m,[39
+m [33mContainer[39m 
+} [36mfrom[39m [32m
+"@mantine/core"[39m[
+33m;[39m
+ [90m 6 |[39m 
+[36mimport[39m 
+[33mLink[39m 
+[36mfrom[39m [32m"n
+ext/link"[39m[33m;[
+39m[0m
+
+You're importing a 
+component that needs 
+"revalidatePath". 
+That only works in a 
+Server Component but 
+one of its parents is 
+marked with "use 
+client", so it's a 
+Client Component.
+Learn more: https://ne
+xtjs.org/docs/app/buil
+ding-your-application/
+rendering
+
+
+
+Import traces:
+  Client Component 
+Browser:
+    ./src/app/(admin)/
+dashboard/members/page
+.tsx [Client 
+Component Browser]
+    ./src/components/r
+ole-update-form.tsx 
+[Client Component 
+Browser]
+    ./src/components/r
+ole-update-form.tsx 
+[Server Component]
+    ./src/app/(admin)/
+dashboard/members/page
+.tsx [Server 
+Component]
+
+  Client Component 
+SSR:
+    ./src/app/(admin)/
+dashboard/members/page
+.tsx [Client 
+Component SSR]
+    ./src/components/r
+ole-update-form.tsx 
+[Client Component SSR]
+    ./src/components/r
+ole-update-form.tsx 
+[Server Component]
+    ./src/app/(admin)/
+dashboard/members/page
+.tsx [Server 
+Component]
+
+
+./src/components/layou
+t/user-nav.tsx:75:5
+Ecmascript file had 
+an error
+[0m [90m 73 |[39m
+ [90m 74 |[39m   
+[36mconst[39m 
+signOut [33m=[39m 
+[36masync[39m () 
+[33m=>[39m {
+[31m[1m>[22m[39m[
+90m 75 |[39m     
+[32m"use server"[39m
+ [90m    |[39m     
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m
+[31m[1m^[22m[39m
+ [90m 76 |[39m     
+[36mconst[39m 
+supabase [33m=[39m 
+[36mawait[39m 
+createClient()
+ [90m 77 |[39m     
+[36mawait[39m supaba
+se[33m.[39mauth[33m
+.[39msignOut()
+ [90m 78 |[39m     
+[36mreturn[39m redir
+ect([32m"/login"[39m
+)[0m
+
+It is not allowed to 
+define inline "use 
+server" annotated 
+Server Actions in 
+Client Components.
+To use Server Actions 
+in a Client 
+Component, you can 
+either export them 
+from a separate file 
+with "use server" at 
+the top, or pass them 
+down through props 
+from a Server 
+Component.
+
+Read more: https://nex
+tjs.org/docs/app/api-r
+eference/directives/us
+e-server#using-server-
+functions-in-a-client-
+component
+
+
+Import traces:
+  Client Component 
+Browser:
+    ./src/components/l
+ayout/user-nav.tsx 
+[Client Component 
+Browser]
+    ./src/components/l
+ayout/navigation.tsx 
+[Client Component 
+Browser]
+    ./src/components/l
+ayout/navigation.tsx 
+[Server Component]
+    
+./src/app/layout.tsx 
+[Server Component]
+
+  Client Component 
+SSR:
+    ./src/components/l
+ayout/user-nav.tsx 
+[Client Component SSR]
+    ./src/components/l
+ayout/navigation.tsx 
+[Client Component SSR]
+    ./src/components/l
+ayout/navigation.tsx 
+[Server Component]
+    
+./src/app/layout.tsx 
+[Server Component]
+
+
+./src/lib/supabase/ser
+ver.ts:2:1
+Ecmascript file had 
+an error
+[0m [90m 1 |[39m 
+[36mimport[39m { 
+createServerClient } 
+[36mfrom[39m [32m'@
+supabase/ssr'[39m
+[31m[1m>[22m[39m[
+90m 2 |[39m 
+[36mimport[39m { 
+cookies } 
+[36mfrom[39m [32m'n
+ext/headers'[39m
+ [90m   |[39m [31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m
+ [90m 3 |[39m
+ [90m 4 |[39m 
+[36mexport[39m 
+[36masync[39m 
+[36mfunction[39m 
+createClient() {
+ [90m 5 |[39m   
+[90m// 1. Ahora 
+esperamos (await) a 
+las cookies[39m[0m
+
+You're importing a 
+component that needs 
+"next/headers". That 
+only works in a 
+Server Component 
+which is not 
+supported in the 
+pages/ directory. 
+Read more: https://nex
+tjs.org/docs/app/build
+ing-your-application/r
+endering/server-compon
+ents
+
+
+
+Import traces:
+  #1 [App Route]:
+    ./src/lib/supabase
+/server.ts
+    ./src/app/auth/cal
+lback/route.ts
+
+  #2 [Server 
+Component]:
+    ./src/lib/supabase
+/server.ts
+    ./src/app/(admin)/
+categories/page.tsx
+
+  #3 [Server 
+Component]:
+    ./src/lib/supabase
+/server.ts
+    ./src/features/adm
+in/components/brands-a
+ctions.ts
+
+  #4 [Client 
+Component Browser]:
+    ./src/lib/supabase
+/server.ts [Client 
+Component Browser]
+    ./src/app/(admin)/
+dashboard/members/page
+.tsx [Client 
+Component Browser]
+    ./src/components/r
+ole-update-form.tsx 
+[Client Component 
+Browser]
+    ./src/components/r
+ole-update-form.tsx 
+[Server Component]
+    ./src/app/(admin)/
+dashboard/members/page
+.tsx [Server 
+Component]
+
+  #5 [Client 
+Component SSR]:
+    ./src/lib/supabase
+/server.ts [Client 
+Component SSR]
+    ./src/app/(admin)/
+dashboard/members/page
+.tsx [Client 
+Component SSR]
+    ./src/components/r
+ole-update-form.tsx 
+[Client Component SSR]
+    ./src/components/r
+ole-update-form.tsx 
+[Server Component]
+    ./src/app/(admin)/
+dashboard/members/page
+.tsx [Server 
+Component]
+
+
+    at <unknown> (./sr
+c/app/(admin)/dashboar
+d/members/page.tsx:39:
+3)
+    at <unknown> (./sr
+c/app/(admin)/dashboar
+d/members/page.tsx:1:1
+)
+    at <unknown> (./sr
+c/app/(admin)/dashboar
+d/members/page.tsx:3:1
+0)
+    at <unknown> (./sr
+c/components/layout/us
+er-nav.tsx:75:5)
+    at <unknown> (./sr
+c/lib/supabase/server.
+ts:2:1)
+ΓÇëELIFECYCLEΓÇë Command failed with exit code 1.

@@ -1,4 +1,6 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+"use client"
+
+import { Card, Text, Title, SimpleGrid, ThemeIcon, Stack, Container } from "@mantine/core"
 import { Lightbulb, Award, Users, Leaf } from "lucide-react"
 
 export function AboutValues() {
@@ -30,30 +32,32 @@ export function AboutValues() {
 
   return (
     <section className="py-20 bg-muted/20">
-      <div className="container mx-auto px-4">
+      <Container size="xl">
         <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold text-foreground mb-4">Nuestros Valores</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
+          <Title order={2} mb="md">Nuestros Valores</Title>
+          <Text c="dimmed" size="lg" maw={600} mx="auto">
             Los principios que guían nuestro trabajo y definen nuestra identidad como empresa
-          </p>
+          </Text>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <SimpleGrid cols={{ base: 1, md: 2, lg: 4 }} spacing="lg">
           {values.map((value, index) => (
-            <Card key={index} className="text-center border-0 elegant-shadow hover-lift">
-              <CardHeader>
-                <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                  <value.icon className="h-6 w-6 text-primary" />
-                </div>
-                <CardTitle className="text-lg">{value.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground text-sm leading-relaxed">{value.description}</p>
-              </CardContent>
+            <Card key={index} padding="xl" radius="md" withBorder className="text-center elegant-shadow hover-lift">
+              <Stack align="center" gap="md">
+                <ThemeIcon size={60} radius="xl" variant="light" color="blue">
+                  <value.icon size={30} />
+                </ThemeIcon>
+                <Title order={3} size="h4">{value.title}</Title>
+                <Text size="sm" c="dimmed" lh={1.6}>
+                  {value.description}
+                </Text>
+              </Stack>
             </Card>
           ))}
-        </div>
-      </div>
+        </SimpleGrid>
+      </Container>
     </section>
   )
 }
+
+

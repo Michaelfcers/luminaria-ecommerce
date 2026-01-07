@@ -1,7 +1,5 @@
 "use client"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Card, Tabs, Text, List, Group, ThemeIcon, Stack, Button, Box } from "@mantine/core"
 import { Download, FileText } from "lucide-react"
 
 interface ProductSpecsProps {
@@ -12,106 +10,77 @@ interface ProductSpecsProps {
 
 export function ProductSpecs({ features, specifications, technicalSheet }: ProductSpecsProps) {
   return (
-    <div className="mb-16">
-      <Tabs defaultValue="features" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="features">Características</TabsTrigger>
-          <TabsTrigger value="specs">Especificaciones</TabsTrigger>
-          <TabsTrigger value="documents">Documentos</TabsTrigger>
-        </TabsList>
+    <Box mb="xl">
+      <Tabs defaultValue="features" variant="outline">
+        <Tabs.List grow>
+          <Tabs.Tab value="features">Características</Tabs.Tab>
+          <Tabs.Tab value="specs">Especificaciones</Tabs.Tab>
+          <Tabs.Tab value="documents">Documentos</Tabs.Tab>
+        </Tabs.List>
 
-        <TabsContent value="features" className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Características Principales</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="grid gap-3">
+        <Tabs.Panel value="features" pt="md">
+          <Card withBorder padding="lg">
+            <Stack gap="md">
+              <Text fw={600} size="lg">Características Principales</Text>
+              <List spacing="xs" icon={<Box w={8} h={8} style={{ borderRadius: '50%', backgroundColor: 'var(--mantine-color-blue-6)' }} />}>
                 {features.map((feature, index) => (
-                  <li key={index} className="flex items-center gap-3">
-                    <div className="h-2 w-2 rounded-full bg-primary flex-shrink-0" />
-                    <span>{feature}</span>
-                  </li>
+                  <List.Item key={index}>{feature}</List.Item>
                 ))}
-              </ul>
-            </CardContent>
+              </List>
+            </Stack>
           </Card>
-        </TabsContent>
+        </Tabs.Panel>
 
-        <TabsContent value="specs" className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Especificaciones Técnicas</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4">
+        <Tabs.Panel value="specs" pt="md">
+          <Card withBorder padding="lg">
+            <Stack gap="md">
+              <Text fw={600} size="lg">Especificaciones Técnicas</Text>
+              <Stack gap="xs">
                 {Object.entries(specifications).map(([key, value]) => (
-                  <div
-                    key={key}
-                    className="flex justify-between items-center py-2 border-b border-border last:border-0"
-                  >
-                    <span className="font-medium text-muted-foreground">{key}</span>
-                    <span className="text-foreground">{value}</span>
-                  </div>
+                  <Group key={key} justify="space-between" style={{ borderBottom: '1px solid var(--mantine-color-gray-2)', paddingBottom: 8 }}>
+                    <Text fw={500} c="dimmed">{key}</Text>
+                    <Text>{value}</Text>
+                  </Group>
                 ))}
-              </div>
-            </CardContent>
+              </Stack>
+            </Stack>
           </Card>
-        </TabsContent>
+        </Tabs.Panel>
 
-        <TabsContent value="documents" className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Documentación</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 border border-border rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <FileText className="h-8 w-8 text-primary" />
-                    <div>
-                      <h4 className="font-medium">Ficha Técnica</h4>
-                      <p className="text-sm text-muted-foreground">Especificaciones completas del producto</p>
-                    </div>
-                  </div>
-                  <Button variant="outline" size="sm">
-                    <Download className="h-4 w-4 mr-2" />
-                    Descargar PDF
-                  </Button>
-                </div>
-
-                <div className="flex items-center justify-between p-4 border border-border rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <FileText className="h-8 w-8 text-primary" />
-                    <div>
-                      <h4 className="font-medium">Manual de Instalación</h4>
-                      <p className="text-sm text-muted-foreground">Guía paso a paso para la instalación</p>
-                    </div>
-                  </div>
-                  <Button variant="outline" size="sm">
-                    <Download className="h-4 w-4 mr-2" />
-                    Descargar PDF
-                  </Button>
-                </div>
-
-                <div className="flex items-center justify-between p-4 border border-border rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <FileText className="h-8 w-8 text-primary" />
-                    <div>
-                      <h4 className="font-medium">Certificados de Calidad</h4>
-                      <p className="text-sm text-muted-foreground">Certificaciones CE, RoHS y garantía</p>
-                    </div>
-                  </div>
-                  <Button variant="outline" size="sm">
-                    <Download className="h-4 w-4 mr-2" />
-                    Descargar PDF
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
+        <Tabs.Panel value="documents" pt="md">
+          <Card withBorder padding="lg">
+            <Stack gap="md">
+              <Text fw={600} size="lg">Documentación</Text>
+              <Stack gap="md">
+                <DocumentRow title="Ficha Técnica" description="Especificaciones completas del producto" />
+                <DocumentRow title="Manual de Instalación" description="Guía paso a paso para la instalación" />
+                <DocumentRow title="Certificados de Calidad" description="Certificaciones CE, RoHS y garantía" />
+              </Stack>
+            </Stack>
           </Card>
-        </TabsContent>
+        </Tabs.Panel>
       </Tabs>
-    </div>
+    </Box>
+  )
+}
+
+function DocumentRow({ title, description }: { title: string, description: string }) {
+  return (
+    <Card withBorder padding="sm" radius="md">
+      <Group justify="space-between">
+        <Group>
+          <ThemeIcon size="xl" variant="light" color="blue">
+            <FileText size={24} />
+          </ThemeIcon>
+          <Stack gap={0}>
+            <Text fw={600}>{title}</Text>
+            <Text size="sm" c="dimmed">{description}</Text>
+          </Stack>
+        </Group>
+        <Button variant="outline" size="sm" leftSection={<Download size={14} />}>
+          Descargar PDF
+        </Button>
+      </Group>
+    </Card>
   )
 }

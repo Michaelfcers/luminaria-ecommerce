@@ -1,46 +1,13 @@
 "use client"
 
 import { useState } from "react"
-import { useForm } from "react-hook-form"
+import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { Button } from "@/components/ui/button"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+import { Button, TextInput, Select, Table, Modal, Group, Stack, Text, Title, ActionIcon } from "@mantine/core"
 import { addCategory, updateCategory, deleteCategory } from "./categories-actions"
-import { toast } from "sonner"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+import { notifications } from "@mantine/notifications"
+import { Edit, Trash } from "lucide-react"
 
 const categoryFormSchema = z.object({
   name: z.string().min(2, "El nombre debe tener al menos 2 caracteres."),
@@ -88,10 +55,18 @@ export function CategoriesCrudContainer({ categories: initialCategories }: Categ
     if (result?.error) {
       // @ts-ignore
       const errorMessages = Object.values(result.error).flat().join(", ")
-      toast.error(`Error: ${errorMessages}`)
+      notifications.show({
+        title: 'Error',
+        message: errorMessages,
+        color: 'red',
+      })
     } else {
-      toast.success(`Categoría ${editingCategory ? "actualizada" : "creada"} con éxito.`)
-      
+      notifications.show({
+        title: 'Éxito',
+        message: `Categoría ${editingCategory ? "actualizada" : "creada"} con éxito.`,
+        color: 'green',
+      })
+
       const newCategory = result.data?.[0]
       if (newCategory) {
         const parent = categories.find(c => String(c.id) === String(newCategory.parent_id))
@@ -122,9 +97,17 @@ export function CategoriesCrudContainer({ categories: initialCategories }: Categ
     if (deletingCategoryId) {
       const result = await deleteCategory(deletingCategoryId)
       if (result?.error) {
-        toast.error(`Error: ${result.error}`)
+        notifications.show({
+          title: 'Error',
+          message: result.error,
+          color: 'red',
+        })
       } else {
-        toast.success("Categoría eliminada con éxito.")
+        notifications.show({
+          title: 'Éxito',
+          message: "Categoría eliminada con éxito.",
+          color: 'green',
+        })
         setCategories(categories.filter((c) => c.id !== deletingCategoryId))
       }
       setIsDeleteDialogOpen(false)
@@ -140,119 +123,92 @@ export function CategoriesCrudContainer({ categories: initialCategories }: Categ
   return (
     <div className="grid gap-8 md:grid-cols-3">
       <div className="md:col-span-1">
-        <h2 className="text-2xl font-bold mb-4">
+        <Title order={3} mb="md">
           {editingCategory ? "Editar Categoría" : "Crear Nueva Categoría"}
-        </h2>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nombre</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Iluminación Interior" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+        </Title>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <Stack gap="md">
+            <TextInput
+              label="Nombre"
+              placeholder="Iluminación Interior"
+              {...form.register("name")}
+              error={form.formState.errors.name?.message}
             />
-            <FormField
-              control={form.control}
-              name="slug"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Slug</FormLabel>
-                  <FormControl>
-                    <Input placeholder="iluminacion-interior" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+            <TextInput
+              label="Slug"
+              placeholder="iluminacion-interior"
+              {...form.register("slug")}
+              error={form.formState.errors.slug?.message}
             />
-            <FormField
+            <Controller
               control={form.control}
               name="parent_id"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Categoría Padre</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value || ""}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecciona una categoría padre (opcional)" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="none">Ninguna</SelectItem>
-                      {categories
-                        .filter(c => c.id !== editingCategory?.id) // Prevent self-parenting
-                        .map((category) => (
-                        <SelectItem key={category.id} value={String(category.id)}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
+                <Select
+                  label="Categoría Padre"
+                  placeholder="Selecciona una categoría padre (opcional)"
+                  data={[
+                    { value: "none", label: "Ninguna" },
+                    ...categories
+                      .filter(c => c.id !== editingCategory?.id)
+                      .map(c => ({ value: String(c.id), label: c.name }))
+                  ]}
+                  value={field.value || "none"}
+                  onChange={field.onChange}
+                  error={form.formState.errors.parent_id?.message}
+                />
               )}
             />
-            <div className="flex gap-2">
-              <Button type="submit" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? "Guardando..." : (editingCategory ? "Guardar Cambios" : "Crear Categoría")}
+            <Group>
+              <Button type="submit" loading={form.formState.isSubmitting}>
+                {editingCategory ? "Guardar Cambios" : "Crear Categoría"}
               </Button>
               {editingCategory && (
-                <Button variant="outline" onClick={() => { setEditingCategory(null); form.reset(); }}>
+                <Button variant="default" onClick={() => { setEditingCategory(null); form.reset(); }}>
                   Cancelar
                 </Button>
               )}
-            </div>
-          </form>
-        </Form>
+            </Group>
+          </Stack>
+        </form>
       </div>
       <div className="md:col-span-2">
-        <h2 className="text-2xl font-bold mb-4">Listado de Categorías</h2>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nombre</TableHead>
-              <TableHead>Categoría Padre</TableHead>
-              <TableHead className="text-right">Acciones</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
+        <Title order={3} mb="md">Listado de Categorías</Title>
+        <Table highlightOnHover>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Categoría Padre</th>
+              <th style={{ textAlign: 'right' }}>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
             {categories.map((category) => (
-              <TableRow key={category.id}>
-                <TableCell>{category.name}</TableCell>
-                <TableCell>{category.parent_name || "N/A"}</TableCell>
-                <TableCell className="text-right">
-                  <Button variant="outline" size="sm" className="mr-2" onClick={() => handleEdit(category)}>
-                    Editar
-                  </Button>
-                  <Button variant="destructive" size="sm" onClick={() => openDeleteDialog(category.id)}>
-                    Eliminar
-                  </Button>
-                </TableCell>
-              </TableRow>
+              <tr key={category.id}>
+                <td>{category.name}</td>
+                <td>{category.parent_name || "N/A"}</td>
+                <td style={{ textAlign: 'right' }}>
+                  <Group justify="flex-end" gap="xs">
+                    <ActionIcon variant="subtle" color="blue" onClick={() => handleEdit(category)}>
+                      <Edit size={16} />
+                    </ActionIcon>
+                    <ActionIcon variant="subtle" color="red" onClick={() => openDeleteDialog(category.id)}>
+                      <Trash size={16} />
+                    </ActionIcon>
+                  </Group>
+                </td>
+              </tr>
             ))}
-          </TableBody>
+          </tbody>
         </Table>
       </div>
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Esta acción marcará la categoría como eliminada.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteConfirm}>Confirmar</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <Modal opened={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)} title="¿Estás seguro?">
+        <Text size="sm">Esta acción marcará la categoría como eliminada.</Text>
+        <Group justify="flex-end" mt="md">
+          <Button variant="default" onClick={() => setIsDeleteDialogOpen(false)}>Cancelar</Button>
+          <Button color="red" onClick={handleDeleteConfirm}>Confirmar</Button>
+        </Group>
+      </Modal>
     </div>
   )
 }

@@ -1,59 +1,46 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+"use client"
+import { Avatar, Button, Card, Container, Grid, SimpleGrid, Stack, Text, TextInput, Title, Group } from "@mantine/core"
 
 export default function AccountPage() {
   return (
-    <div className="container mx-auto py-8 px-4 md:px-6">
-      <h1 className="text-3xl font-bold mb-6">Mi Cuenta</h1>
-      <div className="grid md:grid-cols-[1fr_2fr] gap-8">
-        <Card>
-          <CardHeader className="flex flex-col items-center gap-4">
-            <Avatar className="h-24 w-24">
-              <AvatarImage alt="@shadcn" src="/placeholder-user.jpg" />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
-            <div className="text-center">
-              <CardTitle>Nombre de Usuario</CardTitle>
-              <CardDescription>usuario@example.com</CardDescription>
-            </div>
-          </CardHeader>
-          <CardContent className="grid gap-2">
-            <Button variant="outline">Editar Perfil</Button>
-            <Button variant="outline">Historial de Pedidos</Button>
-            <Button variant="outline">Configuración de Seguridad</Button>
-            <Button variant="destructive">Cerrar Sesión</Button>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Información Personal</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="firstName">Nombre</Label>
-                <Input id="firstName" defaultValue="Nombre" />
+    <Container size="lg" py="xl">
+      <Title order={1} mb="lg">Mi Cuenta</Title>
+      <Grid gutter="lg">
+        <Grid.Col span={{ base: 12, md: 4 }}>
+          <Card withBorder padding="lg" radius="md">
+            <Stack align="center" gap="md">
+              <Avatar src="/placeholder-user.jpg" alt="@shadcn" size={96} radius="xl">CN</Avatar>
+              <div style={{ textAlign: "center" }}>
+                <Title order={3} size="h4">Nombre de Usuario</Title>
+                <Text c="dimmed" size="sm">usuario@example.com</Text>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="lastName">Apellido</Label>
-                <Input id="lastName" defaultValue="Apellido" />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Correo Electrónico</Label>
-              <Input id="email" defaultValue="usuario@example.com" type="email" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="phone">Teléfono</Label>
-              <Input id="phone" defaultValue="+1 123 456 7890" type="tel" />
-            </div>
-            <Button>Guardar Cambios</Button>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+            </Stack>
+            <Stack mt="lg" gap="sm">
+              <Button variant="outline" fullWidth>Editar Perfil</Button>
+              <Button variant="outline" fullWidth>Historial de Pedidos</Button>
+              <Button variant="outline" fullWidth>Configuración de Seguridad</Button>
+              <Button color="red" fullWidth>Cerrar Sesión</Button>
+            </Stack>
+          </Card>
+        </Grid.Col>
+
+        <Grid.Col span={{ base: 12, md: 8 }}>
+          <Card withBorder padding="lg" radius="md">
+            <Title order={3} mb="md">Información Personal</Title>
+            <Stack gap="md">
+              <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+                <TextInput label="Nombre" id="firstName" defaultValue="Nombre" />
+                <TextInput label="Apellido" id="lastName" defaultValue="Apellido" />
+              </SimpleGrid>
+              <TextInput label="Correo Electrónico" id="email" defaultValue="usuario@example.com" type="email" />
+              <TextInput label="Teléfono" id="phone" defaultValue="+1 123 456 7890" type="tel" />
+              <Group justify="flex-end" mt="md">
+                <Button>Guardar Cambios</Button>
+              </Group>
+            </Stack>
+          </Card>
+        </Grid.Col>
+      </Grid>
+    </Container>
   );
 }

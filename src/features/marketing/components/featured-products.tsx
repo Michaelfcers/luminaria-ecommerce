@@ -2,9 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { Card, Button, Badge, Text, Group, Title, Container, SimpleGrid, Tabs, Image, Stack, Box, Center } from "@mantine/core"
 
 export function FeaturedProducts() {
   const [activeFilter, setActiveFilter] = useState("recomendados")
@@ -16,7 +14,7 @@ export function FeaturedProducts() {
     { id: "nuevos", label: "Nuevos", icon: "✨" },
   ]
 
-  const productsByFilter = {
+  const productsByFilter: Record<string, any[]> = {
     recomendados: [
       {
         id: 1,
@@ -336,111 +334,122 @@ export function FeaturedProducts() {
 
   return (
     <section className="py-24 bg-gradient-to-b from-background to-muted/20">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-12 fade-in-up">
-          <h2 className="text-4xl font-bold text-foreground mb-6">Productos Destacados</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto text-lg leading-relaxed">
+      <Container size="xl">
+        <Stack align="center" mb={50}>
+          <Title order={2} style={{ fontSize: '2.5rem' }}>Productos Destacados</Title>
+          <Text c="dimmed" size="lg" maw={600} ta="center">
             Descubre nuestra selección curada de los mejores productos de iluminación
-          </p>
-        </div>
+          </Text>
+        </Stack>
 
-        <div className="flex flex-wrap justify-center gap-2 mb-16 fade-in-up stagger-1">
-          {filters.map((filter) => (
-            <button
-              key={filter.id}
-              onClick={() => setActiveFilter(filter.id)}
-              className={`
-                px-6 py-3 rounded-full font-medium transition-all duration-300 
-                ${
-                  activeFilter === filter.id
-                    ? "bg-primary text-white shadow-lg scale-105"
-                    : "bg-card/50 text-muted-foreground hover:bg-primary/10 hover:text-primary border border-border/50"
-                }
-              `}
-            >
-              <span className="flex items-center gap-2">
-                <span className="text-lg">{filter.icon}</span>
+        <Tabs value={activeFilter} onChange={(val) => val && setActiveFilter(val)} variant="pills" radius="xl" mb={60} color="dark">
+          <Tabs.List justify="center" style={{ gap: 8 }}>
+            {filters.map((filter) => (
+              <Tabs.Tab
+                key={filter.id}
+                value={filter.id}
+                leftSection={<Text span size="lg">{filter.icon}</Text>}
+                px="lg"
+                py="sm"
+                style={{ fontSize: 16 }}
+              >
                 {filter.label}
-              </span>
-            </button>
-          ))}
-        </div>
+              </Tabs.Tab>
+            ))}
+          </Tabs.List>
+        </Tabs>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {currentProducts.map((product, index) => (
+        <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="lg">
+          {currentProducts.map((product) => (
             <Card
               key={`${activeFilter}-${product.id}`}
-              className={`group overflow-hidden border-0 elegant-shadow hover-lift fade-in-up stagger-${Math.min((index % 4) + 1, 4)} bg-card/50 backdrop-blur-sm`}
+              padding="lg"
+              radius="lg"
+              withBorder
+              className="group"
+              bg="rgba(255,255,255,0.5)"
+              style={{ transition: 'all 0.3s', backdropFilter: 'blur(10px)' }}
             >
-              <div className="relative overflow-hidden">
-                <img
-                  src={product.image || "/placeholder.svg"}
-                  alt={product.name}
-                  className="h-72 w-full object-cover transition-all duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <Card.Section>
+                <div style={{ position: 'relative', overflow: 'hidden' }}>
+                  <Image
+                    src={product.image || "/placeholder.svg"}
+                    alt={product.name}
+                    h={288}
+                    fit="cover"
+                    className="transition-transform duration-500 group-hover:scale-110"
+                  />
+                  {/* Overlay gradient */}
+                  <Box className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-                {activeFilter === "promociones" && product.discount && (
-                  <Badge className="absolute top-4 left-4 bg-red-500 text-white shadow-lg animate-bounce">
-                    -{product.discount}
-                  </Badge>
-                )}
-                {activeFilter === "mas-vendidos" && product.sales && (
-                  <Badge className="absolute top-4 left-4 bg-green-500 text-white shadow-lg">
-                    {product.sales} vendidos
-                  </Badge>
-                )}
-                {activeFilter === "nuevos" && product.isNew && (
-                  <Badge className="absolute top-4 left-4 bg-primary text-primary-foreground shadow-lg animate-pulse">
-                    Nuevo
-                  </Badge>
-                )}
-                {activeFilter === "recomendados" && product.rating && (
-                  <Badge className="absolute top-4 left-4 bg-amber-500 text-white shadow-lg">⭐ {product.rating}</Badge>
-                )}
-              </div>
-              <CardContent className="p-6">
-                <div className="mb-3">
-                  <Badge
-                    variant="secondary"
-                    className="text-xs bg-slate-100 text-slate-700 border-slate-200 font-medium"
-                  >
-                    {product.category}
-                  </Badge>
-                </div>
-                <h3 className="font-bold text-base mb-3 line-clamp-2 group-hover:text-primary transition-colors duration-300">
-                  {product.name}
-                </h3>
-
-                {activeFilter === "nuevos" && product.launchDate && (
-                  <p className="text-xs text-muted-foreground mb-2">Lanzado {product.launchDate}</p>
-                )}
-
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="text-xl font-bold text-primary">{product.price}</span>
-                  {product.originalPrice && (
-                    <span className="text-sm text-muted-foreground line-through">{product.originalPrice}</span>
+                  {activeFilter === "promociones" && product.discount && (
+                    <Badge color="red" className="absolute top-4 left-4 shadow-lg animate-bounce" size="lg">
+                      -{product.discount}
+                    </Badge>
+                  )}
+                  {activeFilter === "mas-vendidos" && product.sales && (
+                    <Badge color="green" className="absolute top-4 left-4 shadow-lg" size="lg">
+                      {product.sales} vendidos
+                    </Badge>
+                  )}
+                  {activeFilter === "nuevos" && product.isNew && (
+                    <Badge color="blue" className="absolute top-4 left-4 shadow-lg animate-pulse" size="lg">
+                      Nuevo
+                    </Badge>
+                  )}
+                  {activeFilter === "recomendados" && product.rating && (
+                    <Badge color="yellow" className="absolute top-4 left-4 shadow-lg" size="lg">
+                      ⭐ {product.rating}
+                    </Badge>
                   )}
                 </div>
-                <Button asChild size="sm" className="w-full bg-primary hover:bg-primary/90 transition-all duration-300">
-                  <Link href={`/producto/${product.id}`}>Ver Detalles</Link>
+              </Card.Section>
+
+              <Stack mt="md" gap="xs">
+                <Group justify="space-between">
+                  <Badge variant="light" color="gray" radius="sm">
+                    {product.category}
+                  </Badge>
+                </Group>
+
+                <Text fw={700} lineClamp={2} style={{ minHeight: 48 }} className="group-hover:text-blue-600 transition-colors">
+                  {product.name}
+                </Text>
+
+                {activeFilter === "nuevos" && product.launchDate && (
+                  <Text size="xs" c="dimmed">Lanzado {product.launchDate}</Text>
+                )}
+
+                <Group align="baseline" gap="xs">
+                  <Text size="xl" fw={700} c="blue.7">{product.price}</Text>
+                  {product.originalPrice && (
+                    <Text size="sm" c="dimmed" td="line-through">{product.originalPrice}</Text>
+                  )}
+                </Group>
+
+                <Button component={Link} href={`/producto/${product.id}`} fullWidth mt="sm" color="dark">
+                  Ver Detalles
                 </Button>
-              </CardContent>
+              </Stack>
             </Card>
           ))}
-        </div>
+        </SimpleGrid>
 
-        <div className="text-center mt-16 fade-in-up stagger-4">
+        <Center mt={60}>
           <Button
-            asChild
+            component={Link}
+            href="/productos"
             size="lg"
             variant="outline"
-            className="border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 px-8 py-3 bg-transparent"
+            color="dark"
+            px={40}
           >
-            <Link href="/productos">Ver Todos los Productos</Link>
+            Ver Todos los Productos
           </Button>
-        </div>
-      </div>
+        </Center>
+      </Container>
     </section>
   )
 }
+
+

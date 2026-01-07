@@ -1,4 +1,5 @@
 import { Footer } from "@/components/layout/footer"
+import { Box, Flex } from "@mantine/core"
 
 export default function AuthLayout({
   children,
@@ -6,11 +7,11 @@ export default function AuthLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="min-h-screen flex flex-col bg-neutral-50">
-      <main className="flex-1 flex items-center justify-center p-4">
+    <Flex direction="column" mih="100vh" bg="gray.0">
+      <Flex style={{ flex: 1 }} align="center" justify="center" p="md">
         {children}
-      </main>
+      </Flex>
       <Footer />
-    </div>
+    </Flex>
   )
 }
