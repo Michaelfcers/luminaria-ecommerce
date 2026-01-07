@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
-import { ProductsGrid } from "@/features/store/components/products-grid"
+import { ProductsGrid } from "@/features/products/components/products-grid"
+import { PromotionsCarousel } from "@/features/marketing/components/promotions-carousel"
 
 export default async function OffersPage() {
     const supabase = await createClient()

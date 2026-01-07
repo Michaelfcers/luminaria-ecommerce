@@ -1,8 +1,8 @@
 import { createClient } from "@/lib/supabase/server"
 import { notFound } from "next/navigation"
-import { ProductDetailClient } from "@/features/store/components/product-detail-client"
-import { RecommendedProducts } from "@/features/store/components/recommended-products"
-import { Product, ProductMedia } from "@/features/store/types"
+import { ProductDetailClient } from "@/features/products/components/product-detail-client"
+import { RecommendedProducts } from "@/features/products/components/recommended-products"
+import { Product, ProductMedia } from "@/features/products/types"
 import { getLocalProductImage } from "@/lib/local-images"
 
 export type RecommendedProduct = {

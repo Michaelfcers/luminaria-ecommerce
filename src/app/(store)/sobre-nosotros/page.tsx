@@ -1,8 +1,8 @@
-import { AboutHero } from "@/features/store/components/about-hero"
-import { AboutStory } from "@/features/store/components/about-story"
-import { AboutValues } from "@/features/store/components/about-values"
-import { AboutTeam } from "@/features/store/components/about-team"
-import { AboutStats } from "@/features/store/components/about-stats"
+import { AboutHero } from "@/features/marketing/components/about-hero"
+import { AboutStory } from "@/features/marketing/components/about-story"
+import { AboutValues } from "@/features/marketing/components/about-values"
+import { AboutTeam } from "@/features/marketing/components/about-team"
+import { AboutStats } from "@/features/marketing/components/about-stats"
 
 export default function AboutPage() {
   return (

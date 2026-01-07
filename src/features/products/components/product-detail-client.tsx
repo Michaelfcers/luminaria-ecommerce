@@ -1,7 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import {
   Select,
@@ -18,7 +19,7 @@ import { FileText } from "lucide-react"
 
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
-import { AddToCartButton } from "./add-to-cart-button"
+import { AddToCartButton } from "../../cart/components/add-to-cart-button"
 import { Product, ProductVariant } from "../types"
 
 // A helper function to format attributes for display
@@ -37,14 +38,54 @@ export function ProductDetailClient({
   promotion?: any
   initialImage: string
 }) {
+  const searchParams = useSearchParams()
+  const initialVariantId = searchParams.get("variant")
+
   // Initialize with the first variant, or null if there are no variants
-  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(
-    product.product_variants && product.product_variants.length > 0
+  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(() => {
+    if (initialVariantId && product.product_variants) {
+      const variant = product.product_variants.find(v => v.id === initialVariantId)
+      if (variant) return variant
+    }
+    return product.product_variants && product.product_variants.length > 0
       ? product.product_variants[0]
       : null
-  )
+  })
+
+  // Update effect to handle URL changes if needed, or just initial load
+  // But usually initial state is enough if we link to a fresh page load. 
+  // If we navigate client side, we might need useEffect.
+  useEffect(() => {
+    const variantIdParam = searchParams.get("variant")
+    if (variantIdParam && product.product_variants) {
+      const variant = product.product_variants.find(v => v.id === variantIdParam)
+      if (variant && variant.id !== selectedVariant?.id) {
+        setSelectedVariant(variant)
+        if (variant.localImage) {
+          setCurrentImage(variant.localImage) // Assuming localImage exists on variant based on previous code
+        } else {
+          // Handle image update if no local image?
+          // Existing HandleVariantChange logic:
+          // if (newVariant.localImage) setCurrentImage(newVariant.localImage)
+          // It doesn't handle fallback. Ideally we should.
+        }
+      }
+    }
+  }, [searchParams, product.product_variants]) // Add dependencies
 
   const [currentImage, setCurrentImage] = useState(initialImage)
+
+  // Sync image with selected variant on mount if logic requires
+  useEffect(() => {
+    // If we initialized with a specific variant from URL, we should probably set the image too if it has one.
+    // But `initialImage` is passed from server.
+    if (selectedVariant && selectedVariant.localImage) {
+      setCurrentImage(selectedVariant.localImage)
+    }
+  }, []) // Run once on mount to override server image if variant selected? 
+  // Actually, handleVariantChange updates image.
+  // URL param only sets state. We should also update image.
+
 
   const getActivePromotion = (variant: any) => {
     // ... (existing code)

@@ -10,6 +10,7 @@ import { Grid, List } from "lucide-react"
 // Define a type for the product prop for better type safety
 type Product = {
   id: number | string;
+  productId?: string; // Added to support linking to parent product
   name: string;
   image: string;
   category?: string;
@@ -125,7 +126,15 @@ export function ProductsGrid({ products = [] }: { products: Product[] }) {
               )}
 
               <Button asChild size="sm" className="w-full mt-3">
-                <Link href={`/producto/${product.id}`}>Ver todas las versiones</Link>
+                <Link
+                  href={
+                    product.productId
+                      ? `/producto/${product.productId}?variant=${product.id}`
+                      : `/producto/${product.id}`
+                  }
+                >
+                  Ver Detalle
+                </Link>
               </Button>
             </CardContent>
           </Card>

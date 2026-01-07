@@ -1,7 +1,7 @@
 
 import { createClient } from "@/lib/supabase/server"
-import { ProductsGrid } from "@/features/store/components/products-grid"
-import { ProductFilters } from "@/features/store/components/product-filters"
+import { ProductsGrid } from "@/features/products/components/products-grid"
+import { ProductFilters } from "@/features/products/components/product-filters"
 import { getLocalProductImage } from "@/lib/local-images"
 
 // Define a type for the data structure returned by the Supabase query for products
@@ -13,7 +13,7 @@ type ProductWithRelations = {
   brands: { name: string } | null
   product_media: { url: string; is_primary: boolean }[] | null
   product_categories: { category_id: string }[] | null // Added for filtering
-  product_variants: { code: string }[] | null
+  product_variants: { id: string; code: string; attributes: Record<string, any>; name: string | null }[] | null
 }
 
 // Define a type for the filter items
@@ -52,6 +52,16 @@ export default async function ProductsPage({
     : resolvedSearchParams.brands
       ? resolvedSearchParams.brands.split(",")
       : []
+  const selectedFamilies = Array.isArray(resolvedSearchParams.families)
+    ? resolvedSearchParams.families
+    : resolvedSearchParams.families
+      ? resolvedSearchParams.families.split(",")
+      : []
+  const selectedGroups = Array.isArray(resolvedSearchParams.groups)
+    ? resolvedSearchParams.groups
+    : resolvedSearchParams.groups
+      ? resolvedSearchParams.groups.split(",")
+      : []
 
   // Expand selected categories to include sub-categories
   let idsToFilter = [...selectedCategoryIds]
@@ -76,7 +86,7 @@ export default async function ProductsPage({
       brands ( name ),
       product_media ( url, is_primary ),
       product_categories!inner(category_id),
-      product_variants ( code )
+      product_variants ( id, code, attributes, name )
     `
     )
     .eq("status", "active")
@@ -95,6 +105,89 @@ export default async function ProductsPage({
     console.error("Error fetching products:", productsError)
     // Optionally, render an error state
   }
+
+  // Cast the fetched product data to our new type to ensure type safety
+  const typedProductsData = productsData as ProductWithRelations[] | null
+
+  // Extract Families and Groups from all fetched products (before filtering by them to show all options, 
+  // OR after filtering if we only want to show relevant options. Usually show all or context aware. 
+  // Let's extracting from the CURRENT fetched set might be limited if we filter in DB.
+  // Ideally we should fetch ALL options separately or fetch ALL products then filter in memory for this specific UI requirement ("Show ALL products... and sidebar filters").
+  // The user said "cheque que todos los productos se muestren en pantalla absolutamente todos".
+  // So we should probably fetch ALL active products first, then filter in memory? 
+  // Or fetch attributes definitions separately. 
+  // Since we don't have a separate table, we'll extract from products.
+
+  // However, we are currently filtering by Brand and Category in the DB query.
+  // If we filter, we might hide available families/groups. 
+  // But usually, filters are context-dependent.
+  // Let's proceed with current fetched data which respects Brand/Category filters.
+
+  const familiesSet = new Set<string>()
+  const groupsSet = new Set<string>()
+
+  // Helper to normalize strings (trim)
+  const normalize = (str: string) => str?.trim()
+
+  typedProductsData?.forEach((product) => {
+    product.product_variants?.forEach((variant) => {
+      const attrs = variant.attributes || {}
+      // Check for Familia
+      if (attrs["Familia"]) familiesSet.add(normalize(attrs["Familia"]))
+      if (attrs["Family"]) familiesSet.add(normalize(attrs["Family"]))
+
+      // Check for Grupo
+      if (attrs["Grupo"]) groupsSet.add(normalize(attrs["Grupo"]))
+      if (attrs["Group"]) groupsSet.add(normalize(attrs["Group"]))
+    })
+  })
+
+  const families: FilterItem[] = Array.from(familiesSet)
+    .sort()
+    .map((name) => ({
+      id: name,
+      name: name,
+      count: 0,
+    }))
+
+  const groups: FilterItem[] = Array.from(groupsSet)
+    .sort()
+    .map((name) => ({
+      id: name,
+      name: name,
+      count: 0,
+    }))
+
+
+  // Flatten variants and apply filters
+  const variantsList: { product: ProductWithRelations; variant: any }[] = []
+
+  // Iterate over ALL fetched products to flatten them into variants
+  typedProductsData?.forEach((product) => {
+    product.product_variants?.forEach((variant) => {
+      const attrs = variant.attributes || {}
+      const family = normalize(attrs["Familia"] || attrs["Family"] || "")
+      const group = normalize(attrs["Grupo"] || attrs["Group"] || "")
+
+      // Filter by Family if selected
+      if (selectedFamilies.length > 0 && !selectedFamilies.includes(family)) {
+        return
+      }
+
+      // Filter by Group if selected
+      if (selectedGroups.length > 0 && !selectedGroups.includes(group)) {
+        return
+      }
+
+      // Also filter by category/brand implicitly because we only iterate over fetched products
+      // which are already filtered by brand and category in the DB query.
+
+      variantsList.push({
+        product,
+        variant,
+      })
+    })
+  })
 
   const categoriesForFilter: FilterItem[] =
     allCategories.map((cat) => ({
@@ -119,28 +212,25 @@ export default async function ProductsPage({
       count: 0, // Placeholder
     })) || []
 
-  // Cast the fetched product data to our new type to ensure type safety
-  const typedProductsData = productsData as ProductWithRelations[] | null
 
-  // Transform the data to match the structure expected by ProductsGrid
+
+
+  // Transform the flattened data to match the structure expected by ProductsGrid
   const products = await Promise.all(
-    (typedProductsData || []).map(async (product) => {
+    variantsList.map(async ({ product, variant }) => {
       let imageUrl = "/placeholder-image.jpg"
 
       // Determine the code to use for image lookup
-      let codeToUse = product.code
-      if (!codeToUse && product.product_variants && product.product_variants.length > 0) {
-        codeToUse = product.product_variants[0].code
-      }
+      // Use variant code
+      let codeToUse = variant.code
 
       // Try to get local image first
       const localImage = await getLocalProductImage(codeToUse)
 
-      // console.log(`Product: ${product.name}, Code: ${codeToUse}, LocalImage: ${localImage}`);
-
       if (localImage) {
         imageUrl = localImage
       } else {
+        // Fallback to product primary media if no local variant image
         const primaryMedia = Array.isArray(product.product_media)
           ? product.product_media.find((media) => media.is_primary)
           : null
@@ -154,9 +244,16 @@ export default async function ProductsPage({
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
       const isNew = new Date(product.created_at) > sevenDaysAgo
 
+      // Construct name: Product Name + Variant Name (if available and different)
+      let displayName = product.name
+      if (variant.name && variant.name.trim() !== "" && variant.name !== product.name) {
+        displayName = `${product.name} - ${variant.name}`
+      }
+
       return {
-        id: product.id,
-        name: product.name,
+        id: variant.id, // Unique ID for ProductsGrid key
+        productId: product.id, // Parent Product ID for Link
+        name: displayName,
         image: imageUrl,
         brand: product.brands?.name || "Sin Marca",
         isNew: isNew,
@@ -179,7 +276,12 @@ export default async function ProductsPage({
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Filters Sidebar */}
         <aside className="lg:w-64 flex-shrink-0">
-          <ProductFilters categories={categoriesForFilter} brands={brands} />
+          <ProductFilters
+            categories={categoriesForFilter}
+            brands={brands}
+            families={families}
+            groups={groups}
+          />
         </aside>
 
         {/* Products Grid */}

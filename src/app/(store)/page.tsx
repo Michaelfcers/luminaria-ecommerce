@@ -1,6 +1,6 @@
-import { HeroSection } from "@/features/store/components/hero-section"
-import { BrandsSection } from "@/features/store/components/brands-section"
-import { PromotionsCarousel } from "@/features/store/components/promotions-carousel"
+import { HeroSection } from "@/features/marketing/components/hero-section"
+import { BrandsSection } from "@/features/marketing/components/brands-section"
+import { PromotionsCarousel } from "@/features/marketing/components/promotions-carousel"
 
 export default function HomePage() {
   return (
