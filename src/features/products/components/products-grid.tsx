@@ -15,6 +15,8 @@ type Product = {
   isNew?: boolean;
   rating?: number;
   reviews?: number;
+  price?: number | string | null;
+  description?: string | null;
 };
 
 export function ProductsGrid({ products = [] }: { products: Product[] }) {
@@ -86,11 +88,7 @@ export function ProductsGrid({ products = [] }: { products: Product[] }) {
       )}
 
       {/* Pagination could be added here */}
-      <Flex justify="center" mt="xl">
-        <Button variant="outline" size="lg">
-          Cargar Más Productos
-        </Button>
-      </Flex>
+      
     </Stack>
   )
 }
@@ -120,6 +118,12 @@ function ProductCard({ product }: { product: Product }) {
         </Group>
 
         <Text fw={600} lineClamp={2} style={{ minHeight: 44 }}>{product.name}</Text>
+
+        <Text fw={600} size="md" c="dark.4">
+          {typeof product.price === 'number' 
+            ? `$ ${product.price.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD` 
+            : product.price || 'Precio a consultar'}
+        </Text>
 
         {product.rating && (
           <Group gap={4}>
@@ -169,6 +173,15 @@ function ProductCardList({ product }: { product: Product }) {
               {product.brand && <Badge variant="outline" color="gray" size="sm">{product.brand}</Badge>}
             </Group>
             <Text fw={700} size="lg" mb="xs">{product.name}</Text>
+            
+            <Text fw={600} size="lg" c="dark.4" mb="xs">
+              {typeof product.price === 'number' 
+                ? `$ ${product.price.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD` 
+                : product.price || 'Precio a consultar'}
+            </Text>
+
+            <Text size="sm" c="dimmed" lineClamp={2} mb="md">{product.description}</Text>
+
             {product.rating && (
               <Group gap={4}>
                 <Rating value={product.rating} readOnly size="sm" />

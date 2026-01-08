@@ -3,17 +3,25 @@ import { createClient } from "@/lib/supabase/server"
 import { ProductsGrid } from "@/features/products/components/products-grid"
 import { ProductFilters } from "@/features/products/components/product-filters"
 import { getLocalProductImage } from "@/lib/local-images"
+import Link from "next/link"
 
 // Define a type for the data structure returned by the Supabase query for products
 type ProductWithRelations = {
   id: string
   name: string
   code: string | null
+  description: string | null
   created_at: string
-  brands: { name: string } | null
+  brands: { name: string } | { name: string }[] | null
   product_media: { url: string; is_primary: boolean }[] | null
   product_categories: { category_id: string }[] | null // Added for filtering
-  product_variants: { id: string; code: string; attributes: Record<string, any>; name: string | null }[] | null
+  product_variants: { 
+    id: string; 
+    code: string; 
+    attributes: Record<string, any>; 
+    name: string | null;
+    list_price_usd: number | null;
+  }[] | null
 }
 
 // Define a type for the filter items
@@ -28,8 +36,10 @@ export default async function ProductsPage({
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
-  const resolvedSearchParams = await searchParams
-  const supabase = await createClient()
+  const [resolvedSearchParams, supabase] = await Promise.all([
+    searchParams,
+    createClient()
+  ])
 
   // Fetch all categories to determine hierarchy
   const { data: allCategoriesData, error: categoriesError } = await supabase
@@ -63,6 +73,10 @@ export default async function ProductsPage({
       ? resolvedSearchParams.groups.split(",")
       : []
 
+  // Configuración de paginación (50 por página)
+  const currentPage = Number(resolvedSearchParams.page) || 1
+  const pageSize = 20
+
   // Expand selected categories to include sub-categories
   let idsToFilter = [...selectedCategoryIds]
   selectedCategoryIds.forEach((id) => {
@@ -74,6 +88,9 @@ export default async function ProductsPage({
   // Remove duplicates
   idsToFilter = [...new Set(idsToFilter)]
 
+  // Solo usamos !inner si hay un filtro de categoría activo para no excluir productos sin categoría
+  const categoryJoin = idsToFilter.length > 0 ? "product_categories!inner" : "product_categories"
+
   // Build the Supabase query for products
   let productsQuery = supabase
     .from("products")
@@ -82,12 +99,14 @@ export default async function ProductsPage({
       id,
       name,
       code,
+      description,
       created_at,
       brands ( name ),
       product_media ( url, is_primary ),
-      product_categories!inner(category_id),
-      product_variants ( id, code, attributes, name )
-    `
+      ${categoryJoin}(category_id),
+      product_variants ( id, code, attributes, name, list_price_usd )
+    `,
+    { count: 'exact' }
     )
     .eq("status", "active")
 
@@ -99,95 +118,63 @@ export default async function ProductsPage({
     productsQuery = productsQuery.in("product_categories.category_id", idsToFilter)
   }
 
-  const { data: productsData, error: productsError } = await productsQuery
+  // Aplicar rango de paginación y orden para que los resultados sean consistentes
+  const from = (currentPage - 1) * pageSize
+  const to = from + pageSize - 1
+  productsQuery = productsQuery.range(from, to).order('created_at', { ascending: false })
 
-  if (productsError) {
-    console.error("Error fetching products:", productsError)
-    // Optionally, render an error state
+  // Fetch products and brands in parallel to avoid waterfall
+  const [productsResult, brandsResult] = await Promise.all([
+    productsQuery,
+    supabase.from("brands").select("id, name")
+  ])
+
+  if (productsResult.error) {
+    console.error("Error fetching products:", productsResult.error.message)
   }
 
-  // Cast the fetched product data to our new type to ensure type safety
-  const typedProductsData = productsData as ProductWithRelations[] | null
+  const typedProductsData = (productsResult.data as unknown as ProductWithRelations[]) || []
 
-  // Extract Families and Groups from all fetched products (before filtering by them to show all options, 
-  // OR after filtering if we only want to show relevant options. Usually show all or context aware. 
-  // Let's extracting from the CURRENT fetched set might be limited if we filter in DB.
-  // Ideally we should fetch ALL options separately or fetch ALL products then filter in memory for this specific UI requirement ("Show ALL products... and sidebar filters").
-  // The user said "cheque que todos los productos se muestren en pantalla absolutamente todos".
-  // So we should probably fetch ALL active products first, then filter in memory? 
-  // Or fetch attributes definitions separately. 
-  // Since we don't have a separate table, we'll extract from products.
+  // Lógica de paginación
+  const totalCount = productsResult.count || 0
+  const totalPages = Math.ceil(totalCount / pageSize)
 
-  // However, we are currently filtering by Brand and Category in the DB query.
-  // If we filter, we might hide available families/groups. 
-  // But usually, filters are context-dependent.
-  // Let's proceed with current fetched data which respects Brand/Category filters.
+  const createPageUrl = (pageNumber: number) => {
+    const params = new URLSearchParams()
+    Object.entries(resolvedSearchParams).forEach(([key, value]) => {
+      if (value) params.set(key, Array.isArray(value) ? value.join(",") : String(value))
+    })
+    params.set("page", String(pageNumber))
+    return `?${params.toString()}`
+  }
 
   const familiesSet = new Set<string>()
   const groupsSet = new Set<string>()
-
-  // Helper to normalize strings (trim)
-  const normalize = (str: string) => str?.trim()
-
-  typedProductsData?.forEach((product) => {
-    product.product_variants?.forEach((variant) => {
-      const attrs = variant.attributes || {}
-      // Check for Familia
-      if (attrs["Familia"]) familiesSet.add(normalize(attrs["Familia"]))
-      if (attrs["Family"]) familiesSet.add(normalize(attrs["Family"]))
-
-      // Check for Grupo
-      if (attrs["Grupo"]) groupsSet.add(normalize(attrs["Grupo"]))
-      if (attrs["Group"]) groupsSet.add(normalize(attrs["Group"]))
-    })
-  })
-
-  const families: FilterItem[] = Array.from(familiesSet)
-    .sort()
-    .map((name) => ({
-      id: name,
-      name: name,
-      count: 0,
-    }))
-
-  const groups: FilterItem[] = Array.from(groupsSet)
-    .sort()
-    .map((name) => ({
-      id: name,
-      name: name,
-      count: 0,
-    }))
-
-
-  // Flatten variants and apply filters
   const variantsList: { product: ProductWithRelations; variant: any }[] = []
 
-  // Iterate over ALL fetched products to flatten them into variants
-  typedProductsData?.forEach((product) => {
+  const normalize = (str: any) => (typeof str === 'string' ? str.trim() : "")
+
+  // Single pass to extract filters and flatten variants
+  typedProductsData.forEach((product) => {
     product.product_variants?.forEach((variant) => {
       const attrs = variant.attributes || {}
       const family = normalize(attrs["Familia"] || attrs["Family"] || "")
       const group = normalize(attrs["Grupo"] || attrs["Group"] || "")
 
-      // Filter by Family if selected
-      if (selectedFamilies.length > 0 && !selectedFamilies.includes(family)) {
-        return
+      if (family) familiesSet.add(family)
+      if (group) groupsSet.add(group)
+
+      const familyMatch = selectedFamilies.length === 0 || selectedFamilies.includes(family)
+      const groupMatch = selectedGroups.length === 0 || selectedGroups.includes(group)
+
+      if (familyMatch && groupMatch) {
+        variantsList.push({ product, variant })
       }
-
-      // Filter by Group if selected
-      if (selectedGroups.length > 0 && !selectedGroups.includes(group)) {
-        return
-      }
-
-      // Also filter by category/brand implicitly because we only iterate over fetched products
-      // which are already filtered by brand and category in the DB query.
-
-      variantsList.push({
-        product,
-        variant,
-      })
     })
   })
+
+  const families: FilterItem[] = Array.from(familiesSet).sort().map(name => ({ id: name, name, count: 0 }))
+  const groups: FilterItem[] = Array.from(groupsSet).sort().map(name => ({ id: name, name, count: 0 }))
 
   const categoriesForFilter: FilterItem[] =
     allCategories.map((cat) => ({
@@ -196,17 +183,8 @@ export default async function ProductsPage({
       count: 0, // Placeholder
     })) || []
 
-  // Fetch brands
-  const { data: brandsData, error: brandsError } = await supabase
-    .from("brands")
-    .select("id, name")
-
-  if (brandsError) {
-    console.error("Error fetching brands:", brandsError)
-  }
-
   const brands: FilterItem[] =
-    brandsData?.map((brand) => ({
+    brandsResult.data?.map((brand) => ({
       id: String(brand.id),
       name: brand.name,
       count: 0, // Placeholder
@@ -244,6 +222,11 @@ export default async function ProductsPage({
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
       const isNew = new Date(product.created_at) > sevenDaysAgo
 
+      // Handle brands being either an object or an array of objects (Supabase join behavior)
+      const brandName = Array.isArray(product.brands) 
+        ? product.brands[0]?.name 
+        : (product.brands as { name: string } | null)?.name
+
       // Construct name: Product Name + Variant Name (if available and different)
       let displayName = product.name
       if (variant.name && variant.name.trim() !== "" && variant.name !== product.name) {
@@ -255,8 +238,10 @@ export default async function ProductsPage({
         productId: product.id, // Parent Product ID for Link
         name: displayName,
         image: imageUrl,
-        brand: product.brands?.name || "Sin Marca",
+        brand: brandName || "Sin Marca",
         isNew: isNew,
+        price: variant.list_price_usd, // Enviamos el número puro
+        description: product.description || "", // Enviamos la descripción limpia
       }
     })
   )
@@ -287,6 +272,35 @@ export default async function ProductsPage({
         {/* Products Grid */}
         <div className="flex-1">
           <ProductsGrid products={products} />
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="mt-12 flex justify-center items-center gap-4">
+              <Link
+                href={createPageUrl(currentPage - 1)}
+                className={`px-4 py-2 rounded-md border ${
+                  currentPage <= 1 
+                    ? "pointer-events-none opacity-50 bg-muted" 
+                    : "hover:bg-accent"
+                }`}
+              >
+                Anterior
+              </Link>
+              <span className="text-sm font-medium">
+                Página {currentPage} de {totalPages}
+              </span>
+              <Link
+                href={createPageUrl(currentPage + 1)}
+                className={`px-4 py-2 rounded-md border ${
+                  currentPage >= totalPages 
+                    ? "pointer-events-none opacity-50 bg-muted" 
+                    : "hover:bg-accent"
+                }`}
+              >
+                Siguiente
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </main>
