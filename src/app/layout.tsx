@@ -28,9 +28,14 @@ const dmSans = DM_Sans({
 })
 
 export const metadata: Metadata = {
-  title: "Luminaria",
+  title: "Mikomercio",
   description:
     "Descubre nuestra exclusiva colección de luminarias, lámparas y accesorios eléctricos de alta gama. Diseño minimalista y elegancia premium.",
+  icons: {
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
+    apple: "/favicon.png",
+  }
 }
 
 export default function RootLayout({

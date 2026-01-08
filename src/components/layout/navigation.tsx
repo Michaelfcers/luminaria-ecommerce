@@ -10,6 +10,8 @@ import { useDisclosure } from "@mantine/hooks"
 
 import { CartIcon } from "./cart-icon"
 import { SearchDialog } from "./search-dialog"
+import Image from "next/image"
+import logo from "@/assets/mikomercio/mikomercio-logo.png"
 
 interface NavigationProps {
   userNav: React.ReactNode;
@@ -48,9 +50,8 @@ export function Navigation({ userNav }: NavigationProps) {
           <Burger opened={opened} onClick={toggle} hiddenFrom="md" size="sm" />
 
           {/* Logo */}
-          <Link href="/" onClick={close} style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ width: 32, height: 32, borderRadius: '50%', backgroundColor: 'var(--mantine-color-blue-9)' }}></div>
-            <Text fw={700} size="xl" lh={1}>LUMINARIA</Text>
+          <Link href="/" onClick={close} style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center' }}>
+            <Image src={logo} alt="Luminaria Logo" style={{ height: '48px', width: 'auto', objectFit: 'contain' }} priority />
           </Link>
 
           {/* Desktop Navigation */}

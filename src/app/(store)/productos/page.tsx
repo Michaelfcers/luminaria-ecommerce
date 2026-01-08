@@ -15,10 +15,10 @@ type ProductWithRelations = {
   brands: { name: string } | { name: string }[] | null
   product_media: { url: string; is_primary: boolean }[] | null
   product_categories: { category_id: string }[] | null // Added for filtering
-  product_variants: { 
-    id: string; 
-    code: string; 
-    attributes: Record<string, any>; 
+  product_variants: {
+    id: string;
+    code: string;
+    attributes: Record<string, any>;
     name: string | null;
     list_price_usd: number | null;
   }[] | null
@@ -67,10 +67,16 @@ export default async function ProductsPage({
     : resolvedSearchParams.families
       ? resolvedSearchParams.families.split(",")
       : []
+  /* ... existing code ... */
   const selectedGroups = Array.isArray(resolvedSearchParams.groups)
     ? resolvedSearchParams.groups
     : resolvedSearchParams.groups
       ? resolvedSearchParams.groups.split(",")
+      : []
+  const selectedProductIds = Array.isArray(resolvedSearchParams.products)
+    ? resolvedSearchParams.products
+    : resolvedSearchParams.products
+      ? resolvedSearchParams.products.split(",")
       : []
 
   // Configuración de paginación (50 por página)
@@ -89,7 +95,8 @@ export default async function ProductsPage({
   idsToFilter = [...new Set(idsToFilter)]
 
   // Solo usamos !inner si hay un filtro de categoría activo para no excluir productos sin categoría
-  const categoryJoin = idsToFilter.length > 0 ? "product_categories!inner" : "product_categories"
+  // Si hay filtro de producto, la categoría no debería restringir
+  const categoryJoin = (idsToFilter.length > 0 && selectedProductIds.length === 0) ? "product_categories!inner" : "product_categories"
 
   // Build the Supabase query for products
   let productsQuery = supabase
@@ -106,7 +113,7 @@ export default async function ProductsPage({
       ${categoryJoin}(category_id),
       product_variants ( id, code, attributes, name, list_price_usd )
     `,
-    { count: 'exact' }
+      { count: 'exact' }
     )
     .eq("status", "active")
 
@@ -114,8 +121,14 @@ export default async function ProductsPage({
     productsQuery = productsQuery.in("brand_id", selectedBrandIds)
   }
 
-  if (idsToFilter.length > 0) {
+  // Only filter by category if NO specific product is selected
+  // This allows seeing proper product versions when specifically selected from sidebar
+  if (idsToFilter.length > 0 && selectedProductIds.length === 0) {
     productsQuery = productsQuery.in("product_categories.category_id", idsToFilter)
+  }
+
+  if (selectedProductIds.length > 0) {
+    productsQuery = productsQuery.in("id", selectedProductIds)
   }
 
   // Aplicar rango de paginación y orden para que los resultados sean consistentes
@@ -123,10 +136,37 @@ export default async function ProductsPage({
   const to = from + pageSize - 1
   productsQuery = productsQuery.range(from, to).order('created_at', { ascending: false })
 
-  // Fetch products and brands in parallel to avoid waterfall
-  const [productsResult, brandsResult] = await Promise.all([
+  // Create a separate query for Facets (Filters)
+  // This query determines what "Families" and "Groups" are available based on current Category/Brand selection
+  // It specifically IGNORES the specific selectedProductIds filter and Pagination
+  // This ensures the sidebar filters don't disappear when you select a specific product or change pages.
+  const facetsCategoryJoin = (idsToFilter.length > 0) ? "product_categories!inner" : "product_categories"
+
+  let facetsQuery = supabase
+    .from("products")
+    .select(
+      `
+      id,
+      brand_id,
+      ${facetsCategoryJoin}(category_id),
+      product_variants ( attributes )
+     `
+    )
+    .eq("status", "active")
+
+  if (selectedBrandIds.length > 0) {
+    facetsQuery = facetsQuery.in("brand_id", selectedBrandIds)
+  }
+
+  if (idsToFilter.length > 0) {
+    facetsQuery = facetsQuery.in("product_categories.category_id", idsToFilter)
+  }
+
+  // Fetch products, brands, and FACETS in parallel
+  const [productsResult, brandsResult, facetsResult] = await Promise.all([
     productsQuery,
-    supabase.from("brands").select("id, name")
+    supabase.from("brands").select("id, name"),
+    facetsQuery
   ])
 
   if (productsResult.error) {
@@ -155,15 +195,31 @@ export default async function ProductsPage({
   const normalize = (str: any) => (typeof str === 'string' ? str.trim() : "")
 
   // Single pass to extract filters and flatten variants
-  typedProductsData.forEach((product) => {
-    product.product_variants?.forEach((variant) => {
+  // Use the FACETS result to populate the filters
+  // This ensures we show all available Families/Groups for the category/brand, 
+  // not just the ones for the specific product selected.
+  const facetsData = (facetsResult.data as any[]) || []
+
+  facetsData.forEach((product) => {
+    product.product_variants?.forEach((variant: any) => {
       const attrs = variant.attributes || {}
       const family = normalize(attrs["Familia"] || attrs["Family"] || "")
       const group = normalize(attrs["Grupo"] || attrs["Group"] || "")
 
       if (family) familiesSet.add(family)
       if (group) groupsSet.add(group)
+    })
+  })
 
+  // We still need to iterate over the GRID products to flatten them for display, 
+  // but we don't use them for building the filter list anymore.
+  typedProductsData.forEach((product) => {
+    product.product_variants?.forEach((variant) => {
+      const attrs = variant.attributes || {}
+      const family = normalize(attrs["Familia"] || attrs["Family"] || "")
+      const group = normalize(attrs["Grupo"] || attrs["Group"] || "")
+
+      // We check if this variant matches selected filters to show in grid
       const familyMatch = selectedFamilies.length === 0 || selectedFamilies.includes(family)
       const groupMatch = selectedGroups.length === 0 || selectedGroups.includes(group)
 
@@ -173,6 +229,7 @@ export default async function ProductsPage({
     })
   })
 
+  // Sort and Map final filter lists
   const families: FilterItem[] = Array.from(familiesSet).sort().map(name => ({ id: name, name, count: 0 }))
   const groups: FilterItem[] = Array.from(groupsSet).sort().map(name => ({ id: name, name, count: 0 }))
 
@@ -223,8 +280,8 @@ export default async function ProductsPage({
       const isNew = new Date(product.created_at) > sevenDaysAgo
 
       // Handle brands being either an object or an array of objects (Supabase join behavior)
-      const brandName = Array.isArray(product.brands) 
-        ? product.brands[0]?.name 
+      const brandName = Array.isArray(product.brands)
+        ? product.brands[0]?.name
         : (product.brands as { name: string } | null)?.name
 
       // Construct name: Product Name + Variant Name (if available and different)
@@ -278,11 +335,10 @@ export default async function ProductsPage({
             <div className="mt-12 flex justify-center items-center gap-4">
               <Link
                 href={createPageUrl(currentPage - 1)}
-                className={`px-4 py-2 rounded-md border ${
-                  currentPage <= 1 
-                    ? "pointer-events-none opacity-50 bg-muted" 
-                    : "hover:bg-accent"
-                }`}
+                className={`px-4 py-2 rounded-md border ${currentPage <= 1
+                  ? "pointer-events-none opacity-50 bg-muted"
+                  : "hover:bg-accent"
+                  }`}
               >
                 Anterior
               </Link>
@@ -291,11 +347,10 @@ export default async function ProductsPage({
               </span>
               <Link
                 href={createPageUrl(currentPage + 1)}
-                className={`px-4 py-2 rounded-md border ${
-                  currentPage >= totalPages 
-                    ? "pointer-events-none opacity-50 bg-muted" 
-                    : "hover:bg-accent"
-                }`}
+                className={`px-4 py-2 rounded-md border ${currentPage >= totalPages
+                  ? "pointer-events-none opacity-50 bg-muted"
+                  : "hover:bg-accent"
+                  }`}
               >
                 Siguiente
               </Link>
