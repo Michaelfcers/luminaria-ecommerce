@@ -3,7 +3,7 @@ import { notFound, redirect } from "next/navigation"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/server"
 import { LinkButton } from "@/components/link-button";
-import { Button, Card, Badge, Title, Text, Group, Stack, Grid, Image } from "@mantine/core"
+import { Button, Card, Badge, Title, Text, Group, Stack, Grid, Image, GridCol, CardSection } from "@mantine/core"
 import { getLocalProductImage } from "@/lib/local-images"
 import { IconEdit, IconPackage, IconTag, IconArrowLeft, IconPlus } from "@tabler/icons-react"
 
@@ -77,7 +77,7 @@ id,
 
       <Grid gutter="lg">
         {enrichedVariants.map((variant: any) => (
-          <Grid.Col key={variant.id} span={{ base: 12, md: 6, lg: 4, xl: 3 }}>
+          <GridCol key={variant.id} span={{ base: 12, md: 6, lg: 4, xl: 3 }}>
             <Card
               withBorder
               radius="lg"
@@ -85,7 +85,7 @@ id,
               style={{ transition: 'all 0.3s', cursor: 'pointer', height: '100%', display: 'flex', flexDirection: 'column' }}
               padding="md"
             >
-              <Card.Section>
+              <CardSection>
                 <div style={{ position: 'relative', overflow: 'hidden', aspectRatio: '1/1' }}>
                   <Image
                     src={variant.imageUrl}
@@ -105,7 +105,7 @@ id,
                     </Badge>
                   </div>
                 </div>
-              </Card.Section>
+              </CardSection>
 
               <Stack gap="sm" mt="md" flex={1}>
                 <Title order={4} lineClamp={1}>{variant.name || "Sin Nombre"}</Title>
@@ -147,7 +147,7 @@ id,
                 Editar Versión
               </LinkButton>
             </Card >
-          </Grid.Col >
+          </GridCol >
         ))}
       </Grid >
 
