@@ -1,5 +1,6 @@
 
-import { Button, Card, Table, Title, Text, Group, Stack, Badge, ActionIcon, Container, Avatar } from "@mantine/core";
+import { Suspense } from "react";
+import { Card, Table, Title, Text, Group, Stack, Badge, Avatar, Skeleton } from "@mantine/core";
 import { DeleteProductButton } from "@/features/admin/components/delete-product-button";
 import { LinkButton } from "@/components/link-button";
 import { createClient } from "@/lib/supabase/server";
@@ -7,32 +8,79 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getLocalProductImage } from "@/lib/local-images";
 import { IconPackage, IconPlus } from "@tabler/icons-react";
+import { ProductSearch } from "./product-search";
 
-export default async function ProductsPage() {
-  const supabase = await createClient()
+// Definición de tipos para mejorar el rendimiento y eliminar @ts-ignore
+interface ProductVariant {
+  code: string;
+}
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) {
-    redirect("/login")
-  }
+interface ProductWithRelations {
+  id: string;
+  name: string;
+  code: string | null;
+  status: string;
+  stock: number;
+  brands: { name: string } | null;
+  product_media: { url: string }[] | null;
+  product_variants: ProductVariant[] | null;
+  promotion_products: { promotions: { status: string } }[] | null;
+}
 
-  // Fetch the user's store_id from the store_members table
-  const { data: storeMembers, error: storeMemberError } = await supabase
+export default async function ProductsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
+  return (
+    <Stack gap="lg" p="md">
+      <Group justify="space-between">
+        <Title order={1}>Gestión de Productos</Title>
+        <Group>
+          <LinkButton href="/dashboard" variant="default">Dashboard</LinkButton>
+          <LinkButton href="/products/create" leftSection={<IconPlus size={16} />}>Crear Nuevo Producto</LinkButton>
+        </Group>
+      </Group>
+
+      <Suspense fallback={<ProductTableSkeleton />}>
+        <ProductList searchParams={searchParams} />
+      </Suspense>
+    </Stack>
+  )
+}
+
+async function ProductList({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
+  const [resolvedSearchParams, supabase] = await Promise.all([searchParams, createClient()])
+
+  // Optimizamos: Obtenemos usuario y su tienda en paralelo o de forma más directa
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect("/login")
+
+  const { data: storeMember } = await supabase
     .from("store_members")
     .select("store_id")
     .eq("user_id", user.id)
+    .single() // .single() es más rápido que .select() si esperamos un solo resultado
 
-  if (storeMemberError || !storeMembers || storeMembers.length === 0) {
-    console.error("Error fetching user's store:", storeMemberError)
-    return <div>Error: No se pudo determinar la tienda del usuario.</div>
+  if (!storeMember) {
+    return <Text c="red">Error: No se pudo determinar la tienda del usuario.</Text>
   }
 
-  const store_id = storeMembers[0].store_id
-  console.log("Determined store ID for user:", store_id)
+  const store_id = storeMember.store_id
 
-  const { data: productsData, error } = await supabase
+  const query = typeof resolvedSearchParams.q === 'string' ? resolvedSearchParams.q : undefined
+
+  // Configuración de paginación
+  const currentPage = Number(resolvedSearchParams.page) || 1
+  const pageSize = 25
+  const from = (currentPage - 1) * pageSize
+  const to = from + pageSize - 1
+
+  let productsQuery = supabase
     .from("products")
     .select(
       `
@@ -53,40 +101,38 @@ export default async function ProductsPage() {
             type
         )
       )
-    `
+    `,
+    { count: 'exact' }
     )
     .eq("store_id", store_id) // Filter by store_id
-    .is("deleted_at", null) // Fetch only non-deleted products
+    .is("deleted_at", null)
 
-  if (error) {
-    console.error("Error fetching products:", error)
-    // Handle error state appropriately
-    return <div>Error loading products.</div>
+  if (query) {
+    productsQuery = productsQuery.or(`name.ilike.%${query}%,code.ilike.%${query}%`)
   }
 
-  // Enrich products with images
-  const products = await Promise.all((productsData || []).map(async (product) => {
+  const { data: productsData, error, count } = await (productsQuery as any)
+    .range(from, to)
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    return <Text c="red">Error al cargar productos.</Text>
+  }
+
+  // Enriquecimiento de imágenes optimizado
+  const products = await Promise.all(((productsData as unknown as ProductWithRelations[]) || []).map(async (product) => {
     let imageUrl = "/placeholder-image.jpg"
+    
+    // Prioridad: Código de producto > Código de primera variante
+    const codeToUse = product.code || product.product_variants?.[0]?.code
 
-    // Determine the code to use for image lookup
-    let codeToUse = product.code
-    // @ts-ignore
-    if (!codeToUse && product.product_variants && product.product_variants.length > 0) {
-      // @ts-ignore
-      codeToUse = product.product_variants[0].code
-    }
-
-    // Try to get local image first
+    // getLocalProductImage suele ser el punto lento si hace I/O
     const localImage = await getLocalProductImage(codeToUse)
 
     if (localImage) {
       imageUrl = localImage
     } else {
-      // @ts-ignore
-      if (product.product_media && product.product_media.length > 0) {
-        // @ts-ignore
-        imageUrl = product.product_media[0].url
-      }
+      imageUrl = product.product_media?.[0]?.url || imageUrl
     }
 
     return {
@@ -96,25 +142,23 @@ export default async function ProductsPage() {
   }))
 
   return (
-    <Stack gap="lg" p="md">
-      <Group justify="space-between">
-        <Title order={1}>Gestión de Productos</Title>
-        <Group>
-          <LinkButton href="/dashboard" variant="default">Dashboard</LinkButton>
-          <LinkButton href="/products/create" leftSection={<IconPlus size={16} />}>Crear Nuevo Producto</LinkButton>
-        </Group>
-      </Group>
-
-      <Card withBorder radius="lg" padding="lg">
-        <Stack gap="md">
+    <Card withBorder radius="lg" padding="lg">
+      <Stack gap="md">
+        <Group justify="space-between" align="flex-start">
           <div>
             <Title order={3}>Listado de Productos</Title>
             <Text c="dimmed" size="sm">Administra los productos de tu tienda.</Text>
           </div>
+          <ProductSearch />
+        </Group>
+
+        {products.length === 0 ? (
+          <Text c="dimmed" ta="center" py="xl">No se encontraron productos.</Text>
+        ) : (
           <Table highlightOnHover>
             <thead>
               <tr>
-                <th>Imagen</th>
+                <th style={{ width: 60 }}>Imagen</th>
                 <th>Nombre</th>
                 <th>Marca</th>
                 <th>Estado</th>
@@ -131,14 +175,10 @@ export default async function ProductsPage() {
                     </Avatar>
                   </td>
                   <td style={{ fontWeight: 500 }}>{product.name}</td>
-                  <td>
-                    {/* @ts-ignore */}
-                    {product.brands?.name || "N/A"}
-                  </td>
+                  <td>{product.brands?.name || "N/A"}</td>
                   <td>
                     <Group gap="xs">
-                      {/* @ts-ignore */}
-                      {product.promotion_products?.some((pp: any) => pp.promotions?.status === 'active') && (
+                      {product.promotion_products?.some(pp => pp.promotions?.status === 'active') && (
                         <Badge color="pink" variant="light">Oferta</Badge>
                       )}
                       <Badge color={product.status === 'active' ? 'green' : 'gray'}>{product.status}</Badge>
@@ -160,8 +200,62 @@ export default async function ProductsPage() {
               ))}
             </tbody>
           </Table>
-        </Stack>
-      </Card>
-    </Stack>
+        )}
+
+        <PaginationControls 
+          currentPage={currentPage} 
+          totalCount={count || 0} 
+          pageSize={pageSize} 
+          searchParams={resolvedSearchParams} 
+        />
+      </Stack>
+    </Card>
+  )
+}
+
+interface PaginationProps {
+  currentPage: number;
+  totalCount: number;
+  pageSize: number;
+  searchParams: Record<string, any>;
+}
+
+function PaginationControls({ currentPage, totalCount, pageSize, searchParams }: PaginationProps) {
+  const totalPages = Math.ceil(totalCount / pageSize)
+  if (totalPages <= 1) return null
+
+  const createPageUrl = (pageNumber: number) => {
+    const params = new URLSearchParams()
+    Object.entries(searchParams).forEach(([key, value]) => {
+      if (value) params.set(key, Array.isArray(value) ? value.join(",") : String(value))
+    })
+    params.set("page", String(pageNumber))
+    return `?${params.toString()}`
+  }
+
+  return (
+    <Group justify="center" mt="xl">
+      <LinkButton href={createPageUrl(currentPage - 1)} variant="default" disabled={currentPage <= 1}>
+        Anterior
+      </LinkButton>
+      <Text size="sm" fw={500}>Página {currentPage} de {totalPages}</Text>
+      <LinkButton href={createPageUrl(currentPage + 1)} variant="default" disabled={currentPage >= totalPages}>
+        Siguiente
+      </LinkButton>
+    </Group>
+  )
+}
+
+function ProductTableSkeleton() {
+  return (
+    <Card withBorder radius="lg" padding="lg">
+      <Stack gap="md">
+        <Group justify="space-between">
+          <Skeleton h={40} w={200} />
+          <Skeleton h={40} w={300} />
+        </Group>
+        <Skeleton h={400} w="100%" />
+      </Stack>
+    </Card>
   )
 }
