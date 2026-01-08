@@ -76,7 +76,7 @@ async function ProductList({
 
   // Configuración de paginación
   const currentPage = Number(resolvedSearchParams.page) || 1
-  const pageSize = 25
+  const pageSize = 20
   const from = (currentPage - 1) * pageSize
   const to = from + pageSize - 1
 
